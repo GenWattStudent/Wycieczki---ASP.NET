@@ -1,0 +1,38 @@
+@using Book.App.ViewModels
+@model TourViewModel
+
+@{
+    ViewData["Title"] = "Add Tour";
+}
+
+<div>
+    @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <label for="name">Name</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="description">Description</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description..." })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="price">Price</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1" })
+            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="image">Image</label>
+        <div class="input-group mt-1">
+            <input class="form-control" type="file" name="image" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
+        </div>
+        <div class="d-flex flex-column">
+            <img class="img-fluid mt-3" style="max-height: 30rem; object-fit: contain;" id="ImgPreview" src="">
+            <input class="btn btn-primary mt-3" type="submit" value="Submit">
+        </div>
+    }
+</div>

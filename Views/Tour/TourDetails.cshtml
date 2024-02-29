@@ -1,0 +1,23 @@
+@using Book.App.ViewModels
+@model TourViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="card">
+    <img class="card-img-top" src="@Model.ImageUrl" alt="@Model.Name">
+    <div class="card-body">
+        <h1 class="card-title mt-2">@Model.Name</h1>
+
+        <div class="">
+            <p class="card-text">@Model.Description</p>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-primary">Book</button>
+            <strong class="text-danger h3 m-0">@Model.Price zł</strong>
+        </div>
+    </div>
+
+</section>
