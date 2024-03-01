@@ -1,0 +1,42 @@
+@using Book.App.Models
+@model RegisterModel
+
+@{
+    ViewData["Title"] = "BOOKMANIA - Register";
+    Layout = "~/Views/Shared/_UserAuthLayout.cshtml";
+}
+
+
+<div>
+    <header class="container mt-4 d-flex align-items-center gap-2">
+        <img src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
+        <h1>Register To <strong class="text-primary">Bookmania</strong></h1>
+    </header>
+    
+    @using (Html.BeginForm("Register", "User", FormMethod.Post))
+    {
+        <label for="Username">Username</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
+            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="Password">Password</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.PasswordFor(model => model.Password, new { @class = "form-control w-100", placeholder = "Your password...", })
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="ConfirmPassword">Confirm Password</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control w-100", placeholder = "Confirm your password...", })
+            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <a href="@Url.Action("Login", "User")" class="mt-2">Already have an account? Login</a>
+
+        <div class="input-group mt-3">
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+        </div>
+    }
+</div>

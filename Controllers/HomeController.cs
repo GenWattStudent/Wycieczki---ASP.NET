@@ -1,9 +1,13 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Book.App.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Book.App.ViewModels;
 
 namespace Book.App.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -15,7 +19,13 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        ClaimsData claimsData = new ClaimsData
+        {
+            Name = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
+            Role = User.FindFirst(ClaimTypes.Role) != null ? (Role)Enum.Parse(typeof(Role), User.FindFirst(ClaimTypes.Role)?.Value) : Role.User
+        };
+
+        return View(claimsData);
     }
 
     public IActionResult Privacy()

@@ -12,34 +12,44 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-primary border-bottom box-shadow mb-3">
+        <nav
+            class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-primary border-bottom box-shadow mb-3 d-block">
             <div class="container-fluid">
                 <a class="navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
                     asp-action="Index">
                     <img class="rounded me-2" style="width: 50px;height:50px;" src="~/images/th.jpeg" alt="logo" />
                     Bookmania
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
+
+                <div class="d-flex align-items-center">
+                    <partial name="_UserPartial" />
+                </div>
+            </div>
+            <div class="collapse justify-content-between container-fluid">
+                <ul class="navbar-nav flex-row">
+                    <li class="nav-item pe-2">
+                        <a class="nav-link text-light pl-0" asp-area="" asp-controller="Home"
+                            asp-action="Index">Home</a>
+                    </li>
+                    @if (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin")
+                    {
+                        <li class="nav-item  pe-2">
                             <a class="nav-link text-light" asp-area="" asp-controller="Tour" asp-action="AddTour">
                                 Add Tour
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Tour" asp-action="Tours">
-                                Tours
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                    }
+                    <li class="nav-item pe-2">
+                        <a class="nav-link text-light" asp-area="" asp-controller="Tour" asp-action="Tours">
+                            Tours
+                        </a>
+                    </li>
+                    <li class="nav-item pe-2">
+                        <a class="nav-link text-light" asp-area="" asp-controller="Book" asp-action="Index">
+                            Your Book Tours
+                        </a>
+                    </li>
+                </ul>
             </div>
         </nav>
     </header>

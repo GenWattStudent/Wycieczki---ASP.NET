@@ -17,10 +17,11 @@ public class TourController : Controller
         _tourService = tourService;
     }
 
-    public IActionResult Tours()
+    public async Task<IActionResult> Tours()
     {
         _logger.LogInformation("Getting all tours");
-        return View(_tourService.GetTours());
+        var tours = await _tourService.GetTours();
+        return View(tours);
     }
 
     public IActionResult AddTour()
@@ -29,7 +30,7 @@ public class TourController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddTour(string name, string description, decimal price, IFormFile image)
+    public async Task<IActionResult> AddTour(string name, string description, decimal price, IFormFile image)
     {
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) || price <= 0)
         {
@@ -43,23 +44,22 @@ public class TourController : Controller
             _tourService.SaveImage(image, out imageUrl);
         }
 
-        var tour = new TourViewModel
+        var tour = new TourModel
         {
-            Id = _tourService.GetTours().Max(t => t.Id) + 1,
             Name = name,
             Description = description,
             ImageUrl = imageUrl,
             Price = price
         };
 
-        _tourService.AddTour(tour);
+        await _tourService.AddTour(tour);
 
         return RedirectToAction("Tours");
     }
 
-    public IActionResult TourDetails(int id)
+    public async Task<IActionResult> TourDetails(int id)
     {
-        var tour = _tourService.GetTour(id);
+        var tour = await _tourService.GetTour(id);
         if (tour == null)
         {
             return NotFound();
@@ -67,9 +67,9 @@ public class TourController : Controller
         return View(tour);
     }
 
-    public IActionResult DeleteTour(int id)
+    public async Task<IActionResult> DeleteTour(int id)
     {
-        var tour = _tourService.GetTour(id);
+        var tour = await _tourService.GetTour(id);
         if (tour == null)
         {
             return NotFound();
@@ -80,7 +80,7 @@ public class TourController : Controller
             _tourService.RemoveImage(tour.ImageUrl);
         }
 
-        _tourService.DeleteTour(id);
+        await _tourService.DeleteTour(id);
 
         return RedirectToAction("Tours");
     }

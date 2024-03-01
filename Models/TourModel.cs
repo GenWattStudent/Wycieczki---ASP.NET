@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Book.App.ViewModels;
+namespace Book.App.Models;
 
-public class TourViewModel
+public class TourModel
 {
+    [Key]
     public int Id { get; set; }
     [Required]
     [StringLength(100)]
@@ -18,4 +19,3 @@ public class TourViewModel
     [Range(1, 10000)]
     public decimal Price { get; set; }
 }
-

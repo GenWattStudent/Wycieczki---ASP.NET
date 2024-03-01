@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Identity
+
+@{
+    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+}
+
+<div class="d-flex gap-2">
+    <a asp-action="UserInfo" asp-controller="User">
+        <strong class="text-light m-0">@userName</strong>
+    </a>
+    <span class="devider-x"></span>
+    <a asp-action="Logout" asp-controller="User">
+        <strong class="text-light m-0">Logout</strong>
+    </a>
+    <span class="devider-x"></span>
+</div>

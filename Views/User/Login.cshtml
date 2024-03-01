@@ -1,0 +1,35 @@
+@using Book.App.Models
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Login - To Bookmania";
+    Layout = "~/Views/Shared/_UserAuthLayout.cshtml";
+}
+
+
+<div>
+    <header class="container mt-4 d-flex align-items-center gap-2">
+        <img src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
+        <h1>Login To <strong class="text-primary">Bookmania</strong></h1>
+    </header>
+    @using (Html.BeginForm("Login", "User", FormMethod.Post))
+    {
+        <label for="Username">Username</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(m => m.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
+            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+        </div>
+
+        <label for="Password">Password</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control w-100", placeholder = "Your password...", })
+            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+        </div>
+
+        <a href="@Url.Action("Register", "User")" class="mt-2">Don't have an account? Register here</a>
+
+        <div class="input-group mt-3">
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </div>
+    }
+</div>

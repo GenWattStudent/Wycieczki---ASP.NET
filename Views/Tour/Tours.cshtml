@@ -1,8 +1,22 @@
 @{
     ViewData["Title"] = "Tours";
 }
-@using Book.App.ViewModels
-@model List<TourViewModel>
+@using Book.App.Models
+@model List<TourModel>
+
+@{
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+
+@if (Model.Count == 0)
+{
+    <h3>No tours available</h3>
+}
+else
+{
+    <h5 class="text-muted">Available @Model.Count tour(s)</h5>
+}
 
 <ul class="d-flex flex-wrap gap-3 p-0 justify-content-center">
     @foreach (var tour in Model)
@@ -12,11 +26,14 @@
             <div class="card-body d-flex flex-column">
                 <div class="d-flex justify-content-between">
                     <h2 class="card-title">@tour.Name</h2>
-                    @using (Html.BeginForm("DeleteTour", "Tour", new { id = tour.Id }, FormMethod.Post))
+                    @if (role == "Admin")
                     {
-                        <button data-toggle="tooltip" data-placement="top" title="Delete @tour.Name tour" class="btn p-0">
-                            <ion-icon name="trash-outline"></ion-icon>
-                        </button>
+                        @using (Html.BeginForm("DeleteTour", "Tour", new { id = tour.Id }, FormMethod.Post))
+                        {
+                            <button data-toggle="tooltip" data-placement="top" title="Delete @tour.Name tour" class="btn p-0">
+                                <ion-icon name="trash-outline"></ion-icon>
+                            </button>
+                        }
                     }
                 </div>
                 <p class="card-text">@tour.Description</p>

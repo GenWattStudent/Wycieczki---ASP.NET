@@ -1,12 +1,12 @@
-@using Book.App.ViewModels
-@model TourViewModel
+@using Book.App.Models
+@model TourModel
 
 @{
     ViewData["Title"] = Model.Name;
 }
 
 <section class="card">
-    <img class="card-img-top" src="@Model.ImageUrl" alt="@Model.Name">
+    <img class="card-img-top" style="max-height: 30rem; object-fit: contain;" src="@Model.ImageUrl" alt="@Model.Name">
     <div class="card-body">
         <h1 class="card-title mt-2">@Model.Name</h1>
 
