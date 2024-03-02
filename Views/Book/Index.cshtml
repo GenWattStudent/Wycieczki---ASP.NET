@@ -1,14 +1,49 @@
+@using Book.App.ViewModels
+@model ToursViewModel
+
 @{
     ViewData["Title"] = "Your tours";
 }
 
-<h1>Your trips: </h1>
-@*
-@if (Model.Count() == 0)
+<h1 class="text-uppercase">Your tours</h1>
+
+@if (Model.Tours.Count() == 0)
 {
-<p>You have no trips yet.</p>
+    <p>You have no trips yet.</p>
+    <a asp-action="Tours" asp-controller="Tour">
+        <button class="btn btn-primary">
+            Book a trip
+        </button>
+    </a>
 }
 else
 {
-
-} *@
+    <ul class="list-group">
+        @foreach (var tour in Model.Tours)
+        {
+            <li class="list-group-item">
+                <div class="d-flex gap-2">
+                    <img class="img-thumbnail" src="@tour.ImageUrl" alt="@tour.Name">
+                    <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
+                        asp-route-id="@tour.Id">
+                        <h2>@tour.Name</h2>
+                    </a>
+                </div>
+                <p class="mt-2">@tour.Description</p>
+                <div class="d-flex gap-2">
+                    <a asp-action="Details" asp-controller="Book" asp-route-id="@tour.Id">
+                        <button class="btn btn-primary">
+                            Details
+                        </button>
+                    </a>
+                    <form asp-action="Delete" asp-controller="Book" method="post">
+                        <input type="hidden" name="id" value="@tour.Id" />
+                        <button class="btn btn-danger">
+                            Cancel this trip
+                        </button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+}

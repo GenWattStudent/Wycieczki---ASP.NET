@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +21,16 @@ var tokenValidationParameters = new TokenValidationParameters
 };
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddJsonOptions(options =>
+{
+
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+
+});
 builder.Services.AddTransient<TourService>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<TokenService>();
+builder.Services.AddTransient<BookService>();
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

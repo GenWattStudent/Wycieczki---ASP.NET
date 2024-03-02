@@ -26,13 +26,204 @@
             @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
         </div>
 
+        <label for="maxUsers">Max People</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
+            @Html.ValidationMessageFor(model => model.MaxUsers, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="startDate">Start Date</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm"), value = DateTime.Now.ToString("yyyy-MM-ddTHH:mm")})
+            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="endDate">End Date</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm"), value = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+            @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
         <label for="image">Image</label>
         <div class="input-group mt-1">
             <input class="form-control" type="file" name="image" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
         </div>
-        <div class="d-flex flex-column">
+
+        <div class="d-flex justify-content-center">
             <img class="img-fluid mt-3" style="max-height: 30rem; object-fit: contain;" id="ImgPreview" src="">
+        </div>
+
+         @Html.Hidden("waypoints", "", new { id = "waypoints" })
+        
+        <strong class="mt-3 d-block">Click on the map to add waypoints</strong>
+
+        <div id="waypoint-form" class="mt-2"></div>
+
+        <div id="map" class="mt-4 rounded"></div>
+        <div class="d-flex flex-column">
             <input class="btn btn-primary mt-3" type="submit" value="Submit">
         </div>
     }
 </div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let waypoints = []
+
+    function createWayPointPopup(title, description, image, id) {
+        return `
+            <div>
+                <h4>${title}</h4>
+                <p>${description}</p>
+                ${image ? `<img class="img-fluid" src="${image}" /> `: ""}
+                <button type="button" class="btn btn-primary mt-2" onclick="removeWayPoint(${id})">Remove</button>
+            </div>
+        `
+    }
+
+    function removeWayPoint(id) {
+        const waypoint = waypoints.find(w => w.id === id)
+
+        if (waypoint) {
+            map.removeLayer(waypoint.marker)
+            waypoints = waypoints.filter(w => w.id !== id)
+        }
+
+        connectWaypointsWithLine()
+    }   
+
+    function createWaypointData(lat, lng, marker) {
+        return {
+            lat: lat,
+            lng: lng,
+            marker: marker,
+            name: `Waypoint ${waypoints.length + 1}`,
+            description: "Simple description :)",
+            image: null,
+            id: Date.now()
+        }
+    }
+
+    function createWaypointForm(waypointData) {
+        return `
+            <div>
+                <label for="waypoint-title">Title</label>
+                <div class="input-group mt-1">
+                    <input class="form-control w-100" type="text" id="waypoint-title" value="${waypointData.name}" />
+                </div>
+                <label for="waypoint-description">Description</label>
+                <div class="input-group mt-1">
+                    <textarea class="form-control w-100" id="waypoint-description">${waypointData.description}</textarea>
+                </div>
+                <label for="waypoint-image">Image</label>
+                <input class="form-control w-100" type="file" id="waypoint-image" />
+                <button type="button" class="btn btn-primary mt-2" onclick="updateWaypoint(${waypointData.id})">Update</button>
+            </div>
+        `
+    }
+
+    function createSubmitData(waypointData) {
+        return new Promise((resolve, reject) => {
+            if (waypointData.image) {
+                const reader = new FileReader();
+                reader.readAsDataURL(waypointData.image);
+                reader.onload = () => {
+                    resolve({
+                        lat: waypointData.lat,
+                        lng: waypointData.lng,
+                        name: waypointData.name,
+                        description: waypointData.description,
+                        image: reader.result
+                    });
+                };
+                reader.onerror = reject;
+            } else {
+                resolve({
+                    lat: waypointData.lat,
+                    lng: waypointData.lng,
+                    name: waypointData.name,
+                    description: waypointData.description,
+                    image: null
+                });
+            }
+        });
+    }
+
+    function updateWaypoint(id) {
+        const waypoint = waypoints.find(w => w.id === id)
+
+        if (waypoint) {
+            const title = document.getElementById('waypoint-title').value
+            const description = document.getElementById('waypoint-description').value
+            const image = document.getElementById('waypoint-image').files[0]
+            const waypointsEl = document.getElementById('waypoints')
+
+            waypoint.name = title
+            waypoint.description = description
+            waypoint.image = image
+
+            const imageUrl = image ? URL.createObjectURL(image) : null 
+
+            waypoint.marker
+                .bindPopup(createWayPointPopup(title, description, imageUrl, id))
+                .openPopup()
+
+            Promise.all(waypoints.map(createSubmitData)).then(submitData => {
+                waypointsEl.value = JSON.stringify(submitData);
+            })
+        }
+    }
+
+    function selectWaypoint(waypointData) {
+        const form = createWaypointForm(waypointData)
+        document.getElementById('waypoint-form').innerHTML = form
+    }
+
+    function clearLines() {
+        map.eachLayer((layer) => {
+            if (layer instanceof L.Polyline) {
+                map.removeLayer(layer)
+            }
+        })
+    }
+
+    function connectWaypointsWithLine() {
+        clearLines()
+        const latlngs = waypoints.map(w => [w.lat, w.lng])
+        const polyline = L.polyline(latlngs, { color: 'red' }).addTo(map)
+    }
+
+    function addWayPoint(e) {
+        console.log(e.latlng)
+        const marker = L.marker(e.latlng, { draggable: true }).addTo(map)
+        const waypointData = createWaypointData(e.latlng.lat, e.latlng.lng, marker)
+        const waypointsEl = document.getElementById('waypoints')
+
+        marker
+            .bindPopup(createWayPointPopup(waypointData.name, waypointData.description, waypointData.image, waypointData.id))
+            .openPopup()
+            .on('click', () => selectWaypoint(waypointData))
+            .on('dragend', (e) => {
+                waypointData.lat = e.target._latlng.lat
+                waypointData.lng = e.target._latlng.lng
+                connectWaypointsWithLine()
+            })
+
+        waypoints.push(waypointData)
+        Promise.all(waypoints.map(createSubmitData)).then(submitData => {
+            console.log(submitData)
+            waypointsEl.value = JSON.stringify(submitData);
+        })
+
+        connectWaypointsWithLine()
+    }
+
+    map.on('click', addWayPoint)
+</script>

@@ -10,5 +10,6 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<TourModel> Tours { get; set; }
     public DbSet<UserModel> Users { get; set; }
+    public DbSet<WaypointModel> Waypoints { get; set; }
 
 }

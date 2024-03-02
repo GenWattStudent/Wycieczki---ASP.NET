@@ -25,8 +25,17 @@ body {
   margin-bottom: 60px;
 }
 
-.devider-x {
+.devider-y {
   border-right: 3px solid #e5e5e5;
+}
+
+.devider-x {
+  border-bottom: 3px solid #525252;
+}
+
+.dash {
+  border-top: 3px dashed #525252c1;
+  width: 0.6rem;
 }
 
 .nav-item {
@@ -35,4 +44,8 @@ body {
 
 .nav-item:hover {
   translate: 0 -3px;
+}
+
+#map {
+  height: 400px;
 }

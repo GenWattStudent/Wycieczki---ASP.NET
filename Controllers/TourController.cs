@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Book.App.Models;
 using Book.App.ViewModels;
 using Book.App.Services;
+using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace Book.App.Controllers;
 
+[Authorize]
 public class TourController : Controller
 {
     private readonly ILogger<TourController> _logger;
@@ -30,7 +33,8 @@ public class TourController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddTour(string name, string description, decimal price, IFormFile image)
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AddTour(string name, string description, decimal price, IFormFile image, int maxUsers, DateTime startDate, DateTime endDate, string waypoints)
     {
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) || price <= 0)
         {
@@ -49,10 +53,15 @@ public class TourController : Controller
             Name = name,
             Description = description,
             ImageUrl = imageUrl,
-            Price = price
+            Price = price,
+            StartDate = startDate,
+            EndDate = endDate,
+            MaxUsers = maxUsers
         };
 
-        await _tourService.AddTour(tour);
+        var waypointsList = string.IsNullOrEmpty(waypoints) ? new List<AddTourWaypointsModel>() : JsonConvert.DeserializeObject<List<AddTourWaypointsModel>>(waypoints);
+
+        await _tourService.AddTour(tour, waypointsList);
 
         return RedirectToAction("Tours");
     }
@@ -62,11 +71,12 @@ public class TourController : Controller
         var tour = await _tourService.GetTour(id);
         if (tour == null)
         {
-            return NotFound();
+            return RedirectToAction("Tours");
         }
         return View(tour);
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteTour(int id)
     {
         var tour = await _tourService.GetTour(id);

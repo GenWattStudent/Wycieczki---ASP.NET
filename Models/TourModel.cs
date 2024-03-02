@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Book.App.Validators;
 
 namespace Book.App.Models;
 
-public class TourModel
+public class TourModel : IValidatableObject
 {
     [Key]
     public int Id { get; set; }
@@ -18,4 +19,22 @@ public class TourModel
     [Required]
     [Range(1, 10000)]
     public decimal Price { get; set; }
+    public List<UserModel> Users { get; set; } = new();
+    [Required]
+    [Range(1, 100)]
+    public int MaxUsers { get; set; }
+    public DateTime StartDate { get; set; }
+    [DateGreaterThan("StartDate", ErrorMessage = "End date must be greater than start date.")]
+    public DateTime EndDate { get; set; }
+    public List<WaypointModel> Waypoints { get; set; } = new();
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (EndDate <= StartDate)
+        {
+            yield return new ValidationResult(
+                "End date must be greater than start date.",
+                new[] { nameof(EndDate) });
+        }
+    }
 }

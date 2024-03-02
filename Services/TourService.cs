@@ -1,17 +1,10 @@
 using Book.App.Models;
-using Book.App.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
 
 public class TourService
 {
-    private readonly List<TourViewModel> _tours = new()
-    {
-        new TourViewModel { Id = 1, Price = 53000, Name = "Mystical Machu Picchu Expedition", Description = "Embark on a journey to the heart of the Andes Mountains and uncover the ancient mysteries of Machu Picchu. Trek through lush forests, traverse rugged terrains, and marvel at the awe-inspiring ruins of this UNESCO World Heritage Site. Led by expert guides, this expedition promises an immersive cultural experience as you learn about the fascinating history and architecture of the Inca civilization. Get ready to be captivated by the breathtaking beauty and enigmatic allure of Machu Picchu.", ImageUrl = "https://via.placeholder.com/150" },
-        new TourViewModel { Id = 2, Price = 100, Name = "Safari Adventure: Explore the Serengeti", Description = "Embark on a thrilling safari adventure through the iconic landscapes of the Serengeti. Witness the majestic wildlife in their natural habitat as you traverse vast savannahs and acacia-dotted plains. From awe-inspiring lion prides to graceful giraffes and elusive leopards, every moment promises an unforgettable encounter with Africa's Big Five and beyond. With expert guides and luxurious accommodations, this safari experience offers the perfect blend of excitement and comfort in the heart of the wild.", ImageUrl = "https://via.placeholder.com/150" },
-        new TourViewModel { Id = 3, Price = 20000, Name = "Cultural Odyssey: Discover Ancient Rome", Description = "Step back in time and immerse yourself in the grandeur of Ancient Rome on this captivating cultural odyssey. Explore iconic landmarks such as the Colosseum, Roman Forum, and Pantheon, as you unravel the rich tapestry of Rome's history and heritage. Wander through cobblestone streets lined with centuries-old architecture, and indulge in delectable Italian cuisine amidst the charming ambiance of local trattorias. With knowledgeable guides leading the way, this journey promises a captivating blend of ancient wonders and modern delights.", ImageUrl = "https://via.placeholder.com/150" }
-    };
     private readonly ApplicationDbContext _dbContext;
 
     public TourService(ApplicationDbContext dbContext)
@@ -24,8 +17,26 @@ public class TourService
         return await _dbContext.Tours.ToListAsync();
     }
 
-    public async Task AddTour(TourModel tour)
+    public async Task AddTour(TourModel tour, List<AddTourWaypointsModel> waypointModel)
     {
+        foreach (var waypoint in waypointModel)
+        {
+            string imageUrl = string.Empty;
+
+            if (waypoint.Image != null)
+            {
+                imageUrl = await SaveBase64Image(waypoint.Image.Split(",")[1]);
+            }
+
+            tour.Waypoints.Add(new WaypointModel
+            {
+                Name = waypoint.Name,
+                Latitude = waypoint.Lat,
+                Longitude = waypoint.Lng,
+                Description = waypoint.Description,
+                ImageUrl = imageUrl
+            });
+        }
         _dbContext.Tours.Add(tour);
 
         await _dbContext.SaveChangesAsync();
@@ -33,7 +44,22 @@ public class TourService
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _dbContext.Tours.FirstOrDefaultAsync(t => t.Id == id);
+        return await _dbContext.Tours.Include(t => t.Waypoints).Include(t => t.Users).FirstOrDefaultAsync(t => t.Id == id);
+    }
+
+    public async Task<string> SaveBase64Image(string base64)
+    {
+        var bytes = Convert.FromBase64String(base64);
+        var fileName = $"{Guid.NewGuid()}.jpg";
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "waypoints", fileName);
+
+        if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+        }
+
+        await File.WriteAllBytesAsync(filePath, bytes);
+        return $"/images/waypoints/{fileName}";
     }
 
     public void SaveImage(IFormFile image, out string imageUrl)
@@ -56,28 +82,36 @@ public class TourService
         }
     }
 
-    public async Task UpdateTour(TourViewModel tour)
-    {
-        var existingTour = await _dbContext.Tours.FirstOrDefaultAsync(t => t.Id == tour.Id);
+    // public async Task UpdateTour(TourViewModel tour)
+    // {
+    //     var existingTour = await _dbContext.Tours.FirstOrDefaultAsync(t => t.Id == tour.Id);
 
-        if (existingTour != null)
-        {
-            existingTour.Name = tour.Name;
-            existingTour.Description = tour.Description;
-            existingTour.ImageUrl = tour.ImageUrl;
-            existingTour.Price = tour.Price;
+    //     if (existingTour != null)
+    //     {
+    //         existingTour.Name = tour.Name;
+    //         existingTour.Description = tour.Description;
+    //         existingTour.ImageUrl = tour.ImageUrl;
+    //         existingTour.Price = tour.Price;
 
-            await _dbContext.SaveChangesAsync();
-        }
-    }
+    //         await _dbContext.SaveChangesAsync();
+    //     }
+    // }
 
     public async Task DeleteTour(int id)
     {
-        var tour = await _dbContext.Tours.FirstOrDefaultAsync(t => t.Id == id);
+        var tour = await _dbContext.Tours.Include(t => t.Waypoints).FirstOrDefaultAsync(t => t.Id == id);
 
         if (tour != null)
         {
             _dbContext.Tours.Remove(tour);
+            // Delete all waypoints images
+            foreach (var waypoint in tour.Waypoints)
+            {
+                if (!string.IsNullOrWhiteSpace(waypoint.ImageUrl))
+                {
+                    RemoveImage(waypoint.ImageUrl);
+                }
+            }
             await _dbContext.SaveChangesAsync();
         }
     }

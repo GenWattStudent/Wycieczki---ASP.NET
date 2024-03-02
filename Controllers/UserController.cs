@@ -40,7 +40,7 @@ public class UserController : Controller
                 if (userExists != null)
                 {
                     ModelState.AddModelError("Username", "Username already exists");
-                    return RedirectToAction("Register");
+                    return View(registerModel);
                 }
 
                 var user = new UserModel
@@ -54,12 +54,12 @@ public class UserController : Controller
                 return RedirectToAction("Login");
             }
 
-            return RedirectToAction("Register");
+            return View(registerModel);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error registering user");
-            return BadRequest();
+            return View(registerModel);
         }
     }
 
@@ -73,7 +73,7 @@ public class UserController : Controller
             if (user == null)
             {
                 ModelState.AddModelError("Username", "Invalid username or password");
-                return RedirectToAction("Login");
+                return View(loginModel);
             }
 
             var token = _tokenService.GenerateToken(user.Username, user.Role, user.Id);
@@ -90,7 +90,7 @@ public class UserController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error logging in user");
-            return BadRequest();
+            return View(loginModel);
         }
     }
 
@@ -103,13 +103,13 @@ public class UserController : Controller
 
     public IActionResult UserInfo()
     {
-        ClaimsData claimsData = new ClaimsData
+        ClaimsViewModel ClaimsViewModel = new ClaimsViewModel
         {
             Name = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
             Role = User.FindFirst(ClaimTypes.Role) != null ? (Role)Enum.Parse(typeof(Role), User.FindFirst(ClaimTypes.Role)?.Value) : Role.User
         };
 
-        return View(claimsData);
+        return View(ClaimsViewModel);
     }
 
     [Authorize]

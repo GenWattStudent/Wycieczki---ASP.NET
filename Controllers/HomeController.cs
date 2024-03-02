@@ -19,13 +19,13 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        ClaimsData claimsData = new ClaimsData
+        ClaimsViewModel ClaimsViewModel = new ClaimsViewModel
         {
             Name = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
             Role = User.FindFirst(ClaimTypes.Role) != null ? (Role)Enum.Parse(typeof(Role), User.FindFirst(ClaimTypes.Role)?.Value) : Role.User
         };
 
-        return View(claimsData);
+        return View(ClaimsViewModel);
     }
 
     public IActionResult Privacy()

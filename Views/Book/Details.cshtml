@@ -1,42 +1,47 @@
-@using Book.App.Models
-@model TourModel
+@using Book.App.ViewModels
+@model TourViewModel
 
 @{
-    ViewData["Title"] = Model.Name;
+    ViewBag.Title = $"Tour - {Model.TourModel.Name}";
 }
 
 <section class="card">
-    <img class="card-img-top" style="max-height: 30rem; object-fit: contain;" src="@Model.ImageUrl" alt="@Model.Name">
-    <div class="card-body">
-        <h1 class="card-title mt-2">@Model.Name</h1>
+    <div class="card-header d-flex gap-2">
+        @if (Model.TourModel.ImageUrl != null)
+        {
+            <img src="@Model.TourModel.ImageUrl" alt="">
+        }
+        <h4 class="card-title text-primary">@Model.TourModel.Name</h4>
+    </div>
 
+    <div class="card-body">
         <div class="">
-            <p class="card-text">@Model.Description</p>
+            <p class="card-text">@Model.TourModel.Description</p>
 
             <span class="devider-x w-100 d-block"></span>
 
             <div class="d-flex align-items-center gap-2 pt-2">
                 <ion-icon name="person"></ion-icon>
                 <strong>Max: </strong>
-                <strong>@Model.MaxUsers</strong>
+                <strong>@Model.TourModel.MaxUsers</strong>
             </div>
 
             <div class="d-flex align-items-center gap-2">
                 <ion-icon name="person"></ion-icon>
                 <strong>Current: </strong>
-                <strong>@Model.Users.Count</strong>
+                <strong>@Model.TourModel.Users.Count</strong>
             </div>
 
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <ion-icon name="calendar-number"></ion-icon>
                     <strong>Start Date: </strong>
-                    <strong>@Model.StartDate.ToLocalTime().ToString("g")</strong>
+                    <strong>@Model.TourModel.StartDate.ToLocalTime().ToString("g")</strong>
                 </div>
                 <span class="dash"></span>
                 <div>
                     <strong>End Date: </strong>
-                    <strong>@Model.EndDate.ToLocalTime().ToString("g")</strong>
+                    <strong>@Model.TourModel.EndDate.ToLocalTime().ToString("g")</strong>
                 </div>
             </div>
 
@@ -44,11 +49,11 @@
 
             <div>
                 <div class="d-flex gap-2 mt-4">
-                    @foreach (var waypoint in Model.Waypoints)
+                    @foreach (var waypoint in Model.TourModel.Waypoints)
                     {
                         <div class="d-flex align-items-center">
                             <strong class="d-block pe-2">@waypoint.Name</strong>
-                            @if (@Model.Waypoints.Last() != waypoint)
+                            @if (@Model.TourModel.Waypoints.Last() != waypoint)
                             {
                                 <ion-icon name="arrow-forward"></ion-icon>
                             }
@@ -57,14 +62,7 @@
                 </div>
             </div>
         </div>
-
-        <div class="d-flex justify-content-between mt-4">
-            <form asp-action="BookTour" asp-controller="Book" method="post">
-                <input type="hidden" name="id" value="@Model.Id" />
-                <button class="btn btn-primary">Book</button>
-            </form>
-            <strong class="text-danger h3 m-0">@Model.Price zł</strong>
-        </div>
+        <button class="btn btn-danger mt-3">Cancel this trip</button>
     </div>
 </section>
 
@@ -75,14 +73,12 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-
 <script>
-    const model = @Html.Raw(Json.Serialize(Model));
+    const model = @Html.Raw(Json.Serialize(Model.TourModel));
     const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
         return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
     }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
 
-    console.log(middleLatLong);
     const map = L.map('map').setView(middleLatLong, 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -105,7 +101,7 @@
     L.polyline(waypointsLatLng, { color: 'red' }).addTo(map);
 
     waypoints.forEach(w => {
-        console.log(w);
         L.marker({ lat: w.latitude, lng: w.longitude }).addTo(map).bindPopup(createWayPointPopup(w.name, w.description, w.imageUrl));
     });
+
 </script>
