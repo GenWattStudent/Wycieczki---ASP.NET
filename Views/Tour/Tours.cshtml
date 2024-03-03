@@ -18,10 +18,10 @@ else
     <h5 class="text-muted">Available @Model.Count tour(s)</h5>
 }
 
-<ul class="d-flex flex-wrap gap-3 p-0 justify-content-center">
+<ul class="grid gap-3 p-0 justify-content-center">
     @foreach (var tour in Model)
     {
-        <li class="card" style="width: 20rem;">
+        <li class="card">
             <img class="card-img-top" src="@tour.ImageUrl" alt="@tour.Name">
             <div class="card-body d-flex flex-column">
                 <div class="d-flex justify-content-between">

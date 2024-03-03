@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
 using Book.App.Services;
@@ -23,17 +24,14 @@ var tokenValidationParameters = new TokenValidationParameters
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 {
-
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-
 });
 builder.Services.AddTransient<TourService>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<TokenService>();
 builder.Services.AddTransient<BookService>();
 // Add database context
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 // Setup authentication JWT
 builder.Services.AddAuthentication(x =>
@@ -74,6 +72,16 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+
+    if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+    {
+        response.Redirect("/User/Login");
+    }
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

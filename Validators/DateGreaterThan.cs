@@ -1,27 +1,43 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Book.App.Validators;
 
-public class DateGreaterThanAttribute : ValidationAttribute
+public class DateGreaterThanAttribute : ValidationAttribute, IClientModelValidator
 {
-    private readonly string _comparisonProperty;
+    private readonly string comparisonProperty;
 
     public DateGreaterThanAttribute(string comparisonProperty)
     {
-        _comparisonProperty = comparisonProperty;
+        this.comparisonProperty = comparisonProperty;
+    }
+
+    public void AddValidation(ClientModelValidationContext context)
+    {
+        context.Attributes.Add("data-val", "true");
+        context.Attributes.Add("data-val-dategreaterthan", ErrorMessage ?? GetErrorMessage(context.ModelMetadata.GetDisplayName()));
+        context.Attributes.Add("data-val-dategreaterthan-propertyname", comparisonProperty);
+        var currentProperty = context.ModelMetadata.PropertyName;
+        context.Attributes.Add("data-val-dategreaterthan-target", currentProperty);
+    }
+
+    private string GetErrorMessage(string displayName)
+    {
+        return $"{displayName} must be greater than the target date.";
     }
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        var currentValue = (DateTime)value;
-
-        var comparisonValue = (DateTime)validationContext.ObjectType.GetProperty(_comparisonProperty).GetValue(validationContext.ObjectInstance);
-        Console.WriteLine("Current value: " + currentValue + " Comparison value: " + comparisonValue);
-        if (currentValue <= comparisonValue)
+        DateTime dateTime = (DateTime)value;
+        DateTime target = (DateTime)validationContext.ObjectType.GetProperty(comparisonProperty).GetValue(validationContext.ObjectInstance, null);
+        Console.WriteLine(dateTime);
+        if (dateTime > target)
         {
-            return new ValidationResult(ErrorMessage);
+            return ValidationResult.Success;
         }
-
-        return ValidationResult.Success;
+        else
+        {
+            return new ValidationResult("Date is not greater than the target date.");
+        }
     }
 }

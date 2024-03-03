@@ -3,7 +3,7 @@ using Book.App.Validators;
 
 namespace Book.App.Models;
 
-public class TourModel : IValidatableObject
+public class TourModel
 {
     [Key]
     public int Id { get; set; }
@@ -27,14 +27,4 @@ public class TourModel : IValidatableObject
     [DateGreaterThan("StartDate", ErrorMessage = "End date must be greater than start date.")]
     public DateTime EndDate { get; set; }
     public List<WaypointModel> Waypoints { get; set; } = new();
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (EndDate <= StartDate)
-        {
-            yield return new ValidationResult(
-                "End date must be greater than start date.",
-                new[] { nameof(EndDate) });
-        }
-    }
 }

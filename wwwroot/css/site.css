@@ -49,3 +49,14 @@ body {
 #map {
   height: 400px;
 }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  grid-gap: 1rem;
+}
+
+.active {
+  scale: 1.1;
+  font-weight: bolder;
+}
