@@ -34,36 +34,42 @@ public class TourController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> AddTour(string name, string description, decimal price, IFormFile image, int maxUsers, DateTime startDate, DateTime endDate, string waypoints)
+    public async Task<IActionResult> AddTour(AddTourModel addTourModel)
     {
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) || price <= 0)
+        List<string> imageUrls = new List<string>();
+
+        try
         {
-            return BadRequest();
+            if (ModelState.IsValid == false)
+            {
+                return View();
+            }
+
+            if (addTourModel.Images != null && addTourModel.Images.Count > 0)
+            {
+                _tourService.SaveImages(addTourModel.Images, out imageUrls);
+            }
+
+            var tour = new TourModel
+            {
+                Name = addTourModel.Name,
+                Description = addTourModel.Description,
+                Price = addTourModel.Price,
+                StartDate = addTourModel.StartDate,
+                EndDate = addTourModel.EndDate,
+                MaxUsers = addTourModel.MaxUsers,
+            };
+
+            var waypointsList = string.IsNullOrEmpty(addTourModel.Waypoints) ? new List<AddTourWaypointsModel>() : JsonConvert.DeserializeObject<List<AddTourWaypointsModel>>(addTourModel.Waypoints);
+
+            await _tourService.AddTour(tour, waypointsList, imageUrls);
+
+            return RedirectToAction("Tours");
         }
-
-        var imageUrl = string.Empty;
-
-        if (image != null)
+        catch (Exception)
         {
-            _tourService.SaveImage(image, out imageUrl);
+            return View();
         }
-
-        var tour = new TourModel
-        {
-            Name = name,
-            Description = description,
-            ImageUrl = imageUrl,
-            Price = price,
-            StartDate = startDate,
-            EndDate = endDate,
-            MaxUsers = maxUsers
-        };
-
-        var waypointsList = string.IsNullOrEmpty(waypoints) ? new List<AddTourWaypointsModel>() : JsonConvert.DeserializeObject<List<AddTourWaypointsModel>>(waypoints);
-
-        await _tourService.AddTour(tour, waypointsList);
-
-        return RedirectToAction("Tours");
     }
 
     public async Task<IActionResult> TourDetails(int id)
@@ -85,14 +91,34 @@ public class TourController : Controller
             return NotFound();
         }
 
-        if (!string.IsNullOrWhiteSpace(tour.ImageUrl))
-        {
-            _tourService.RemoveImage(tour.ImageUrl);
-        }
-
-        await _tourService.DeleteTour(id);
+        _tourService.DeleteTour(id);
 
         return RedirectToAction("Tours");
+    }
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> EditTour(int id)
+    {
+        var tour = await _tourService.GetTour(id);
+        if (tour == null)
+        {
+            return RedirectToAction("AddTour");
+        }
+        return View(tour);
+    }
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteImage(int id)
+    {
+        try
+        {
+            await _tourService.DeleteImage(id);
+            return RedirectToAction("EditTour");
+        }
+        catch (Exception)
+        {
+            return View();
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

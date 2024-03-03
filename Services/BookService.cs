@@ -52,7 +52,7 @@ public class BookService
 
     public async Task<TourModel?> GetTourById(int userId, int tourId)
     {
-        var tour = await _context.Tours.Include(t => t.Users).Include(t => t.Waypoints).FirstOrDefaultAsync(t => t.Id == tourId && t.Users.Any(u => u.Id == userId));
+        var tour = await _context.Tours.Include(t => t.Users).Include(t => t.Waypoints).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == tourId && t.Users.Any(u => u.Id == userId));
 
         return tour;
     }

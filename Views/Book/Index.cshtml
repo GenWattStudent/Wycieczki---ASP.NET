@@ -23,7 +23,7 @@ else
         {
             <li class="list-group-item">
                 <div class="d-flex gap-2">
-                    <img class="img-thumbnail" src="@tour.ImageUrl" alt="@tour.Name">
+                    @* <img class="img-thumbnail" src="@tour.ImageUrl" alt="@tour.Name"> *@
                     <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
                         asp-route-id="@tour.Id">
                         <h2>@tour.Name</h2>

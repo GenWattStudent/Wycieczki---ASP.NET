@@ -1,0 +1,30 @@
+@model TourModel
+
+<span class="devider-x w-100 d-block"></span>
+
+<div class="d-flex align-items-center gap-2 pt-2">
+    <ion-icon name="person"></ion-icon>
+    <strong>Max: </strong>
+    <strong>@Model.MaxUsers</strong>
+</div>
+
+<div class="d-flex align-items-center gap-2">
+    <ion-icon name="person"></ion-icon>
+    <strong>Current: </strong>
+    <strong>@Model.Users.Count</strong>
+</div>
+
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <ion-icon name="calendar-number"></ion-icon>
+        <strong>Start Date: </strong>
+        <strong>@Model.StartDate.ToLocalTime().ToString("g")</strong>
+    </div>
+    <span class="dash"></span>
+    <div>
+        <strong>End Date: </strong>
+        <strong>@Model.EndDate.ToLocalTime().ToString("g")</strong>
+    </div>
+</div>
+
+<span class="devider-x w-100 d-block pt-2"></span>

@@ -7,10 +7,7 @@
 
 <section class="card">
     <div class="card-header d-flex gap-2">
-        @if (Model.TourModel.ImageUrl != null)
-        {
-            <img src="@Model.TourModel.ImageUrl" alt="">
-        }
+        <partial name="_ImageSliderPartial" model="@Model.TourModel" />
         <h4 class="card-title text-primary">@Model.TourModel.Name</h4>
     </div>
 
@@ -18,34 +15,7 @@
         <div class="">
             <p class="card-text">@Model.TourModel.Description</p>
 
-            <span class="devider-x w-100 d-block"></span>
-
-            <div class="d-flex align-items-center gap-2 pt-2">
-                <ion-icon name="person"></ion-icon>
-                <strong>Max: </strong>
-                <strong>@Model.TourModel.MaxUsers</strong>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <ion-icon name="person"></ion-icon>
-                <strong>Current: </strong>
-                <strong>@Model.TourModel.Users.Count</strong>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <ion-icon name="calendar-number"></ion-icon>
-                    <strong>Start Date: </strong>
-                    <strong>@Model.TourModel.StartDate.ToLocalTime().ToString("g")</strong>
-                </div>
-                <span class="dash"></span>
-                <div>
-                    <strong>End Date: </strong>
-                    <strong>@Model.TourModel.EndDate.ToLocalTime().ToString("g")</strong>
-                </div>
-            </div>
-
-            <span class="devider-x w-100 d-block pt-2"></span>
+            <partial name="_TourDetailsPartial" model="@Model.TourModel" />
 
             <div>
                 <div class="d-flex gap-2 mt-4">
@@ -74,34 +44,5 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    const model = @Html.Raw(Json.Serialize(Model.TourModel));
-    const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
-        return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
-    }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
-
-    const map = L.map('map').setView(middleLatLong, 13);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(map);
-
-    const waypoints = model.waypoints.$values
-    const waypointsLatLng = waypoints.map(w => [ w.latitude, w.longitude ]);
-
-    function createWayPointPopup(title, description, image) {
-        return `
-            <div>
-                <h4>${title}</h4>
-                <p>${description}</p>
-                ${image ? `<img class="img-fluid" src="${image}" /> ` : ""}
-            </div>
-        `
-    }
-
-    L.polyline(waypointsLatLng, { color: 'red' }).addTo(map);
-
-    waypoints.forEach(w => {
-        L.marker({ lat: w.latitude, lng: w.longitude }).addTo(map).bindPopup(createWayPointPopup(w.name, w.description, w.imageUrl));
-    });
 
 </script>

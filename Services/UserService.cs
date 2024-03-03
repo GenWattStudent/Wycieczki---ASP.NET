@@ -1,4 +1,5 @@
 using Book.App.Models;
+using Book.App.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
@@ -6,10 +7,12 @@ namespace Book.App.Services;
 public class UserService
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserRepository _userRepository;
 
-    public UserService(ApplicationDbContext context)
+    public UserService(ApplicationDbContext context, UserRepository userRepository)
     {
         _context = context;
+        _userRepository = userRepository;
     }
 
     public async Task Register(UserModel registerModel)
@@ -18,13 +21,13 @@ public class UserService
 
         registerModel.Password = PasswordHash;
 
-        _context.Users.Add(registerModel);
-        await _context.SaveChangesAsync();
+        await _userRepository.Add(registerModel);
+        await _userRepository.SaveAsync();
     }
 
     public async Task<UserModel?> GetByUsername(string username)
     {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        return await _userRepository.GetByUsername(username);
     }
 
     public async Task<UserModel?> Login(LoginModel loginModel)

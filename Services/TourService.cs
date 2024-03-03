@@ -14,10 +14,10 @@ public class TourService
 
     public async Task<List<TourModel>> GetTours()
     {
-        return await _dbContext.Tours.ToListAsync();
+        return await _dbContext.Tours.Include(t => t.Images).ToListAsync();
     }
 
-    public async Task AddTour(TourModel tour, List<AddTourWaypointsModel> waypointModel)
+    public async Task AddTour(TourModel tour, List<AddTourWaypointsModel> waypointModel, List<string> imageUrls)
     {
         foreach (var waypoint in waypointModel)
         {
@@ -34,9 +34,19 @@ public class TourService
                 Latitude = waypoint.Lat,
                 Longitude = waypoint.Lng,
                 Description = waypoint.Description,
+                ImageUrl = imageUrl,
+                IsRoad = waypoint.IsRoad
+            });
+        }
+
+        foreach (var imageUrl in imageUrls)
+        {
+            tour.Images.Add(new ImageModel
+            {
                 ImageUrl = imageUrl
             });
         }
+
         _dbContext.Tours.Add(tour);
 
         await _dbContext.SaveChangesAsync();
@@ -44,7 +54,7 @@ public class TourService
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _dbContext.Tours.Include(t => t.Waypoints).Include(t => t.Users).FirstOrDefaultAsync(t => t.Id == id);
+        return await _dbContext.Tours.Include(t => t.Waypoints).Include(t => t.Users).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<string> SaveBase64Image(string base64)
@@ -62,15 +72,20 @@ public class TourService
         return $"/images/waypoints/{fileName}";
     }
 
-    public void SaveImage(IFormFile image, out string imageUrl)
+    public void SaveImages(List<IFormFile> images, out List<string> imageUrls)
     {
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        imageUrls = new List<string>();
+
+        foreach (var image in images)
         {
-            image.CopyTo(fileStream);
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                image.CopyTo(fileStream);
+            }
+            imageUrls.Add($"/images/{fileName}");
         }
-        imageUrl = $"/images/{fileName}";
     }
 
     public void RemoveImage(string imageUrl)
@@ -97,21 +112,54 @@ public class TourService
     //     }
     // }
 
-    public async Task DeleteTour(int id)
+    public void DeleteTour(int id)
     {
-        var tour = await _dbContext.Tours.Include(t => t.Waypoints).FirstOrDefaultAsync(t => t.Id == id);
-
-        if (tour != null)
+        using (var transaction = _dbContext.Database.BeginTransaction())
         {
-            _dbContext.Tours.Remove(tour);
-            // Delete all waypoints images
-            foreach (var waypoint in tour.Waypoints)
+            try
             {
-                if (!string.IsNullOrWhiteSpace(waypoint.ImageUrl))
+                var tour = _dbContext.Tours.Include(t => t.Waypoints).Include(t => t.Images).FirstOrDefault(t => t.Id == id);
+
+                if (tour != null)
                 {
-                    RemoveImage(waypoint.ImageUrl);
+                    foreach (var image in tour.Images)
+                    {
+                        RemoveImage(image.ImageUrl);
+                    }
+
+                    // remove images from db
+                    _dbContext.Images.RemoveRange(tour.Images);
+                    _dbContext.SaveChanges();
+
+                    _dbContext.Tours.Remove(tour);
+                    // Delete all waypoints images
+                    foreach (var waypoint in tour.Waypoints)
+                    {
+                        if (!string.IsNullOrWhiteSpace(waypoint.ImageUrl))
+                        {
+                            RemoveImage(waypoint.ImageUrl);
+                        }
+                    }
+
+                    _dbContext.SaveChanges();
                 }
+
+                transaction.Commit();
             }
+            catch (Exception)
+            {
+                transaction.Rollback();
+            }
+        }
+    }
+
+    public async Task DeleteImage(int id)
+    {
+        var image = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == id);
+        if (image != null)
+        {
+            RemoveImage(image.ImageUrl);
+            _dbContext.Images.Remove(image);
             await _dbContext.SaveChangesAsync();
         }
     }

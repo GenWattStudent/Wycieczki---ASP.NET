@@ -15,7 +15,7 @@ public class TourModel
     [StringLength(500)]
     [MinLength(3)]
     public string Description { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
+    public List<ImageModel> Images { get; set; } = new();
     [Required]
     [Range(1, 10000)]
     public decimal Price { get; set; }

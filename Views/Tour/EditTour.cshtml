@@ -1,0 +1,88 @@
+@model TourModel
+
+@{
+    ViewBag.Title = $"Edit - {Model.Name}";
+}
+
+
+<header class="card-header">
+    <h2>Edit - <span class="text-primary">@Model.Name</span></h2>
+</header>
+
+    @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <label for="name">Name</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="description">Description</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description..." })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="price">Price</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1" })
+            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="maxUsers">Max People</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
+            @Html.ValidationMessageFor(model => model.MaxUsers, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="startDate">Start Date</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="endDate">End Date</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm"), text = Model.EndDate })
+            @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="image">Image</label>
+        <div class="input-group mt-1">
+            <input class="form-control" type="file" name="images" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
+        </div>
+
+        <div id="preview" class="d-flex mt-2">
+            @foreach (var image in Model.Images)
+            {
+                <div class="position-relative">
+                    <a style="right: 10px;" class="position-absolute text-light h3 bg-danger m-0" asp-controller="Tour" asp-action="DeleteImage" asp-route-id="@image.Id" onclick="return confirm('Are you sure you want to delete this image?')">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </a>
+                    <img src="@image.ImageUrl" style="width: 100px; height: 100px; object-fit: cover; margin-right: 10px;" />
+                </div>
+            }
+        </div>
+
+        @Html.Hidden("waypoints", "", new { id = "waypoints" })
+        
+        <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
+
+        <div id="waypoint-form" class="mt-2"></div>
+
+        <div class="position-relative mt-4 ">
+            <div id="toolbar">
+                <button type="button" onclick="selectTool('marker')" data-tool="marker" class="btn btn-primary">
+                    <ion-icon name="location"></ion-icon>
+                </button>
+                <button type="button" onclick="selectTool('road')" data-tool="road" class="btn btn-primary">
+                    <ion-icon name="ellipsis-vertical"></ion-icon>
+                </button>
+            </div>
+            <div id="map" class="rounded mt-2"></div>
+        </div>
+
+        <div class="d-flex flex-column">
+            <input class="btn btn-primary mt-3" type="submit" value="Submit">
+        </div>
+    }

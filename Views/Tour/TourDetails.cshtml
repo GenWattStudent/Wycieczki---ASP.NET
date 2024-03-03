@@ -6,44 +6,18 @@
 }
 
 <section class="card">
-    <img class="card-img-top" style="max-height: 30rem; object-fit: contain;" src="@Model.ImageUrl" alt="@Model.Name">
-    <div class="card-body">
+    <header class="card-header">
+        <partial name="_ImageSliderPartial" model="@Model" />
         <h1 class="card-title mt-2">@Model.Name</h1>
-
+    </header>
+    <div class="card-body">
         <div class="">
             <p class="card-text">@Model.Description</p>
 
-            <span class="devider-x w-100 d-block"></span>
-
-            <div class="d-flex align-items-center gap-2 pt-2">
-                <ion-icon name="person"></ion-icon>
-                <strong>Max: </strong>
-                <strong>@Model.MaxUsers</strong>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <ion-icon name="person"></ion-icon>
-                <strong>Current: </strong>
-                <strong>@Model.Users.Count</strong>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <ion-icon name="calendar-number"></ion-icon>
-                    <strong>Start Date: </strong>
-                    <strong>@Model.StartDate.ToLocalTime().ToString("g")</strong>
-                </div>
-                <span class="dash"></span>
-                <div>
-                    <strong>End Date: </strong>
-                    <strong>@Model.EndDate.ToLocalTime().ToString("g")</strong>
-                </div>
-            </div>
-
-            <span class="devider-x w-100 d-block pt-2"></span>
+            <partial name="_TourDetailsPartial" model="@Model" />
 
             <div>
-                <div class="d-flex gap-2 mt-4">
+                <div class="d-flex gap-2 mt-4 flex-wrap">
                     @foreach (var waypoint in Model.Waypoints)
                     {
                         <div class="d-flex align-items-center">
@@ -78,34 +52,36 @@
 
 <script>
     const model = @Html.Raw(Json.Serialize(Model));
-    const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
-        return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
-    }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
 
-    console.log(middleLatLong);
-    const map = L.map('map').setView(middleLatLong, 13);
+    if (model.waypoints.$values.length >= 0) {
+        const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
+            return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
+        }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(map);
+        const map = L.map('map').setView(middleLatLong, 13);
 
-    const waypoints = model.waypoints.$values
-    const waypointsLatLng = waypoints.map(w => [ w.latitude, w.longitude ]);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
 
-    function createWayPointPopup(title, description, image) {
-        return `
+        const waypoints = model.waypoints.$values
+        const waypointsLatLng = waypoints.map(w => [ w.latitude, w.longitude ]);
+
+        function createWayPointPopup(title, description, image) {
+            return `
             <div>
                 <h4>${title}</h4>
                 <p>${description}</p>
                 ${image ? `<img class="img-fluid" src="${image}" /> ` : ""}
             </div>
         `
+        }
+
+        L.polyline(waypointsLatLng, { color: 'red' }).addTo(map);
+
+        waypoints.forEach(w => {
+            if (w.isRoad) return
+            L.marker({ lat: w.latitude, lng: w.longitude }).addTo(map).bindPopup(createWayPointPopup(w.name, w.description, w.imageUrl));
+        });
     }
-
-    L.polyline(waypointsLatLng, { color: 'red' }).addTo(map);
-
-    waypoints.forEach(w => {
-        console.log(w);
-        L.marker({ lat: w.latitude, lng: w.longitude }).addTo(map).bindPopup(createWayPointPopup(w.name, w.description, w.imageUrl));
-    });
 </script>

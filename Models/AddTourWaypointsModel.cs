@@ -7,5 +7,6 @@ public class AddTourWaypointsModel
     public string Image { get; set; }
     public decimal Lat { get; set; }
     public decimal Lng { get; set; }
+    public bool IsRoad { get; set; }
 
 }

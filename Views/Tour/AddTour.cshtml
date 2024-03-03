@@ -46,102 +46,46 @@
 
         <label for="image">Image</label>
         <div class="input-group mt-1">
-            <input class="form-control" type="file" name="image" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
+            <input class="form-control" type="file" name="images" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
         </div>
 
-        <div class="d-flex justify-content-center">
-            <img class="img-fluid mt-3" style="max-height: 30rem; object-fit: contain;" id="ImgPreview" src="">
+        <div id="preview" class="d-flex mt-2">
+            
         </div>
 
-         @Html.Hidden("waypoints", "", new { id = "waypoints" })
+        @Html.Hidden("waypoints", "", new { id = "waypoints" })
         
         <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
 
         <div id="waypoint-form" class="mt-2"></div>
 
-        <div id="map" class="mt-4 rounded"></div>
+        <div class="position-relative mt-4 ">
+            <div id="toolbar">
+                <button type="button" onclick="selectTool('marker')" data-tool="marker" class="btn btn-primary">
+                    <ion-icon name="location"></ion-icon>
+                </button>
+                <button type="button" onclick="selectTool('road')" data-tool="road" class="btn btn-primary">
+                    <ion-icon name="ellipsis-vertical"></ion-icon>
+                </button>
+            </div>
+            <div id="map" class="rounded mt-2"></div>
+        </div>
+
         <div class="d-flex flex-column">
             <input class="btn btn-primary mt-3" type="submit" value="Submit">
         </div>
     }
 </div>    
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="~/js/dateGreaterThan.js"></script>
+<script src="~/js/map.js"></script>
+<script src="~/js/imagePreview.js"></script>
 <script>
-    $(document).ready(function () {
-        $.validator.addMethod("dategreaterthan",
-            function (value, element, parameters) {
-                var startDate = $(element).data('val-dategreaterthan-propertyname');
-                var endDate = $(element).data('val-dategreaterthan-target');
-                console.log(Date.parse($(`#${endDate}`)),  Date.parse($(`#${startDate}`)))
-                return Date.parse($(`#${endDate}`).val()) > Date.parse($(`#${startDate}`).val());          
-            });
-
-        $.validator.unobtrusive.adapters.addBool("dategreaterthan");
-    });
-
-    const map = L.map('map').setView([51.505, -0.09], 13);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
     let waypoints = []
-
-    function createWayPointPopup(title, description, image, id) {
-        return `
-            <div>
-                <h4>${title}</h4>
-                <p>${description}</p>
-                ${image ? `<img class="img-fluid" src="${image}" /> `: ""}
-                <button type="button" class="btn btn-primary mt-2" onclick="removeWayPoint(${id})">Remove</button>
-            </div>
-        `
-    }
-
-    function removeWayPoint(id) {
-        const waypoint = waypoints.find(w => w.id === id)
-
-        if (waypoint) {
-            map.removeLayer(waypoint.marker)
-            waypoints = waypoints.filter(w => w.id !== id)
-        }
-
-        connectWaypointsWithLine()
-    }   
-
-    function createWaypointData(lat, lng, marker) {
-        return {
-            lat: lat,
-            lng: lng,
-            marker: marker,
-            name: `Waypoint ${waypoints.length + 1}`,
-            description: "Simple description :)",
-            image: null,
-            id: Date.now()
-        }
-    }
-
-    function createWaypointForm(waypointData) {
-        return `
-            <div>
-                <label for="waypoint-title">Title</label>
-                <div class="input-group mt-1">
-                    <input class="form-control w-100" type="text" id="waypoint-title" value="${waypointData.name}" />
-                </div>
-                <label for="waypoint-description">Description</label>
-                <div class="input-group mt-1">
-                    <textarea class="form-control w-100" id="waypoint-description">${waypointData.description}</textarea>
-                </div>
-                <label for="waypoint-image">Image</label>
-                <input class="form-control w-100" type="file" id="waypoint-image" />
-                <button type="button" class="btn btn-primary mt-2" onclick="updateWaypoint(${waypointData.id})">Update</button>
-            </div>
-        `
-    }
+    let currentTool = 'marker'
 
     function createSubmitData(waypointData) {
         return new Promise((resolve, reject) => {
@@ -154,7 +98,8 @@
                         lng: waypointData.lng,
                         name: waypointData.name,
                         description: waypointData.description,
-                        image: reader.result
+                        image: reader.result,
+                        isRoad: waypointData.marker ? false : true
                     });
                 };
                 reader.onerror = reject;
@@ -164,7 +109,8 @@
                     lng: waypointData.lng,
                     name: waypointData.name,
                     description: waypointData.description,
-                    image: null
+                    image: null,
+                    isRoad: waypointData.marker ? false : true
                 });
             }
         });
@@ -208,35 +154,52 @@
         })
     }
 
-    function connectWaypointsWithLine() {
+    function connectWaypointsWithLine(waypoints) {
         clearLines()
         const latlngs = waypoints.map(w => [w.lat, w.lng])
         const polyline = L.polyline(latlngs, { color: 'red' }).addTo(map)
     }
 
     function addWayPoint(e) {
-        const marker = L.marker(e.latlng, { draggable: true }).addTo(map)
-        const waypointData = createWaypointData(e.latlng.lat, e.latlng.lng, marker)
+        const waypointData = createWaypointData(e.latlng.lat, e.latlng.lng, null)
         const waypointsEl = document.getElementById('waypoints')
 
-        marker
-            .bindPopup(createWayPointPopup(waypointData.name, waypointData.description, waypointData.image, waypointData.id))
-            .openPopup()
-            .on('click', () => selectWaypoint(waypointData))
-            .on('dragend', (e) => {
-                waypointData.lat = e.target._latlng.lat
-                waypointData.lng = e.target._latlng.lng
-                connectWaypointsWithLine()
+        if (currentTool === 'marker') {
+            const marker = L.marker(e.latlng, { draggable: true }).addTo(map)
+            marker
+                .bindPopup(createWayPointPopup(waypointData.name, waypointData.description, waypointData.image, waypointData.id))
+                .openPopup()
+                .on('click', () => selectWaypoint(waypointData))
+                .on('dragend', (e) => {
+                    waypointData.lat = e.target._latlng.lat
+                    waypointData.lng = e.target._latlng.lng
+                    connectWaypointsWithLine(waypoints)
             })
+            waypointData.marker = marker
+        }
 
         waypoints.push(waypointData)
         Promise.all(waypoints.map(createSubmitData)).then(submitData => {
-            console.log(submitData)
             waypointsEl.value = JSON.stringify(submitData);
         })
 
-        connectWaypointsWithLine()
+        connectWaypointsWithLine(waypoints)
     }
 
+    function selectTool(tool) {
+        currentTool = tool
+        const buttons = document.querySelectorAll('#toolbar button')
+        buttons.forEach(b => {
+            if (b.dataset.tool === tool) {
+                b.classList.remove('bg-primary')
+                b.classList.add('bg-secondary')
+            } else {
+                b.classList.remove('bg-secondary')
+                b.classList.add('bg-primary')
+            }
+        })
+    }
+
+    selectTool(currentTool)
     map.on('click', addWayPoint)
 </script>

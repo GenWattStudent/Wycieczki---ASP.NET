@@ -13,4 +13,5 @@ public class WaypointModel
     public decimal Longitude { get; set; }
     public int TourId { get; set; }
     public TourModel Tour { get; set; } = new();
+    public bool IsRoad { get; set; }
 }

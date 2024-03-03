@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
+using Book.App.Models;
+using Book.App.Repositories;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,7 @@ builder.Services.AddTransient<TourService>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<TokenService>();
 builder.Services.AddTransient<BookService>();
+builder.Services.AddTransient<UserRepository>();
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -48,15 +51,7 @@ builder.Services.AddAuthentication(x =>
         OnMessageReceived = context =>
         {
             var token = context.Request.Cookies["token"];
-            Console.WriteLine(token);
             context.Token = token;
-            return Task.CompletedTask;
-        },
-        OnForbidden = context =>
-        {
-            context.Response.StatusCode = 403;
-            // redirect to login page
-            context.Response.Redirect("/User/Login");
             return Task.CompletedTask;
         }
     };
