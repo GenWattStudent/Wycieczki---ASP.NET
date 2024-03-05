@@ -74,9 +74,11 @@ public class BookController : Controller
 
             return RedirectToAction("Index");
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return View();
+            Console.WriteLine(e.Message);
+            TempData["ErrorMessage"] = e.Message;
+            return RedirectToAction("TourDetails", "Tour", new { id = id });
         }
     }
 

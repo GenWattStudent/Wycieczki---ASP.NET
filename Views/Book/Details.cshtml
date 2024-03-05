@@ -32,7 +32,12 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-danger mt-3">Cancel this trip</button>
+        <form asp-action="Delete" asp-controller="Book" method="post" class="mt-3">
+            <input type="hidden" name="id" value="@Model.TourModel.Id" />
+            <button class="btn btn-danger">
+                Cancel this trip
+            </button>
+        </form>
     </div>
 </section>
 
@@ -43,6 +48,55 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-<script>
 
+<script>
+    const model = @Html.Raw(Json.Serialize(Model.TourModel));
+
+    if (model.waypoints.$values.length > 0) {
+        const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
+            return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
+        }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
+
+        const map = L.map('map').setView(middleLatLong, 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        const waypoints = model.waypoints.$values
+        const waypointsLatLng = waypoints.map(w => [ w.latitude, w.longitude ]);
+
+        function createWayPointPopup(title, description, images, id) {
+            const imageDivs = images.map((image, index) => `
+        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            <img src="${image.imageUrl}" class="d-block w-100" alt="Image ${index + 1}" />
+        </div>`).join('')
+
+            return `
+        <div>
+            <h4>${title}</h4>
+            <p>${description}</p>
+
+            <div id="slider-1" class="carousel slide" data-ride="carousel" data-interval="4000">
+                <div class="carousel-inner">
+                    ${imageDivs}
+                </div>
+                <a class="carousel-control-prev" href="#slider-1" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </a>
+                <a class="carousel-control-next" href="#slider-1" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </a>
+            </div>
+        </div>
+            `
+        }
+
+        L.polyline(waypointsLatLng, { color: 'red' }).addTo(map);
+
+        waypoints.forEach(w => {
+            if (w.isRoad) return
+            L.marker({ lat: w.latitude, lng: w.longitude }).addTo(map).bindPopup(createWayPointPopup(w.name, w.description, w.images.$values));
+        });
+    }
 </script>

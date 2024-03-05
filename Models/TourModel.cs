@@ -18,6 +18,8 @@ public class TourModel
     public List<ImageModel> Images { get; set; } = new();
     [Required]
     [Range(1, 10000)]
+    [DataType(DataType.Currency)]
+    [DisplayFormat(DataFormatString = "{0:F2}", ApplyFormatInEditMode = true)]
     public decimal Price { get; set; }
     public List<UserModel> Users { get; set; } = new();
     [Required]
@@ -25,6 +27,7 @@ public class TourModel
     public int MaxUsers { get; set; }
     public DateTime StartDate { get; set; }
     [DateGreaterThan("StartDate", ErrorMessage = "End date must be greater than start date.")]
+    // [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime EndDate { get; set; }
     public List<WaypointModel> Waypoints { get; set; } = new();
 }

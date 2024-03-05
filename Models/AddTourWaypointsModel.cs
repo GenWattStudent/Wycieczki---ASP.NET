@@ -4,9 +4,10 @@ public class AddTourWaypointsModel
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Image { get; set; }
-    public decimal Lat { get; set; }
-    public decimal Lng { get; set; }
+    public List<IFormFile> Images { get; set; } = new List<IFormFile>();
+    public double Lat { get; set; }
+    public double Lng { get; set; }
     public bool IsRoad { get; set; }
+    public int Id { get; set; }
 
 }

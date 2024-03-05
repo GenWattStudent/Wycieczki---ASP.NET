@@ -60,3 +60,21 @@ body {
   scale: 1.1;
   font-weight: bolder;
 }
+
+.small-image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.leaflet-popup-content {
+  margin: 10px !important;
+}
+
+.leaflet-popup-close-button {
+  width: 17px !important;
+  height: 15px !important;
+  display: flex;
+  align-items: center;
+}

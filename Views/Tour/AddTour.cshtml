@@ -8,63 +8,23 @@
 <div>
     @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
-        <label for="name">Name</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
-            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
-        </div>
+        <partial name="_TourFormPartial" model="Model" />
+        <div id="preview" class="d-flex mt-2"></div>
 
-        <label for="description">Description</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description..." })
-            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
-        </div>
+        @Html.Hidden("images", "", new { id = "images" })
 
-        <label for="price">Price</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1" })
-            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="maxUsers">Max People</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
-            @Html.ValidationMessageFor(model => model.MaxUsers, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="startDate">Start Date</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
-            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="endDate">End Date</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
-            @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="image">Image</label>
-        <div class="input-group mt-1">
-            <input class="form-control" type="file" name="images" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
-        </div>
-
-        <div id="preview" class="d-flex mt-2">
-            
-        </div>
-
-        @Html.Hidden("waypoints", "", new { id = "waypoints" })
-        
         <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
 
         <div id="waypoint-form" class="mt-2"></div>
 
-        <div class="position-relative mt-4 ">
+        <div class="position-relative mt-2 ">
             <div id="toolbar">
-                <button type="button" onclick="selectTool('marker')" data-tool="marker" class="btn btn-primary">
+                <button data-toggle="tooltip" data-placement="top" title="Waypoint" type="button"
+                    onclick="selectTool('marker')" data-tool="marker" class="btn btn-primary">
                     <ion-icon name="location"></ion-icon>
                 </button>
-                <button type="button" onclick="selectTool('road')" data-tool="road" class="btn btn-primary">
+                <button data-toggle="tooltip" data-placement="top" title="Road" type="button" onclick="selectTool('road')"
+                    data-tool="road" class="btn btn-primary">
                     <ion-icon name="ellipsis-vertical"></ion-icon>
                 </button>
             </div>
@@ -75,131 +35,25 @@
             <input class="btn btn-primary mt-3" type="submit" value="Submit">
         </div>
     }
-</div>    
+</div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" />
 <script src="~/js/dateGreaterThan.js"></script>
 <script src="~/js/map.js"></script>
 <script src="~/js/imagePreview.js"></script>
-<script>
-    let waypoints = []
-    let currentTool = 'marker'
-
-    function createSubmitData(waypointData) {
-        return new Promise((resolve, reject) => {
-            if (waypointData.image) {
-                const reader = new FileReader();
-                reader.readAsDataURL(waypointData.image);
-                reader.onload = () => {
-                    resolve({
-                        lat: waypointData.lat,
-                        lng: waypointData.lng,
-                        name: waypointData.name,
-                        description: waypointData.description,
-                        image: reader.result,
-                        isRoad: waypointData.marker ? false : true
-                    });
-                };
-                reader.onerror = reject;
-            } else {
-                resolve({
-                    lat: waypointData.lat,
-                    lng: waypointData.lng,
-                    name: waypointData.name,
-                    description: waypointData.description,
-                    image: null,
-                    isRoad: waypointData.marker ? false : true
-                });
-            }
-        });
-    }
-
-    function updateWaypoint(id) {
-        const waypoint = waypoints.find(w => w.id === id)
-
-        if (waypoint) {
-            const title = document.getElementById('waypoint-title').value
-            const description = document.getElementById('waypoint-description').value
-            const image = document.getElementById('waypoint-image').files[0]
-            const waypointsEl = document.getElementById('waypoints')
-
-            waypoint.name = title
-            waypoint.description = description
-            waypoint.image = image
-
-            const imageUrl = image ? URL.createObjectURL(image) : null 
-
-            waypoint.marker
-                .bindPopup(createWayPointPopup(title, description, imageUrl, id))
-                .openPopup()
-
-            Promise.all(waypoints.map(createSubmitData)).then(submitData => {
-                waypointsEl.value = JSON.stringify(submitData);
-            })
-        }
-    }
-
-    function selectWaypoint(waypointData) {
-        const form = createWaypointForm(waypointData)
-        document.getElementById('waypoint-form').innerHTML = form
-    }
-
-    function clearLines() {
-        map.eachLayer((layer) => {
-            if (layer instanceof L.Polyline) {
-                map.removeLayer(layer)
-            }
-        })
-    }
-
-    function connectWaypointsWithLine(waypoints) {
-        clearLines()
-        const latlngs = waypoints.map(w => [w.lat, w.lng])
-        const polyline = L.polyline(latlngs, { color: 'red' }).addTo(map)
-    }
-
-    function addWayPoint(e) {
-        const waypointData = createWaypointData(e.latlng.lat, e.latlng.lng, null)
-        const waypointsEl = document.getElementById('waypoints')
-
-        if (currentTool === 'marker') {
-            const marker = L.marker(e.latlng, { draggable: true }).addTo(map)
-            marker
-                .bindPopup(createWayPointPopup(waypointData.name, waypointData.description, waypointData.image, waypointData.id))
-                .openPopup()
-                .on('click', () => selectWaypoint(waypointData))
-                .on('dragend', (e) => {
-                    waypointData.lat = e.target._latlng.lat
-                    waypointData.lng = e.target._latlng.lng
-                    connectWaypointsWithLine(waypoints)
-            })
-            waypointData.marker = marker
-        }
-
-        waypoints.push(waypointData)
-        Promise.all(waypoints.map(createSubmitData)).then(submitData => {
-            waypointsEl.value = JSON.stringify(submitData);
-        })
-
-        connectWaypointsWithLine(waypoints)
-    }
-
-    function selectTool(tool) {
-        currentTool = tool
-        const buttons = document.querySelectorAll('#toolbar button')
-        buttons.forEach(b => {
-            if (b.dataset.tool === tool) {
-                b.classList.remove('bg-primary')
-                b.classList.add('bg-secondary')
-            } else {
-                b.classList.remove('bg-secondary')
-                b.classList.add('bg-primary')
-            }
-        })
-    }
-
-    selectTool(currentTool)
-    map.on('click', addWayPoint)
-</script>
+<script src="~/js/adminMap.js"></script>
+<script src="~/js/addTour.js"></script>

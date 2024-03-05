@@ -21,17 +21,31 @@ public class BookService
     public async Task AddTourToUser(int userId, int tourId)
     {
         var user = await _context.Users.Include(u => u.Tours).FirstOrDefaultAsync(u => u.Id == userId);
-        var tour = await _context.Tours.FirstOrDefaultAsync(t => t.Id == tourId);
+        var tour = await _context.Tours.Include(t => t.Users).FirstOrDefaultAsync(t => t.Id == tourId);
 
-        if (user != null && tour != null)
-        {
-            user.Tours.Add(tour);
-            await _context.SaveChangesAsync();
-        }
-        else
+        if (user == null || tour == null)
         {
             throw new Exception("User or tour not found");
         }
+
+        // )if user already book this tour
+        if (user.Tours.Any(t => t.Id == tourId))
+        {
+            throw new Exception("User already booked this tour");
+        }
+
+        if (tour.StartDate < DateTime.Now)
+        {
+            throw new Exception("Tour already started");
+        }
+
+        if (tour.MaxUsers <= tour.Users.Count)
+        {
+            throw new Exception("Tour is full");
+        }
+
+        user.Tours.Add(tour);
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteCancelTour(int userId, int tourId)

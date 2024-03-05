@@ -1,7 +1,7 @@
 @model TourModel
 
 @{
-    ViewBag.Title = $"Edit - {Model.Name}";
+   ViewData["Title"] = "Edit";
 }
 
 
@@ -9,80 +9,149 @@
     <h2>Edit - <span class="text-primary">@Model.Name</span></h2>
 </header>
 
-    @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        <label for="name">Name</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
-            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
-        </div>
+@using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <label for="name">Name</label>
+    <div class="input-group mt-1 d-flex flex-column">
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
+    </div>
 
-        <label for="description">Description</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description..." })
-            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
-        </div>
+    <label for="description">Description</label>
+    <div class="input-group mt-1 d-flex flex-column">
+        @Html.TextBoxFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description..." })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
+    </div>
 
-        <label for="price">Price</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1" })
-            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
-        </div>
+    <label for="price">Price</label>
+    <div class="input-group mt-1 d-flex flex-column">
+        @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1" })
+        @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
+    </div>
 
-        <label for="maxUsers">Max People</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
-            @Html.ValidationMessageFor(model => model.MaxUsers, "", new { @class = "field-validation-error text-danger" })
-        </div>
+    <label for="maxUsers">Max People</label>
+    <div class="input-group mt-1 d-flex flex-column">
+        @Html.TextBoxFor(model => model.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
+        @Html.ValidationMessageFor(model => model.MaxUsers, "", new { @class = "field-validation-error text-danger" })
+    </div>
 
-        <label for="startDate">Start Date</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
-            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
-        </div>
+    <label for="startDate">Start Date</label>
+    <div class="input-group mt-1 d-flex flex-column">
+        @Html.TextBoxFor(model => model.StartDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+        @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
+    </div>
 
-        <label for="endDate">End Date</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm"), text = Model.EndDate })
-            @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
-        </div>
+    <label for="endDate">End Date</label>
+    <div class="input-group mt-1 d-flex flex-column">
+        @Html.TextBoxFor(model => model.EndDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = Model.StartDate.ToString("yyyy-MM-ddTHH:mm")})
+        @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
+    </div>
 
-        <label for="image">Image</label>
-        <div class="input-group mt-1">
-            <input class="form-control" type="file" name="images" id="image" multiple="false" onchange="ImgPre(this)" accept="image/*">
-        </div>
+    <label for="image">Image</label>
+    <div class="input-group mt-1">
+        <input class="form-control" type="file" name="images" id="images" multiple="false" onchange="ImgPre(this)" accept="image/*">
+    </div>
 
-        <div id="preview" class="d-flex mt-2">
-            @foreach (var image in Model.Images)
-            {
-                <div class="position-relative">
-                    <a style="right: 10px;" class="position-absolute text-light h3 bg-danger m-0" asp-controller="Tour" asp-action="DeleteImage" asp-route-id="@image.Id" onclick="return confirm('Are you sure you want to delete this image?')">
-                        <ion-icon name="close-outline"></ion-icon>
-                    </a>
-                    <img src="@image.ImageUrl" style="width: 100px; height: 100px; object-fit: cover; margin-right: 10px;" />
-                </div>
-            }
-        </div>
-
-        @Html.Hidden("waypoints", "", new { id = "waypoints" })
-        
-        <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
-
-        <div id="waypoint-form" class="mt-2"></div>
-
-        <div class="position-relative mt-4 ">
-            <div id="toolbar">
-                <button type="button" onclick="selectTool('marker')" data-tool="marker" class="btn btn-primary">
-                    <ion-icon name="location"></ion-icon>
-                </button>
-                <button type="button" onclick="selectTool('road')" data-tool="road" class="btn btn-primary">
-                    <ion-icon name="ellipsis-vertical"></ion-icon>
-                </button>
+    <div id="preview" class="d-flex mt-2">
+        @foreach (var image in Model.Images)
+        {
+            <div class="position-relative">
+                <a style="right: 10px;" class="position-absolute text-light h3 bg-danger m-0" asp-controller="Tour" asp-action="DeleteImage" asp-route-id="@image.Id" asp-route-tourId="@Model.Id" onclick="return confirm('Are you sure you want to delete this image?')">
+                    <ion-icon name="close-outline"></ion-icon>
+                </a>
+                <img src="@image.ImageUrl" class="small-image-preview " />
             </div>
-            <div id="map" class="rounded mt-2"></div>
-        </div>
+        }
+    </div>
 
-        <div class="d-flex flex-column">
-            <input class="btn btn-primary mt-3" type="submit" value="Submit">
+    @Html.Hidden("Id", Model.Id, new { id = "Id" })
+    <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
+
+    <div id="waypoint-form" class="mt-2"></div>
+
+    <div class="position-relative mt-4 ">
+        <div id="toolbar">
+            <button data-toggle="tooltip" data-placement="top" title="Waypoint" type="button" onclick="selectTool('marker')" data-tool="marker" class="btn btn-primary">
+                <ion-icon name="location"></ion-icon>
+            </button>
+            <button data-toggle="tooltip" data-placement="top" title="Road" type="button" onclick="selectTool('road')" data-tool="road" class="btn btn-primary">
+                <ion-icon name="ellipsis-vertical"></ion-icon>
+            </button>
         </div>
+        <div id="map" class="rounded mt-2"></div>
+    </div>
+
+    <div class="d-flex flex-column">
+        <input class="btn btn-primary mt-3" type="submit" value="Submit">
+    </div>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="~/js/dateGreaterThan.js"></script>
+<script src="~/js/map.js"></script>
+<script src="~/js/imagePreview.js"></script>
+<script src="~/js/adminMap.js"></script>
+<script src="~/js/editTour.js"></script>
+
+<script>
+    const model = @Html.Raw(Json.Serialize(Model));
+
+    model.waypoints.$values.forEach(waypoint => {
+        console.log(waypoint);
+        const waypointData = createWaypointData(waypoint.latitude, waypoint.longitude, null, waypoint.name, waypoint.description, waypoint.images.$values, Number(waypoint.id), true);
+        addWaypoint(waypointData, waypoint.isRoad ? 'road' : 'marker', true);
+    });
+
+    function updateWaypointApi(id) {
+        console.log(id, waypoints);
+        updateWaypoint(id, true);
+        const waypoint = waypoints.find(waypoint => waypoint.id == id);
+        if (!waypoint) return;
+
+        const formData = new FormData();
+
+        formData.append('id', waypoint.id);
+        formData.append('lat', waypoint.lat);
+        formData.append('lng', waypoint.lng);
+        formData.append('name', waypoint.name);
+        formData.append('description', waypoint.description);
+        formData.append('isRoad', waypoint.isRoad);
+
+        console.log(waypoint);
+        fetch('/Waypoint/Edit', {
+            method: 'POST',
+            body: formData
+        });
     }
+
+    function addImages(id, event) {
+        const formData = new FormData();
+        console.log(event.target.files, id);
+        formData.append('id', id);
+        const imagesArray = Array.from(event.target.files);
+        imagesArray.forEach(file => {
+            formData.append('images', file);
+        });
+
+        fetch('/Waypoint/AddImages', {
+            method: 'POST',
+            body: formData
+        }).then(res => {
+            window.location.reload();
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+</script>
