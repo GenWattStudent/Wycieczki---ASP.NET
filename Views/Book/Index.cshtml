@@ -21,13 +21,15 @@ else
     <ul class="list-group">
         @foreach (var tour in Model.Tours)
         {
-            <li class="list-group-item">
+            <li class="list-group-item mt-2">
                 <div class="d-flex gap-2">
-                    @* <img class="img-thumbnail" src="@tour.ImageUrl" alt="@tour.Name"> *@
-                    <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
-                        asp-route-id="@tour.Id">
-                        <h2>@tour.Name</h2>
-                    </a>
+                    <header class="card-header w-100">
+                        <partial name="_ImageSliderPartial" model="@tour" />
+                        <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
+                            asp-route-id="@tour.Id">
+                            <h2>@tour.Name</h2>
+                        </a>
+                    </header>
                 </div>
                 <p class="mt-2">@tour.Description</p>
                 <div class="d-flex gap-2">

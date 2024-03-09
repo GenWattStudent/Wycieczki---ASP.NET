@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  console.log($.validator)
   $.validator.addMethod(
     'dategreaterthan',
     function (value, element, parameters) {

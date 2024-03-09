@@ -1,3 +1,4 @@
+@using Book.App.Helpers
 @model TourModel
 
 <label for="name">Name</label>
@@ -8,13 +9,13 @@
 
 <label for="description">Description</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description..." })
+    @Html.TextAreaFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description...", style = "resize: vertical;" })
     @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="price">Price</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.Price, @"{0:0\.00}", new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1", step = "0.01" })
+    @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1", step = "0.01" })
     @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
 </div>
 
@@ -26,13 +27,13 @@
 
 <label for="startDate">Start Date</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+    @Html.TextBoxFor(model => model.StartDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
     @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="endDate">End Date</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+    @Html.TextBoxFor(model => model.EndDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
     @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
 </div>
 
@@ -40,3 +41,6 @@
 <div class="input-group mt-1">
     <input class="form-control" type="file" multiple="false" onchange="ImgPre(this)" accept="image/*">
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/resize-textarea.js"></script>

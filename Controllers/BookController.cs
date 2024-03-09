@@ -34,8 +34,15 @@ public class BookController : Controller
 
         var tourViewModel = new TourViewModel
         {
-            TourModel = tour
+            TourModel = tour,
+            Distance = _bookService.CalculateDistance(tour.Waypoints)
         };
+
+        // the trip started and not ended calculate dsitance and which waypoint you are
+        if (tour.StartDate <= DateTime.Now && tour.EndDate >= DateTime.Now)
+        {
+            tourViewModel.PercentOfTime = (DateTime.Now - tour.StartDate).TotalDays / (tour.EndDate - tour.StartDate).TotalDays;
+        }
 
         return View(tourViewModel);
     }

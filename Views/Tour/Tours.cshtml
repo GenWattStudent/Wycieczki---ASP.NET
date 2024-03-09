@@ -1,13 +1,9 @@
 @{
     ViewData["Title"] = "Tours";
 }
+
 @using Book.App.Models
 @model List<TourModel>
-
-@{
-    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-}
 
 @if (Model.Count == 0)
 {
@@ -21,57 +17,6 @@ else
 <ul class="grid gap-3 p-0 justify-content-center">
     @foreach (var tour in Model)
     {
-        <li class="card">
-            <partial name="_ImageSliderPartial" model="@tour" />
-            <div class="card-body d-flex flex-column">
-                <div class="d-flex justify-content-between">
-                    <header>
-                        <h2 class="card-title">@tour.Name</h2>
-                    </header>
-                    @if (role == "Admin")
-                    {
-                        <div class="d-flex" style="height: fit-content;">
-                            <a asp-action="EditTour" asp-controller="Tour" asp-route-id="@tour.Id">
-                                <button data-toggle="tooltip" data-placement="top" title="Edit @tour.Name tour"
-                                    class="btn pt-0 pe-2">
-                                    <ion-icon name="create-outline"></ion-icon>
-                                </button>
-                            </a>
-                            @using (Html.BeginForm("DeleteTour", "Tour", new { id = tour.Id }, FormMethod.Post))
-                            {
-                                <button data-toggle="tooltip" data-placement="top" title="Delete @tour.Name tour" class="btn p-0">
-                                    <ion-icon name="trash-outline"></ion-icon>
-                                </button>
-                            }
-                        </div>
-                    }
-                </div>
-                <p class="card-text">@tour.Description</p>
-                <partial name="_TourDetailsPartial" model="@tour" />
-
-                @if (tour.Users.Count >= tour.MaxUsers)
-                {
-                    <p class="text-danger mt-2 d-block mb-0">
-                        <ion-icon class="me-1" name="alert"></ion-icon>
-                        This trip is already full!
-                    </p>
-                }
-                @if (userId != null && tour.Users.Any(u => u.Id == int.Parse(userId)))
-                {
-                    <p class="text-success d-flex align-items-center">
-                        <ion-icon class="me-1" name="checkbox"></ion-icon>
-                        You are already
-                        signed up for this
-                        trip!
-                    </p>
-                }
-
-                <div class="d-flex align-items-end justify-content-between justify-self-end h-100 mt-3">
-                    <a asp-action="TourDetails" asp-controller="Tour" asp-route-id="@tour.Id" class="btn btn-primary">See
-                        details</a>
-                    <strong class="text-danger h4">@tour.Price zł</strong>
-                </div>
-            </div>
-        </li>
+        <partial name="_TourPartial" model="tour" />
     }
 </ul>

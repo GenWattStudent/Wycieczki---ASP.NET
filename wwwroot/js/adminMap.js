@@ -1,125 +1,225 @@
-let waypoints = []
-let currentTool = 'marker'
+import { Map } from './map.js'
+import { Waypoint } from './Waypoint.js'
 
-function createSubmitData(waypointData) {
-  console.log(waypointData)
-  const { marker, ...data } = waypointData
-  return {
-    isRoad: marker ? false : true,
-    ...data,
-    id: (typeof waypointData.id === 'string' ? 0 : waypointData.id).toString(),
+class MapAdmin extends Map {
+  constructor(toolSelector) {
+    console.log('admin')
+    super()
+    this.toolSelector = toolSelector
+    this.toolSelector.selectTool('marker')
+    console.log(this.map)
+    this.map.on('click', this.addWayPointClick.bind(this))
   }
-}
 
-function updateWaypoint(id, edit = false) {
-  console.log('update', id, waypoints)
-  const waypoint = waypoints.find((w) => w.id == id)
-
-  if (waypoint) {
-    const title = document.getElementById('waypoint-title').value
-    const description = document.getElementById('waypoint-description').value
-    let images = []
-    waypoint.name = title
-    waypoint.description = description
-
-    if (!edit) {
-      const imagesEL = document.getElementById('waypoint-image').files
-      waypoint.images = Array.from(imagesEL)
+  createSubmitData(waypointData) {
+    console.log(waypointData)
+    const { marker, ...data } = waypointData
+    return {
+      isRoad: marker ? false : true,
+      ...data,
+      id: (typeof waypointData.id === 'string'
+        ? 0
+        : waypointData.id
+      ).toString(),
     }
+  }
 
-    const popup = edit
-      ? createEditPopup(waypoint)
-      : createWayPointPopup(title, description, waypoint.images, id)
+  updateWaypoint(id, edit = false) {
+    console.log('update', id, this.waypoints)
+    const waypoint = this.waypoints.find((w) => w.id == id)
 
-    const imageUrls = []
-    if (!edit) {
-      for (let i = 0; i < images.length; i++) {
-        imageUrls.push(URL.createObjectURL(images[i]))
+    if (waypoint) {
+      const title = document.getElementById('waypoint-title').value
+      const description = document.getElementById('waypoint-description').value
+      let images = []
+
+      if (!edit) {
+        const imagesEL = document.getElementById('waypoint-image').files
+        waypoint.update(title, description, Array.from(imagesEL))
+      } else {
+        waypoint.update(title, description, waypoint.images)
       }
+
+      const popup = edit
+        ? this.createEditPopup(waypoint)
+        : this.createWayPointPopup(title, description, waypoint.images, id)
+
+      const imageUrls = []
+      if (!edit) {
+        for (let i = 0; i < images.length; i++) {
+          imageUrls.push(URL.createObjectURL(images[i]))
+        }
+      }
+
+      waypoint.marker.bindPopup(popup).openPopup()
+      if (!edit)
+        waypoint.addRemoveListener(() => this.removeWayPoint(waypoint.id))
+      console.log(this.waypoints)
     }
-
-    waypoint.marker.bindPopup(popup).openPopup()
-
-    console.log(waypoints)
-  }
-}
-
-function selectWaypoint(waypointData, edit = false) {
-  const form = createWaypointForm(waypointData, edit)
-  document.getElementById('waypoint-form').innerHTML = form
-}
-
-function clearLines() {
-  map.eachLayer((layer) => {
-    if (layer instanceof L.Polyline) {
-      map.removeLayer(layer)
-    }
-  })
-}
-
-function connectWaypointsWithLine(waypoints) {
-  clearLines()
-  const latlngs = waypoints.map((w) => [w.lat, w.lng])
-  L.polyline(latlngs, { color: 'red' }).addTo(map)
-}
-
-function addWayPointClick(e) {
-  const waypointData = createWaypointData(e.latlng.lat, e.latlng.lng, null)
-  addWaypoint(waypointData, currentTool)
-}
-
-function createMarker(waypointData, edit = false) {
-  const marker = L.marker(
-    { lat: waypointData.lat, lng: waypointData.lng },
-    { draggable: true }
-  ).addTo(map)
-
-  const popup = edit
-    ? createEditPopup(waypointData)
-    : createWayPointPopup(
-        waypointData.name,
-        waypointData.description,
-        waypointData.images,
-        waypointData.id
-      )
-
-  marker
-    .bindPopup(popup)
-    .openPopup()
-    .on('click', () => selectWaypoint(waypointData, edit))
-    .on('dragend', (e) => {
-      waypointData.lat = e.target._latlng.lat
-      waypointData.lng = e.target._latlng.lng
-      connectWaypointsWithLine(waypoints)
-    })
-
-  return marker
-}
-
-function addWaypoint(waypointData, currentTool, edit = false) {
-  if (currentTool === 'marker') {
-    const marker = createMarker(waypointData, edit)
-    waypointData.marker = marker
   }
 
-  waypoints.push(waypointData)
+  selectWaypoint(waypointData, edit = false) {
+    console.log(waypointData)
+    const form = this.createWaypointForm(waypointData, edit)
+    document.getElementById('waypoint-form').innerHTML = form
 
-  connectWaypointsWithLine(waypoints)
-}
-
-function selectTool(tool) {
-  currentTool = tool
-  const buttons = document.querySelectorAll('#toolbar button')
-  buttons.forEach((b) => {
-    if (b.dataset.tool === tool) {
-      b.classList.remove('bg-secondary')
-      b.classList.add('bg-primary')
+    if (!edit) {
+      document
+        .getElementById('create-marker-btn')
+        .addEventListener('click', () => this.updateWaypoint(waypointData.id))
     } else {
-      b.classList.remove('bg-primary')
-      b.classList.add('bg-secondary')
+      document
+        .getElementById('edit-marker-btn')
+        .addEventListener('click', () => updateWaypointApi(waypointData.id))
+
+      document
+        .getElementById('waypoint-image')
+        .addEventListener('change', (e) => {
+          addImages(waypointData.id, e)
+        })
     }
-  })
+  }
+
+  addWayPointClick(e) {
+    const waypoint = new Waypoint(e.latlng.lat, e.latlng.lng)
+    this.addWaypoint(waypoint, this.toolSelector.currentTool)
+  }
+
+  addWaypoint(waypoint, currentTool, edit = false) {
+    if (currentTool === 'marker') {
+      const marker = this.createMarker(waypoint, edit, true)
+      waypoint.marker = marker
+      waypoint.isRoad = false
+    } else {
+      waypoint.isRoad = true
+    }
+
+    this.waypoints.push(waypoint)
+    this.connectWaypointsWithLine(this.waypoints)
+  }
+
+  createWaypointForm(waypointData, edit = false) {
+    return `
+          <div>
+              <label for="waypoint-title">Title</label>
+              <div class="input-group mt-1">
+                  <input class="form-control w-100" type="text" id="waypoint-title" value="${
+                    waypointData.name
+                  }" />
+              </div>
+              <label for="waypoint-description">Description</label>
+              <div class="input-group mt-1">
+                  <textarea class="form-control w-100" id="waypoint-description">${
+                    waypointData.description
+                  }</textarea>
+              </div>
+              <label for="waypoint-image">Image</label>
+              ${
+                !edit
+                  ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />`
+                  : ''
+              }
+              ${
+                edit
+                  ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />`
+                  : ''
+              }
+              ${
+                !edit
+                  ? `<button id="create-marker-btn" type="button" class="btn btn-primary mt-2">Update</button>`
+                  : ''
+              }
+              ${
+                edit === true
+                  ? `<button id="edit-marker-btn" type="button" class="btn btn-primary mt-2">Update</button>`
+                  : ''
+              }
+          </div>
+      `
+  }
 }
 
-selectTool(currentTool)
-map.on('click', addWayPointClick)
+class ToolSelector {
+  constructor() {
+    this.currentTool = 'marker'
+    this.buttons = document.querySelectorAll('#toolbar button')
+    this.setUpButtons()
+  }
+
+  setUpButtons() {
+    this.buttons.forEach((b) => {
+      b.addEventListener('click', () => {
+        this.selectTool(b.dataset.tool)
+      })
+    })
+  }
+
+  selectTool(tool) {
+    this.currentTool = tool
+    this.buttons.forEach((b) => {
+      if (b.dataset.tool === tool) {
+        b.classList.remove('bg-secondary')
+        b.classList.add('bg-primary')
+      } else {
+        b.classList.remove('bg-primary')
+        b.classList.add('bg-secondary')
+      }
+    })
+  }
+}
+
+const toolSelector = new ToolSelector()
+export const adminMap = new MapAdmin(toolSelector)
+
+function updateWaypointApi(id) {
+  console.log(id, adminMap.waypoints)
+  adminMap.updateWaypoint(id, true)
+  const waypoint = adminMap.waypoints.find((waypoint) => waypoint.id == id)
+  if (!waypoint) return
+
+  const formData = new FormData()
+
+  formData.append('id', waypoint.id)
+  formData.append('lat', waypoint.lat)
+  formData.append('lng', waypoint.lng)
+  formData.append('name', waypoint.name)
+  formData.append('description', waypoint.description)
+  formData.append('isRoad', waypoint.isRoad)
+
+  console.log(waypoint)
+  fetch('/Waypoint/Edit', {
+    method: 'POST',
+    body: formData,
+  })
+    .then((res) => {
+      if (res.ok) {
+        toastr.success(`${waypoint.name} updated!`)
+      } else {
+        throw new Error('Something went wrong!')
+      }
+    })
+    .catch((err) => {
+      toastr.error(`${waypoint.name} not updated! ${err.message}`)
+    })
+}
+
+function addImages(id, event) {
+  const formData = new FormData()
+  console.log(event.target.files, id)
+  formData.append('id', id)
+  const imagesArray = Array.from(event.target.files)
+  imagesArray.forEach((file) => {
+    formData.append('images', file)
+  })
+
+  fetch('/Waypoint/AddImages', {
+    method: 'POST',
+    body: formData,
+  })
+    .then((res) => {
+      window.location.reload()
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}

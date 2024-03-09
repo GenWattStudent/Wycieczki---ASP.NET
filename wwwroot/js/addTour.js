@@ -1,3 +1,5 @@
+import { adminMap } from './adminMap.js'
+
 document.querySelector('form').addEventListener('submit', function (e) {
   e.preventDefault()
 
@@ -5,7 +7,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
   formData.append('Name', document.querySelector('input[name="Name"]').value)
   formData.append(
     'Description',
-    document.querySelector('input[name="Description"]').value
+    document.querySelector('textarea[name="Description"]').value
   )
   formData.append('Price', document.querySelector('input[name="Price"]').value)
   formData.append(
@@ -21,8 +23,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
     document.querySelector('input[name="EndDate"]').value
   )
 
-  const data = waypoints.map(createSubmitData)
-  console.log(data.images)
+  const data = adminMap.waypoints.map((waypoint) => waypoint.getSubmitData())
 
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data[i].images.length; j++) {
@@ -36,7 +37,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
     formData.append(`Waypoints[${i}][name]`, data[i].name)
     formData.append(`Waypoints[${i}][description]`, data[i].description)
     formData.append(`Waypoints[${i}][lat]`, data[i].lat)
-    formData.append(`Waypoints[${i}][lng]`, data[i].lng.toString())
+    formData.append(`Waypoints[${i}][lng]`, data[i].lng)
     formData.append(`Waypoints[${i}][isRoad]`, data[i].isRoad)
     formData.append(`Waypoints[${i}][id]`, data[i].id)
   }
@@ -50,8 +51,16 @@ document.querySelector('form').addEventListener('submit', function (e) {
     method: 'POST',
     body: formData,
   })
-    .then(() => (window.location.href = '/Tour/Tours'))
+    .then((data) => {
+      if (data.ok) {
+        window.location.href = '/Tour/Tours'
+      } else {
+        data.json().then((json) => {
+          console.log(json)
+        })
+      }
+    })
     .catch((error) => {
-      // Handle the error
+      console.error('Error:', error)
     })
 })

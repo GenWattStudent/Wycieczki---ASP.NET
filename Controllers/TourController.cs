@@ -4,7 +4,6 @@ using Book.App.Models;
 using Book.App.ViewModels;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
 
 namespace Book.App.Controllers;
 
@@ -39,16 +38,6 @@ public class TourController : Controller
     {
         List<string> imageUrls = new List<string>();
 
-        if (ModelState.IsValid == false)
-        {
-            return View();
-        }
-
-        if (addTourModel.Images != null && addTourModel.Images.Count > 0)
-        {
-            _tourService.SaveImages(addTourModel.Images, _tourFolder, out imageUrls);
-        }
-
         var tour = new TourModel
         {
             Name = addTourModel.Name,
@@ -58,6 +47,16 @@ public class TourController : Controller
             EndDate = addTourModel.EndDate,
             MaxUsers = addTourModel.MaxUsers,
         };
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (addTourModel.Images != null && addTourModel.Images.Count > 0)
+        {
+            _tourService.SaveImages(addTourModel.Images, _tourFolder, out imageUrls);
+        }
 
         await _tourService.AddTour(tour, addTourModel, imageUrls);
 
@@ -139,7 +138,7 @@ public class TourController : Controller
         {
             await _tourService.DeleteImage(id);
             var tour = await _tourService.GetTour(tourId);
-
+            Console.WriteLine(tour.Images.Count);
             return View("EditTour", tour);
         }
         catch (Exception e)

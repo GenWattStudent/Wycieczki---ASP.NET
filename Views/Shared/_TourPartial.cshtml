@@ -1,0 +1,92 @@
+@model TourModel
+@{
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<li class="card">
+    <partial name="_ImageSliderPartial" model="@Model" />
+    <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between">
+            <header>
+                <h2 class="card-title">@Model.Name</h2>
+            </header>
+            @if (role == "Admin")
+            {
+                <div class="d-flex" style="height: fit-content;">
+                    <a asp-action="EditTour" asp-controller="Tour" asp-route-id="@Model.Id">
+                        <button data-toggle="tooltip" data-placement="top" title="Edit @Model.Name tour"
+                            class="btn pt-0 pe-2">
+                            <ion-icon name="create-outline"></ion-icon>
+                        </button>
+                    </a>
+                    @using (Html.BeginForm("DeleteTour", "Tour", new { id = Model.Id }, FormMethod.Post, true, new
+                    {
+                        id = $"deleteForm-{Model.Id}",
+                    }))
+                    {
+                        <button type="button" data-toggle="modal" data-target="#deleteConfirmModal" data-toggle="tooltip"
+                            data-placement="top" title="Delete @Model.Name tour" class="btn p-0">
+                            <ion-icon name="trash-outline"></ion-icon>
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+        <p class="card-text">@Model.Description</p>
+        <partial name="_TourDetailsPartial" model="@Model" />
+
+        @if (Model.Users.Count >= Model.MaxUsers)
+        {
+            <p class="text-danger mt-2 d-block mb-0">
+                <ion-icon class="me-1" name="alert"></ion-icon>
+                This trip is already full!
+            </p>
+        }
+        @if (userId != null && Model.Users.Any(u => u.Id == int.Parse(userId)))
+        {
+            <p class="text-success d-flex align-items-center">
+                <ion-icon class="me-1" name="checkbox"></ion-icon>
+                You are already signed up for this trip!
+            </p>
+        }
+
+        <div class="d-flex align-items-end justify-content-between justify-self-end h-100 mt-3">
+            <a asp-action="TourDetails" asp-controller="Tour" asp-route-id="@Model.Id" class="btn btn-primary">
+                See details
+            </a>
+            <strong class="text-danger h4">@Model.Price zł</strong>
+        </div>
+    </div>
+</li>
+
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this tour? <strong class="text-primary">(@Model.Name)</strong>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete-@Model.Id">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const model = @Json.Serialize(Model);
+
+        document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
+            document.getElementById(`deleteForm-${model.id}`).submit();
+        });
+    });
+</script>
