@@ -12,5 +12,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserModel> Users { get; set; }
     public DbSet<WaypointModel> Waypoints { get; set; }
     public DbSet<ImageModel> Images { get; set; }
-
+    public DbSet<PreferencesModel> Preferences { get; set; }
+    public DbSet<ContactModel> Contacts { get; set; }
+    public DbSet<AddressModel> Addresses { get; set; }
 }

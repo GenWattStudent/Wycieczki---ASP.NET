@@ -9,5 +9,5 @@ public class AddTourWaypointsModel
     public double Lng { get; set; }
     public bool IsRoad { get; set; }
     public int Id { get; set; }
-
+    public WaypointType Type { get; set; }
 }

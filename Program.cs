@@ -37,6 +37,7 @@ builder.Services.AddTransient<BookService>();
 builder.Services.AddTransient<FileService>();
 builder.Services.AddTransient<WaypointService>();
 builder.Services.AddTransient<UserRepository>();
+builder.Services.AddTransient<GeoService>();
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 

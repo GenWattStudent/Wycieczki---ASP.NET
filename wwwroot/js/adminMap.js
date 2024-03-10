@@ -3,11 +3,9 @@ import { Waypoint } from './Waypoint.js'
 
 class MapAdmin extends Map {
   constructor(toolSelector) {
-    console.log('admin')
     super()
     this.toolSelector = toolSelector
-    this.toolSelector.selectTool('marker')
-    console.log(this.map)
+    this.toolSelector.selectTool('start')
     this.map.on('click', this.addWayPointClick.bind(this))
   }
 
@@ -82,13 +80,40 @@ class MapAdmin extends Map {
 
   addWayPointClick(e) {
     const waypoint = new Waypoint(e.latlng.lat, e.latlng.lng)
+    waypoint.type = this.toolSelector.currentTool
+
+    if (this.waypoints.some((w) => w.type === 'end')) {
+      return toastr.error('You have endpoint in your tour!')
+    }
+
+    if (
+      this.toolSelector.currentTool === 'start' &&
+      this.waypoints.some((w) => w.type === 'start')
+    ) {
+      return toastr.error('Start point already exists!')
+    }
+
+    if (
+      this.toolSelector.currentTool === 'end' &&
+      !this.waypoints.some((w) => w.type === 'start')
+    ) {
+      return toastr.error('Start point must be added first!')
+    }
+
     this.addWaypoint(waypoint, this.toolSelector.currentTool)
   }
 
   addWaypoint(waypoint, currentTool, edit = false) {
+    const marker = this.createMarker(
+      waypoint,
+      edit,
+      true,
+      false,
+      this.getIcon(currentTool)
+    )
+    waypoint.marker = marker
+
     if (currentTool === 'marker') {
-      const marker = this.createMarker(waypoint, edit, true)
-      waypoint.marker = marker
       waypoint.isRoad = false
     } else {
       waypoint.isRoad = true
@@ -144,6 +169,7 @@ class ToolSelector {
     this.currentTool = 'marker'
     this.buttons = document.querySelectorAll('#toolbar button')
     this.setUpButtons()
+    console.log(this.buttons)
   }
 
   setUpButtons() {

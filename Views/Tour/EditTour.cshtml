@@ -26,38 +26,57 @@
 
     <partial name="_MapTools" />
 
+    <div id="map" class="mt-2"></div>
+
     <div class="d-flex flex-column">
         <input class="btn btn-primary mt-3" type="submit" value="Submit">
     </div>
 }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-    crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-    crossorigin="anonymous"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="~/js/imagePreview.js"></script>
-<script src="~/js/adminMap.js" type="module"></script>
-<script src="~/js/editTour.js" type="module"></script>
-<script src="~/js/dateGreaterThan.js"></script>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 
-<script type="module">
-    import { Waypoint } from '/js/waypoint.js';
-    import { adminMap } from '/js/adminMap.js';
-    const model = @Html.Raw(Json.Serialize(Model));
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    model.waypoints.$values.forEach(waypoint => {
-        const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, waypoint.images.$values, true, waypoint.isRoad);
-        adminMap.addWaypoint(waypointObj, waypoint.isRoad ? 'road' : 'marker', true);
-    });
-</script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
+    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
+
+    <script src="~/js/dateGreaterThan.js"></script>
+    <script src="~/js/imagePreview.js"></script>
+    <script src="~/js/adminMap.js" type="module"></script>
+    <script src="~/js/editTour.js" type="module"></script>
+    <script src="~/js/dateGreaterThan.js"></script>
+
+    <script type="module">
+        import { Waypoint } from '/js/waypoint.js';
+        import { adminMap } from '/js/adminMap.js';
+
+        function getTypeFromEnum(type) {
+            switch (type) {
+                case 0:
+                    return 'start'
+                case 1:
+                    return 'marker'
+                case 2:
+                    return 'end'
+                case 4:
+                    return 'indicator'
+                default:
+                    return 'road'
+            }
+        }
+        const model = @Html.Raw(Json.Serialize(Model));
+
+        model.waypoints.$values.forEach(waypoint => {
+            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
+            console.log(waypointObj);
+            adminMap.addWaypoint(waypointObj, waypointObj.type, true);
+        });
+    </script>
+}

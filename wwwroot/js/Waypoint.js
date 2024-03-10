@@ -5,6 +5,7 @@ export class Waypoint {
     id = new Date().toISOString(),
     name = 'Title',
     description = 'Description',
+    type = 'start',
     images = [],
     fromDb = false,
     isRoad = false
@@ -17,6 +18,8 @@ export class Waypoint {
     this.images = images
     this.fromDb = fromDb
     this.isRoad = isRoad
+    this.type = type
+    this.isTourIndicator = false
   }
 
   getSubmitData() {
@@ -29,6 +32,7 @@ export class Waypoint {
       images: this.images,
       isRoad: this.isRoad,
       fromDb: this.fromDb,
+      type: this.type,
     }
   }
 

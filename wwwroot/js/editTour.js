@@ -26,7 +26,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
   const data = adminMap.waypoints
     .map((waypoint) => waypoint.getSubmitData())
     .filter((w) => !w.fromDb)
-
+  console.log(data)
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data[i].images.length; j++) {
       formData.append(
@@ -42,6 +42,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
     formData.append(`Waypoints[${i}][lng]`, data[i].lng)
     formData.append(`Waypoints[${i}][isRoad]`, data[i].isRoad)
     formData.append(`Waypoints[${i}][id]`, data[i].id)
+    formData.append(`Waypoints[${i}][type]`, data[i].type)
   }
 
   // Add the files

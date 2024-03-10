@@ -39,6 +39,7 @@ public class TourService
                 Longitude = waypoint.Lng,
                 Description = waypoint.Description,
                 IsRoad = waypoint.IsRoad,
+                Type = waypoint.Type
             });
 
             foreach (var imageUrl in waypointImageUrl)
@@ -160,7 +161,8 @@ public class TourService
                         Longitude = waypoint.Lng,
                         Description = waypoint.Description,
                         Images = imagesToAdd,
-                        IsRoad = waypoint.IsRoad
+                        IsRoad = waypoint.IsRoad,
+                        Type = waypoint.Type
                     });
                 }
 

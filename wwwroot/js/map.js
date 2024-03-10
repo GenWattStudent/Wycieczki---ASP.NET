@@ -1,9 +1,17 @@
+import {
+  defaultMarker,
+  endMarker,
+  waypointMarker,
+  startMarker,
+  tourIndicator,
+} from './markers.js'
+const key = 'udRsGNqnZuvxREFK3GeD'
 export class Map {
   constructor() {
     this.map = L.map('map').setView([51.505, -0.09], 13)
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    L.maptilerLayer({
+      apiKey: key,
+      style: '04f9d487-86a6-463f-a5c7-4d4103d7818a',
     }).addTo(this.map)
     this.waypoints = []
   }
@@ -13,12 +21,12 @@ export class Map {
 
     if (images.length && images[0] instanceof File) {
       images = images.map((image) => URL.createObjectURL(image))
-    } else if (images.length) {
+    } else if (images.$values) {
+      console.log(images, 'images')
       images = images.$values.map((image) => image.imageUrl)
     } else {
       images = []
     }
-
     const imageDivs = images
       .map(
         (image, index) => `
@@ -56,6 +64,7 @@ export class Map {
 
   createEditPopup(waypointData) {
     const { name, description, images } = waypointData
+    console.log(images, 'images')
     const imageDivs = images
       .map(
         (image, index) => `
@@ -115,10 +124,33 @@ export class Map {
     L.polyline(latlngs, { color: 'blue' }).addTo(this.map)
   }
 
-  createMarker(waypointData, edit = false, draggable = false, isUser = false) {
+  getIcon(currentTool) {
+    switch (currentTool) {
+      case 'road':
+        return defaultMarker
+      case 'start':
+        return startMarker
+      case 'end':
+        return endMarker
+      case 'marker':
+        return waypointMarker
+      case 'indicator':
+        return tourIndicator
+      default:
+        return defaultMarker
+    }
+  }
+
+  createMarker(
+    waypointData,
+    edit = false,
+    draggable = false,
+    isUser = false,
+    icon = defaultMarker
+  ) {
     const marker = L.marker(
       { lat: waypointData.lat, lng: waypointData.lng },
-      { draggable }
+      { draggable, icon }
     ).addTo(this.map)
 
     const popup = edit
@@ -130,6 +162,10 @@ export class Map {
           waypointData.id,
           isUser
         )
+
+    if (waypointData.isTourIndicator) {
+      return
+    }
 
     marker
       .bindPopup(popup)
@@ -143,7 +179,7 @@ export class Map {
         this.connectWaypointsWithLine(this.waypoints)
       })
       .on('popupopen', () => {
-        if (!edit)
+        if (!edit && !isUser)
           document
             .getElementById(`remove-${waypointData.id}`)
             .addEventListener('click', () =>

@@ -37,7 +37,7 @@ public class TourController : Controller
     public async Task<IActionResult> AddTour([FromForm] AddTourModel addTourModel)
     {
         List<string> imageUrls = new List<string>();
-
+        Console.WriteLine(addTourModel.Waypoints[0].Type + "asdasdasdsadasd");
         var tour = new TourModel
         {
             Name = addTourModel.Name,
@@ -50,7 +50,7 @@ public class TourController : Controller
 
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest();
         }
 
         if (addTourModel.Images != null && addTourModel.Images.Count > 0)

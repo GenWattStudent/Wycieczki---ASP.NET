@@ -2,6 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Book.App.Models;
 
+public enum WaypointType
+{
+    Start,
+    Marker,
+    End,
+    Road
+}
+
 public class WaypointModel
 {
     [Key]
@@ -14,4 +22,5 @@ public class WaypointModel
     public int TourId { get; set; }
     public TourModel Tour { get; set; } = new();
     public bool IsRoad { get; set; }
+    public WaypointType Type { get; set; }
 }
