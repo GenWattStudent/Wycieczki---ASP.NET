@@ -1,0 +1,28 @@
+@model WaypointModel
+
+@{
+    ViewData["Title"] = "Waypoint - " + Model.Name;
+    var sliderData = new ImageSliderModel
+            {
+                Images = Model.Images,
+                SliderId = Model.TourId
+            };
+}
+
+<a class="text-dark" asp-action="TourDetails" asp-controller="Tour" asp-route-id="Model.TourId">
+    Go to the tour - <strong class="text-primary">@Model.Tour.Name</strong>
+</a>
+
+<div class="card mt-2">
+    <header class="card-header text-primary">
+        <h2>@Model.Name</h2>
+    </header>
+
+    <partial name="_ImageSliderPartial" model="@sliderData" />
+
+    <div class="card-body">
+        <p>@Model.Description</p>
+        <p>Latitude: @Model.Latitude</p>
+        <p>Longitude: @Model.Longitude</p>
+    </div>
+</div>

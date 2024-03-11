@@ -51,11 +51,32 @@ public class WaypointController : Controller
         Console.WriteLine(id);
         if (waypoint == null)
         {
-            return NotFound();
+            TempData["ErrorMessage"] = "Waypoint not found";
+            var referrer = Request.Headers["Referer"].ToString();
+            return Redirect(referrer);
         }
 
         await _waypointService.AddImages(images, waypoint);
         Console.WriteLine(waypoint.TourId);
         return RedirectToAction("EditTour", "Tour", new { id = waypoint.TourId });
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Details(int id)
+    {
+        var waypoint = await _waypointService.GetWaypoint(id);
+        if (waypoint == null)
+        {
+            TempData["ErrorMessage"] = "Waypoint not found";
+
+            var referrer = Request.Headers["Referer"].ToString();
+            if (string.IsNullOrEmpty(referrer))
+            {
+                return RedirectToAction("Tours", "Tour");
+            }
+            return Redirect(referrer);
+        }
+
+        return View(waypoint);
     }
 }

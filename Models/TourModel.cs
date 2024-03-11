@@ -30,4 +30,29 @@ public class TourModel
     // [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime EndDate { get; set; }
     public List<WaypointModel> Waypoints { get; set; } = new();
+
+    public TourModel(AddTourModel addTourModel)
+    {
+        Name = addTourModel.Name;
+        Description = addTourModel.Description;
+        Price = addTourModel.Price;
+        StartDate = addTourModel.StartDate;
+        EndDate = addTourModel.EndDate;
+        MaxUsers = addTourModel.MaxUsers;
+    }
+
+    public TourModel(EditTourModel editTourModel)
+    {
+        Id = editTourModel.Id;
+        Name = editTourModel.Name;
+        Description = editTourModel.Description;
+        Price = editTourModel.Price;
+        StartDate = editTourModel.StartDate;
+        EndDate = editTourModel.EndDate;
+        MaxUsers = editTourModel.MaxUsers;
+    }
+
+    public TourModel()
+    {
+    }
 }

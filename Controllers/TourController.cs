@@ -20,6 +20,8 @@ public class TourController : Controller
         _tourService = tourService;
     }
 
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [Authorize]
     public async Task<IActionResult> Tours()
     {
         _logger.LogInformation("Getting all tours");
@@ -27,6 +29,7 @@ public class TourController : Controller
         return View(tours);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult AddTour()
     {
         return View();
@@ -37,20 +40,12 @@ public class TourController : Controller
     public async Task<IActionResult> AddTour([FromForm] AddTourModel addTourModel)
     {
         List<string> imageUrls = new List<string>();
-        Console.WriteLine(addTourModel.Waypoints[0].Type + "asdasdasdsadasd");
-        var tour = new TourModel
-        {
-            Name = addTourModel.Name,
-            Description = addTourModel.Description,
-            Price = addTourModel.Price,
-            StartDate = addTourModel.StartDate,
-            EndDate = addTourModel.EndDate,
-            MaxUsers = addTourModel.MaxUsers,
-        };
+
+        var tour = new TourModel(addTourModel);
 
         if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return View(tour);
         }
 
         if (addTourModel.Images != null && addTourModel.Images.Count > 0)
@@ -68,28 +63,17 @@ public class TourController : Controller
     public async Task<IActionResult> EditTour(EditTourModel editTourModel)
     {
         List<string> imageUrls = new List<string>();
+        var tour = new TourModel(editTourModel);
 
         if (ModelState.IsValid == false)
         {
-
-            return View(editTourModel);
+            return View(tour);
         }
 
         if (editTourModel.Images != null && editTourModel.Images.Count > 0)
         {
             _tourService.SaveImages(editTourModel.Images, _tourFolder, out imageUrls);
         }
-
-        var tour = new TourModel
-        {
-            Id = editTourModel.Id,
-            Name = editTourModel.Name,
-            Description = editTourModel.Description,
-            Price = editTourModel.Price,
-            StartDate = editTourModel.StartDate,
-            EndDate = editTourModel.EndDate,
-            MaxUsers = editTourModel.MaxUsers,
-        };
 
         await _tourService.EditTour(tour, editTourModel, imageUrls);
 
@@ -116,8 +100,8 @@ public class TourController : Controller
         }
 
         _tourService.DeleteTour(id);
-
-        return RedirectToAction("Tours");
+        Console.WriteLine((await _tourService.GetTours()).Count);
+        return Redirect("/Tour/Tours");
     }
 
     [Authorize(Roles = "Admin")]
@@ -134,17 +118,10 @@ public class TourController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteImage(int id, int tourId)
     {
-        try
-        {
-            await _tourService.DeleteImage(id);
-            var tour = await _tourService.GetTour(tourId);
-            Console.WriteLine(tour.Images.Count);
-            return View("EditTour", tour);
-        }
-        catch (Exception e)
-        {
-            return View();
-        }
+        await _tourService.DeleteImage(id);
+        var tour = await _tourService.GetTour(tourId);
+        Console.WriteLine((await _tourService.GetTours()).Count);
+        return View("EditTour", tour);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

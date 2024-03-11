@@ -1,13 +1,18 @@
 @using Book.App.ViewModels
-@model TourViewModel
+@model BookViewModel
 
 @{
     ViewBag.Title = $"Tour - {Model.TourModel.Name}";
+    var sliderData = new ImageSliderModel
+            {
+                Images = Model.TourModel.Images,
+                SliderId = Model.TourModel.Id,
+            };
 }
 
 <section class="card">
     <div class="card-header d-flex gap-2">
-        <partial name="_ImageSliderPartial" model="@Model.TourModel" />
+        <partial name="_ImageSliderPartial" model="@sliderData" />
         <h4 class="card-title text-primary">@Model.TourModel.Name</h4>
     </div>
 
@@ -33,26 +38,11 @@
 
                 <div class="d-flex justify-content-between mt-1">
                     <strong class="text-secondary">Distance: @Math.Round(Model.Distance, 3) km</strong>
-                    <strong class="text-secondary">Passed @(Math.Round(Model.Distance *
+                    <strong id="passed" class="text-secondary">Passed @(Math.Round(Model.Distance *
                         Model.PercentOfTime,
                         3)) km</strong>
                 </div>
-                @if (Model.TourModel.StartDate > DateTime.Now)
-                {
-                    <p class="text-primary mt-1">This trip has not started yet</p>
-                }
-                else if (Model.TourModel.EndDate < DateTime.Now)
-                {
-                    <p class="text-primary mt-1">This trip has ended</p>
-                }
-                else
-                {
-                    <div class="text-secondary font-weight-bold">
-                        @Math.Round(Model.DistanceToNextWaypoint, 3) km to <strong
-                            class="text-primary">@Model.NextWaypoint.Name</strong>
-                    </div>
-                    <p class="text-success mt-1">@(Math.Round(Model.PercentOfTime * 100, 1))% completed</p>
-                }
+                <partial name="_TourStatusPartial" model="@Model" />
             </div>
         </div>
 
@@ -62,32 +52,92 @@
                 Cancel this trip
             </button>
         </form>
+
     </div>
 </section>
+
+<div class="modal fade" id="TourEnded" tabindex="-1" role="dialog" aria-labelledby="TourEndedLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TourEndedLabel">This is over :(</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                The tour <strong class="text-primary">(@Model.TourModel.Name)</strong> has finished.
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-danger" asp-action="Tours" asp-controller="Tour">Check other tours</a>
+                <a class="btn btn-secondary" data-dismiss="modal">Ok</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="map" class="mt-4 rounded"></div>
 
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
     <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
 
     <script src="~/js/userMap.js" type="module"></script>
+    @{
+        var tourLat = Model.NextWaypointData != null ? Model.NextWaypointData.TourLat : 0;
+        var tourLon = Model.NextWaypointData != null ? Model.NextWaypointData.TourLon : 0;
+    }
     <script type="module">
         import { UserMap } from '/js/userMap.js';
-        const model = @Html.Raw(Json.Serialize(Model.TourModel));
-        const tourLat = @Html.Raw(Json.Serialize(Model.TourLat));
-        const tourLon = @Html.Raw(Json.Serialize(Model.TourLon));
+        import { TourData } from '/js/tourData.js';
 
-        if (model.waypoints.$values.length > 0) {
-            const userMap = new UserMap(model.waypoints.$values, tourLat, tourLon);
-            const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
-                return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
-            }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
+        $(document).ready(function () {
+            const model = @Html.Raw(Json.Serialize(Model.TourModel));
+            const tourLat = @tourLat;
+            const tourLon = @tourLon;
+            let isTourEnded = new Date(model.endDate) < new Date();
+            let isTourStarted = new Date(model.startDate) < new Date();
 
-            userMap.map.setView(middleLatLong, 13);
-        }
+            function reloadWhenTourStarts() {
+                if (!isTourStarted && new Date(model.startDate) < new Date()) {
+                    location.reload();
+                }
+            }
+
+            function tourEnded() {
+                if (isTourEnded || new Date(model.endDate) < new Date()) {
+                    $('#TourEnded').modal("show");
+                }
+            }
+
+            function updateTourData(userMap) {
+                reloadWhenTourStarts()
+                tourEnded()
+
+                const tourData = new TourData(model.waypoints.$values, model.startDate, model.endDate);
+                const completed = tourData.calculatePercentComplete();
+                const data = tourData.calculateDistanceToNextWaypoint(completed);
+
+                $('#passed').text(`Passed ${tourData.calculatePassedDistance(completed).toFixed(3)} km`);
+                $('#completed').text(`${(completed * 100).toFixed(1)}% completed`);
+                $('#distanceToNextWaypoint').html(`${data.distance.toFixed(3)} km to <strong class="text-primary">${data.nextWaypoint.name}</strong>`);
+
+                userMap.updateTourIndicator(data.tourLat, data.tourLon);
+            }
+
+            if (model.waypoints.$values.length > 0) {
+                const userMap = new UserMap(model.waypoints.$values, tourLat, tourLon);
+                if (!isTourEnded) setInterval(() => updateTourData(userMap), 1000);
+                else tourEnded();
+
+                const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
+                    return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
+                }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
+
+                userMap.map.setView(middleLatLong, 13);
+            }
+        });
     </script>
 }

@@ -7,12 +7,17 @@
 
 @{
     var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+    var sliderData = new ImageSliderModel
+            {
+                Images = Model.Images,
+                SliderId = Model.Id,
+            };
 }
 
 <p class="text-danger h2"> @TempData["ErrorMessage"]</p>
 <section class="card">
     <header class="card-header">
-        <partial name="_ImageSliderPartial" model="@Model" />
+        <partial name="_ImageSliderPartial" model="@sliderData" />
         <h1 class="card-title mt-2">@Model.Name</h1>
     </header>
     <div class="card-body">
@@ -28,7 +33,10 @@
                         @if (waypoint.Type != WaypointType.Road)
                         {
                             <div class="d-flex align-items-center">
-                                <strong class="d-block pe-2">@waypoint.Name</strong>
+                                <a class="text-secondary" asp-action="Details" asp-controller="Waypoint"
+                                    asp-route-id="@waypoint.Id">
+                                    <strong class="d-block pe-2">@waypoint.Name</strong>
+                                </a>
                                 @if (@Model.Waypoints.Last() != waypoint)
                                 {
                                     <ion-icon class="text-primary" name="arrow-forward"></ion-icon>

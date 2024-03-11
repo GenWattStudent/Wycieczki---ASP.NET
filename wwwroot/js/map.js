@@ -107,6 +107,10 @@ export class Map {
       </div>`
   }
 
+  updateMarker(marker, lat, lng) {
+    marker.setLatLng({ lat, lng })
+  }
+
   removeWayPoint(id) {
     const waypoint = this.waypoints.find((w) => w.id == id)
     console.log(waypoint, 'waypoint')
@@ -120,7 +124,9 @@ export class Map {
 
   connectWaypointsWithLine(waypoints) {
     this.clearLines()
-    const latlngs = waypoints.map((w) => [w.lat, w.lng])
+    const latlngs = waypoints
+      .filter((w) => !w.isTourIndicator)
+      .map((w) => [w.lat, w.lng])
     L.polyline(latlngs, { color: 'blue' }).addTo(this.map)
   }
 
@@ -162,6 +168,8 @@ export class Map {
           waypointData.id,
           isUser
         )
+
+    waypointData.marker = marker
 
     if (waypointData.isTourIndicator) {
       return

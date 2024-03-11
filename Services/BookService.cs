@@ -1,4 +1,5 @@
 using Book.App.Models;
+using Book.App.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
@@ -6,15 +7,23 @@ namespace Book.App.Services;
 public class BookService
 {
     private readonly ApplicationDbContext _context;
+    private readonly GeoService _geoService;
 
-    public BookService(ApplicationDbContext context)
+    public BookService(ApplicationDbContext context, GeoService geoService)
     {
         _context = context;
+        _geoService = geoService;
     }
 
     public async Task<List<TourModel>> GetToursByUserId(int userId)
     {
-        var userWithTours = await _context.Users.Include(u => u.Tours).ThenInclude(t => t.Images).FirstOrDefaultAsync(u => u.Id == userId);
+        var userWithTours = await _context.Users
+        .Include(u => u.Tours)
+            .ThenInclude(t => t.Images)
+        .Include(u => u.Tours)
+            .ThenInclude(t => t.Waypoints)
+        .FirstOrDefaultAsync(u => u.Id == userId);
+
         return userWithTours?.Tours.ToList() ?? new();
     }
 
@@ -52,7 +61,7 @@ public class BookService
         var user = await _context.Users.Include(u => u.Tours).FirstOrDefaultAsync(u => u.Id == userId);
         var tour = await _context.Tours.FirstOrDefaultAsync(t => t.Id == tourId);
 
-        if (tour.StartDate < DateTime.Now)
+        if (tour.StartDate < DateTime.Now && tour.EndDate > DateTime.Now)
         {
             throw new Exception("Tour already started");
         }
@@ -73,5 +82,28 @@ public class BookService
         var tour = await _context.Tours.Include(t => t.Users).Include(t => t.Waypoints).ThenInclude(w => w.Images).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == tourId && t.Users.Any(u => u.Id == userId));
 
         return tour;
+    }
+
+    public BookViewModel GetBookViewModel(TourModel tour)
+    {
+        var bookViewModel = new BookViewModel { TourModel = tour, Distance = _geoService.CalculateDistance(tour.Waypoints) };
+
+        // the trip started and not ended calculate dsitance and which waypoint you are
+        if (tour.StartDate <= DateTime.Now && tour.EndDate >= DateTime.Now)
+        {
+            bookViewModel.PercentOfTime = (DateTime.Now - tour.StartDate).TotalDays / (tour.EndDate - tour.StartDate).TotalDays;
+            var nextWaypointData = _geoService.CalculateDistanceToNextWaypoint(tour.Waypoints, bookViewModel.PercentOfTime);
+            bookViewModel.NextWaypointData = nextWaypointData;
+        }
+        else if (tour.StartDate > DateTime.Now)
+        {
+            bookViewModel.PercentOfTime = 0;
+        }
+        else
+        {
+            bookViewModel.PercentOfTime = 1;
+        }
+
+        return bookViewModel;
     }
 }

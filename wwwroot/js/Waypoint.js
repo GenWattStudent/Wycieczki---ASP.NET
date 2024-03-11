@@ -20,6 +20,7 @@ export class Waypoint {
     this.isRoad = isRoad
     this.type = type
     this.isTourIndicator = false
+    this.marker = null
   }
 
   getSubmitData() {

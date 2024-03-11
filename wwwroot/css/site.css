@@ -156,3 +156,13 @@ body {
   margin-left: -0.5rem;
   margin-top: -0.5rem !important;
 }
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 2rem !important;
+  background-color: #5252528f;
+}
+
+.carousel {
+  background-color: #52525255;
+}

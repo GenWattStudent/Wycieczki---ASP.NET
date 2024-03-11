@@ -1,5 +1,5 @@
 @using Book.App.ViewModels
-@model ToursViewModel
+@model BooksViewModel
 
 @{
     ViewData["Title"] = "Your tours";
@@ -7,7 +7,7 @@
 
 <h1 class="text-uppercase">Your tours</h1>
 
-@if (Model.Tours.Count() == 0)
+@if (Model.Books.Count() == 0)
 {
     <p>You have no trips yet.</p>
     <a asp-action="Tours" asp-controller="Tour">
@@ -19,27 +19,33 @@
 else
 {
     <ul class="list-group">
-        @foreach (var tour in Model.Tours)
+        @foreach (var tour in Model.Books)
         {
+            var sliderData = new ImageSliderModel
+                    {
+                        Images = tour.TourModel.Images,
+                        SliderId = tour.TourModel.Id
+                    };
             <li class="list-group-item mt-2">
                 <div class="d-flex gap-2">
                     <header class="card-header w-100">
-                        <partial name="_ImageSliderPartial" model="@tour" />
+                        <partial name="_ImageSliderPartial" model="@sliderData" />
                         <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
-                            asp-route-id="@tour.Id">
-                            <h2>@tour.Name</h2>
+                            asp-route-id="@tour.TourModel.Id">
+                            <h2>@tour.TourModel.Name</h2>
                         </a>
                     </header>
                 </div>
-                <p class="mt-2">@tour.Description</p>
+                <p class="mt-2">@tour.TourModel.Description</p>
+                <partial name="_TourStatusPartial" model="@tour" />
                 <div class="d-flex gap-2">
-                    <a asp-action="Details" asp-controller="Book" asp-route-id="@tour.Id">
+                    <a asp-action="Details" asp-controller="Book" asp-route-id="@tour.TourModel.Id">
                         <button class="btn btn-primary">
                             Details
                         </button>
                     </a>
                     <form asp-action="Delete" asp-controller="Book" method="post">
-                        <input type="hidden" name="id" value="@tour.Id" />
+                        <input type="hidden" name="id" value="@tour.TourModel.Id" />
                         <button class="btn btn-danger">
                             Cancel this trip
                         </button>

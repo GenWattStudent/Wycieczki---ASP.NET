@@ -1,0 +1,19 @@
+@using Book.App.ViewModels
+@model BookViewModel
+
+@if (Model.TourModel.StartDate > DateTime.Now)
+{
+    <p class="text-primary mt-1">This trip has not started yet</p>
+}
+else if (Model.TourModel.EndDate < DateTime.Now)
+{
+    <p class="text-primary mt-1">This trip has ended</p>
+}
+else
+{
+    <div id="distanceToNextWaypoint" class="text-secondary font-weight-bold">
+        @Math.Round(Model.NextWaypointData.Distance, 3) km to <strong
+            class="text-primary">@Model.NextWaypointData.NextWaypoint.Name</strong>
+    </div>
+    <p id="completed" class="text-success mt-1">@(Math.Round(Model.PercentOfTime * 100, 1))% completed</p>
+}

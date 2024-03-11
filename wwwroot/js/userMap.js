@@ -47,6 +47,20 @@ export class UserMap extends Map {
     this.connectWaypointsWithLine(this.waypoints)
   }
 
+  updateTourIndicator(lat, long) {
+    console.log(this.waypoints)
+    const tourIndicator = this.waypoints.find(
+      (waypoint) => waypoint.isTourIndicator
+    )
+
+    console.log(tourIndicator, 'tourIndicator')
+    if (tourIndicator) {
+      tourIndicator.latitude = lat
+      tourIndicator.longitude = long
+      this.updateMarker(tourIndicator.marker, lat, long)
+    }
+  }
+
   getTypeFromEnum(type) {
     switch (type) {
       case 0:

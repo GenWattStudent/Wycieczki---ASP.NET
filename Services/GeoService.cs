@@ -43,36 +43,39 @@ public class GeoService
 
     public NextWaypointData CalculateDistanceToNextWaypoint(List<WaypointModel> waypoints, double percentOfTime)
     {
-        var distance = 0f;
-        var tourLat = 0d;
-        var tourLon = 0d;
-        var nextWaypoint = new WaypointModel();
+        double totalDistance = CalculateDistance(waypoints);
+        double accumulatedDistance = 0;
+        double tourLat = 0;
+        double tourLon = 0;
+        WaypointModel nextWaypoint = null;
 
+        // Then, find the next waypoint based on percentOfTime
         for (int i = 0; i < waypoints.Count - 1; i++)
         {
             var point1 = waypoints[i];
             var point2 = waypoints[i + 1];
 
             var distanceBetweenPoints = CalculateDistance(point1.Latitude, point1.Longitude, point2.Latitude, point2.Longitude);
+            accumulatedDistance += distanceBetweenPoints;
 
-            if (percentOfTime * distanceBetweenPoints > distance)
+            if (accumulatedDistance / totalDistance >= percentOfTime)
             {
-                distance = distanceBetweenPoints;
-                // Interpolate the current position based on percentOfTime
-                tourLat = point1.Latitude + percentOfTime * (point2.Latitude - point1.Latitude);
-                tourLon = point1.Longitude + percentOfTime * (point2.Longitude - point1.Longitude);
+                // Calculate the distance travelled from the previous waypoint
+                double distanceTravelled = percentOfTime * totalDistance - (accumulatedDistance - distanceBetweenPoints);
+
+                // Interpolate the current position based on the distance travelled
+                double ratio = distanceTravelled / distanceBetweenPoints;
+                tourLat = point1.Latitude + ratio * (point2.Latitude - point1.Latitude);
+                tourLon = point1.Longitude + ratio * (point2.Longitude - point1.Longitude);
+
                 nextWaypoint = point2;
                 break;
-            }
-            else
-            {
-                distance -= (float)(percentOfTime * distanceBetweenPoints);
             }
         }
 
         return new NextWaypointData
         {
-            Distance = distance,
+            Distance = CalculateDistance(tourLat, tourLon, nextWaypoint.Latitude, nextWaypoint.Longitude),
             TourLat = tourLat,
             TourLon = tourLon,
             NextWaypoint = nextWaypoint,

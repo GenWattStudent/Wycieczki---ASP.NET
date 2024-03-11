@@ -10,12 +10,10 @@ namespace Book.App.Controllers;
 public class BookController : Controller
 {
     private readonly BookService _bookService;
-    private readonly GeoService _geoService;
 
-    public BookController(BookService tourService, GeoService geoService)
+    public BookController(BookService tourService)
     {
         _bookService = tourService;
-        _geoService = geoService;
     }
 
     public async Task<IActionResult> Details(int id)
@@ -34,32 +32,9 @@ public class BookController : Controller
             return RedirectToAction("Index");
         }
 
-        var tourViewModel = new TourViewModel
-        {
-            TourModel = tour,
-            Distance = _geoService.CalculateDistance(tour.Waypoints),
-        };
+        var bookViewModel = _bookService.GetBookViewModel(tour);
 
-        // the trip started and not ended calculate dsitance and which waypoint you are
-        if (tour.StartDate <= DateTime.Now && tour.EndDate >= DateTime.Now)
-        {
-            tourViewModel.PercentOfTime = (DateTime.Now - tour.StartDate).TotalDays / (tour.EndDate - tour.StartDate).TotalDays;
-            var nextWaypointData = _geoService.CalculateDistanceToNextWaypoint(tour.Waypoints, tourViewModel.PercentOfTime);
-            tourViewModel.DistanceToNextWaypoint = nextWaypointData.Distance;
-            tourViewModel.TourLat = nextWaypointData.TourLat;
-            tourViewModel.TourLon = nextWaypointData.TourLon;
-            tourViewModel.NextWaypoint = nextWaypointData.NextWaypoint;
-        }
-        else if (tour.StartDate > DateTime.Now)
-        {
-            tourViewModel.PercentOfTime = 0;
-        }
-        else
-        {
-            tourViewModel.PercentOfTime = 1;
-        }
-
-        return View(tourViewModel);
+        return View(bookViewModel);
     }
 
     public async Task<IActionResult> Index()
@@ -72,12 +47,14 @@ public class BookController : Controller
         }
 
         var userTours = await _bookService.GetToursByUserId(int.Parse(userId));
-        var toursViewModel = new ToursViewModel
-        {
-            Tours = userTours
-        };
+        var booksViewModel = new BooksViewModel();
 
-        return View(toursViewModel);
+        foreach (var tour in userTours)
+        {
+            booksViewModel.Books.Add(_bookService.GetBookViewModel(tour));
+        }
+
+        return View(booksViewModel);
     }
 
     [HttpPost]
@@ -98,7 +75,6 @@ public class BookController : Controller
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
             TempData["ErrorMessage"] = e.Message;
             return RedirectToAction("TourDetails", "Tour", new { id = id });
         }

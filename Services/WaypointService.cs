@@ -16,7 +16,7 @@ public class WaypointService
 
     public async Task<WaypointModel?> GetWaypoint(int id)
     {
-        return await _context.Waypoints.FindAsync(id);
+        return await _context.Waypoints.Include(w => w.Images).Include(w => w.Tour).FirstOrDefaultAsync(w => w.Id == id);
     }
 
     public async Task RemoveWaypointImages(WaypointModel waypointModel)
@@ -52,7 +52,6 @@ public class WaypointService
         {
             _context.Waypoints.Remove(waypoint);
             await RemoveWaypointImages(waypoint);
-            _context.SaveChanges();
             await _context.SaveChangesAsync();
         }
     }
