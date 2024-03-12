@@ -23,4 +23,28 @@ public class UserModel
     public ContactModel? Contact { get; set; }
     public PreferencesModel Preferences { get; set; }
     public AddressModel? Address { get; set; }
+    public string? ImagePath { get; set; }
+
+    public UserModel(RegisterModel registerModel)
+    {
+        Username = registerModel.Username;
+        Password = registerModel.Password;
+        Contact = new ContactModel
+        {
+            Email = registerModel.Contact.Email,
+            Phone = registerModel.Contact.Phone
+        };
+        Address = new AddressModel
+        {
+            Street = registerModel.Address.Street,
+            City = registerModel.Address.City,
+            Zip = registerModel.Address.ZipCode,
+            Country = registerModel.Address.Country
+        };
+        Preferences = new PreferencesModel();
+    }
+
+    public UserModel()
+    {
+    }
 }

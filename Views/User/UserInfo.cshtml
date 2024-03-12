@@ -5,11 +5,38 @@
     ViewData["Title"] = $"Welcome {Model.Name}";
 }
 
-<div>
-    <h1>Welcome @Model.Name</h1>
-    <p class="text-muted">Your role is: @Model.Role</p>
-    <div class="d-flex gap-2">
-        <a asp-action="Logout" asp-controller="User"><button class="btn btn-primary">Logout</button></a>
-        <a asp-action="Delete" asp-controller="User"><button class="btn btn-danger">Delete account</button></a>
-    </div>
-</div>
+<section>
+    <header class="d-flex flex-wrap justify-content-between">
+        <h1>Welcome @Model.Name</h1>
+        <img class="rounded" src="@Model.ImagePath" alt="">
+    </header>
+    <table>
+        <tr>
+            <td>Username:</td>
+            <td>@Model.Name</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            @if (@Model.Contact != null && @Model.Contact.Email != null)
+            {
+                <td class="text-primary">@Model.Contact.Email</td>
+            }
+            else
+            {
+                <td class="text-danger">No email</td>
+            }
+
+            @* <tr>
+            <td>Phone:</td>
+            <td>@Model.Contact.Phone</td>
+            </tr> *@
+            @* <tr>
+            <td>Address:</td>
+            <td>@Model.Address.Street</td>
+            </tr>
+            </table> *@
+            <div class="d-flex gap-2">
+                <a asp-action="Logout" asp-controller="User"><button class="btn btn-primary">Logout</button></a>
+                <a asp-action="Delete" asp-controller="User"><button class="btn btn-danger">Delete account</button></a>
+            </div>
+</section>

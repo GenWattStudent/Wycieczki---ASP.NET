@@ -43,13 +43,7 @@ public class UserController : Controller
                     return View(registerModel);
                 }
 
-                var user = new UserModel
-                {
-                    Username = registerModel.Username,
-                    Password = registerModel.Password
-                };
-
-                await _userService.Register(user);
+                await _userService.Register(registerModel);
 
                 return RedirectToAction("Login");
             }
@@ -101,13 +95,16 @@ public class UserController : Controller
         return RedirectToAction("Login");
     }
 
-    public IActionResult UserInfo()
+    async public Task<IActionResult> UserInfo()
     {
-        var userViewModel = new UserViewModel
+        var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
+
+        if (user == null)
         {
-            Name = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
-            Role = User.FindFirst(ClaimTypes.Role) != null ? (Role)Enum.Parse(typeof(Role), User.FindFirst(ClaimTypes.Role)?.Value) : Role.User
-        };
+            return BadRequest();
+        }
+
+        var userViewModel = new UserViewModel(user);
 
         return View(userViewModel);
     }
@@ -149,7 +146,7 @@ public class UserController : Controller
                 Role = Role.Admin
             };
 
-            await _userService.Register(user);
+            await _userService.RegisterAdmin(user);
 
             return RedirectToAction("Login");
         }

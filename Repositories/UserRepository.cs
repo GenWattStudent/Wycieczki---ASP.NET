@@ -12,6 +12,6 @@ public class UserRepository : Repository<UserModel>
 
     public async Task<UserModel?> GetByUsername(string username)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(x => x.Username == username);
+        return await _dbContext.Users.Include(u => u.Contact).Include(u => u.Address).Include(u => u.Preferences).FirstOrDefaultAsync(x => x.Username == username);
     }
 }

@@ -6,15 +6,16 @@
     Layout = "~/Views/Shared/_UserAuthLayout.cshtml";
 }
 
-
 <div>
     <header class="container mt-4 d-flex align-items-center gap-2">
         <img src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
         <h1>Register To <strong class="text-primary">Bookmania</strong></h1>
     </header>
     
-    @using (Html.BeginForm("Register", "User", FormMethod.Post))
-    {
+    @using (Html.BeginForm("Register", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {        
+        <h5 class="mt-2">Account</h5>
+
         <label for="Username">Username</label>
         <div class="input-group mt-1 d-flex flex-column">
             @Html.TextBoxFor(model => model.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
@@ -33,6 +34,53 @@
             @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "field-validation-error text-danger" })
         </div>
 
+        <h5 class="mt-2">Contact</h5>
+
+        <label for="Email">Email</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Contact.Email, new { @class = "form-control w-100", placeholder = "Your email...", })
+            @Html.ValidationMessageFor(model => model.Contact.Email, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="PhoneNumber">Phone Number</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Contact.Phone, new { @class = "form-control w-100", placeholder = "Your phone number...", })
+            @Html.ValidationMessageFor(model => model.Contact.Phone, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <h5 class="mt-2">Address</h5>
+
+        <label for="Address">Street</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Address.Street, new { @class = "form-control w-100", placeholder = "Your str...", })
+            @Html.ValidationMessageFor(model => model.Address.Street, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="City">City</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Address.City, new { @class = "form-control w-100", placeholder = "Your city...", })
+            @Html.ValidationMessageFor(model => model.Address.City, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="State">Country</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Address.Country, new { @class = "form-control w-100", placeholder = "Your state...", })
+            @Html.ValidationMessageFor(model => model.Address.Country, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="ZipCode">Zip Code</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Address.ZipCode, new { @class = "form-control w-100", placeholder = "Your zip code...", })
+            @Html.ValidationMessageFor(model => model.Address.ZipCode, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="image">Avatar</label>
+        <div class="input-group mt-1">
+            <input class="form-control" type="file" name="image" onchange="ImgPre(this)" accept="image/*">
+        </div>
+
+        <div id="preview" class="d-flex mt-2"></div>
+
         <a href="@Url.Action("Login", "User")" class="mt-2 d-block">Already have an account? Login</a>
 
         <div class="input-group mt-3">
@@ -40,3 +88,18 @@
         </div>
     }
 </div>
+
+@section Scripts
+{
+    <script>
+        function ImgPre(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#preview').html('<img src="' + e.target.result + '" class="img-fluid" style="max-width: 100px; max-height: 100px;"/>');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
