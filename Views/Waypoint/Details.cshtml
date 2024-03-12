@@ -21,8 +21,8 @@
     <partial name="_ImageSliderPartial" model="@sliderData" />
 
     <div class="card-body">
-        <p>@Model.Description</p>
-        <p>Latitude: @Model.Latitude</p>
-        <p>Longitude: @Model.Longitude</p>
+        <p class="alert alert-dark">@Model.Description</p>
+        <p>Latitude: <span class="badge bg-primary">@Math.Round(Model.Latitude, 4)</span></p>
+        <p>Longitude: <span class="badge bg-primary">@Math.Round(Model.Longitude, 4)</span></p>
     </div>
 </div>

@@ -1,0 +1,20 @@
+@using Book.App.Models
+@model List<WaypointModel>
+
+<div class="d-flex gap-2 mt-3 flex-wrap">
+    @foreach (var waypoint in Model)
+    {
+        @if (waypoint.Type != WaypointType.Road)
+        {
+            <div class="d-flex align-items-center">
+                <a class="text-secondary" asp-action="Details" asp-controller="Waypoint" asp-route-id="@waypoint.Id">
+                    <strong class="d-block pe-2">@waypoint.Name</strong>
+                </a>
+                @if (@Model.Last() != waypoint)
+                {
+                    <ion-icon class="text-primary" name="arrow-forward"></ion-icon>
+                }
+            </div>
+        }
+    }
+</div>

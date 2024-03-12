@@ -1,0 +1,17 @@
+@using Book.App.ViewModels
+@model BooksViewModel
+
+@{
+    ViewData["Title"] = "Tour History";
+}
+
+<header>
+    <h1>You Tours History</h1>
+</header>
+
+<ul class="gap-3 p-0 justify-content-center">
+    @foreach (var tour in Model.Books)
+    {
+        <partial name="_BookTourItemPartial" model="tour" />
+    }
+</ul>

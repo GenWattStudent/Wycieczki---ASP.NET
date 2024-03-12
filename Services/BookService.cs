@@ -15,16 +15,34 @@ public class BookService
         _geoService = geoService;
     }
 
-    public async Task<List<TourModel>> GetToursByUserId(int userId)
+    public IQueryable<List<TourModel>> GetToursByUserIdQueryable(int userId)
     {
-        var userWithTours = await _context.Users
-        .Include(u => u.Tours)
+        return _context.Users
+            .Include(u => u.Tours)
             .ThenInclude(t => t.Images)
-        .Include(u => u.Tours)
+            .Include(u => u.Tours)
             .ThenInclude(t => t.Waypoints)
-        .FirstOrDefaultAsync(u => u.Id == userId);
+            .Where(u => u.Id == userId).Select(u => u.Tours);
+    }
 
-        return userWithTours?.Tours.ToList() ?? new();
+    public async Task<List<TourModel>> GetActiveAndFutureToursByUserId(int userId)
+    {
+        var userWithTours = GetToursByUserIdQueryable(userId);
+
+        return await userWithTours.SelectMany(t => t)
+                                  .Where(t => t.StartDate >= DateTime.Now || t.EndDate >= DateTime.Now)
+                                  .OrderBy(t => t.StartDate)
+                                  .ToListAsync();
+    }
+
+    public async Task<List<TourModel>> GetToursHistoryByUserId(int userId)
+    {
+        var userWithTours = GetToursByUserIdQueryable(userId);
+
+        return await userWithTours.SelectMany(t => t)
+                                  .Where(t => t.EndDate < DateTime.Now)
+                                  .OrderByDescending(t => t.StartDate)
+                                  .ToListAsync();
     }
 
     public async Task AddTourToUser(int userId, int tourId)

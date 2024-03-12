@@ -46,7 +46,7 @@ public class BookController : Controller
             return RedirectToAction("Login", "Account");
         }
 
-        var userTours = await _bookService.GetToursByUserId(int.Parse(userId));
+        var userTours = await _bookService.GetActiveAndFutureToursByUserId(int.Parse(userId));
         var booksViewModel = new BooksViewModel();
 
         foreach (var tour in userTours)
@@ -100,5 +100,25 @@ public class BookController : Controller
         {
             return RedirectToAction("Index");
         }
+    }
+
+    public async Task<IActionResult> History()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var bookedTours = await _bookService.GetToursHistoryByUserId(int.Parse(userId));
+        var booksViewModel = new BooksViewModel();
+
+        foreach (var tour in bookedTours)
+        {
+            booksViewModel.Books.Add(_bookService.GetBookViewModel(tour));
+        }
+
+        return View(booksViewModel);
     }
 }

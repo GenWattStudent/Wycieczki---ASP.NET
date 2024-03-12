@@ -1,0 +1,36 @@
+@using Book.App.ViewModels
+@model BookViewModel
+@{
+    var sliderData = new ImageSliderModel
+            {
+                Images = Model.TourModel.Images,
+                SliderId = Model.TourModel.Id
+            };
+}
+
+<li class="list-group-item mt-2">
+    <div class="d-flex gap-2">
+        <header class="card-header w-100">
+            <partial name="_ImageSliderPartial" model="@sliderData" />
+            <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
+                asp-route-id="@Model.TourModel.Id">
+                <h2>@Model.TourModel.Name</h2>
+            </a>
+        </header>
+    </div>
+    <p class="mt-2">@Model.TourModel.Description</p>
+    <partial name="_TourStatusPartial" model="@Model" />
+    <div class="d-flex gap-2">
+        <a asp-action="Details" asp-controller="Book" asp-route-id="@Model.TourModel.Id">
+            <button class="btn btn-primary">
+                Details
+            </button>
+        </a>
+        <form asp-action="Delete" asp-controller="Book" method="post">
+            <input type="hidden" name="id" value="@Model.TourModel.Id" />
+            <button class="btn btn-danger">
+                Cancel this trip
+            </button>
+        </form>
+    </div>
+</li>

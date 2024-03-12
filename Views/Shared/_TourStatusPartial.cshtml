@@ -7,7 +7,7 @@
 }
 else if (Model.TourModel.EndDate < DateTime.Now)
 {
-    <p class="text-primary mt-1">This trip has ended</p>
+    <p class="text-danger mt-1">This trip has ended</p>
 }
 else
 {
@@ -15,5 +15,14 @@ else
         @Math.Round(Model.NextWaypointData.Distance, 3) km to <strong
             class="text-primary">@Model.NextWaypointData.NextWaypoint.Name</strong>
     </div>
-    <p id="completed" class="text-success mt-1">@(Math.Round(Model.PercentOfTime * 100, 1))% completed</p>
+    <div class="d-flex align-items-center gap-2 mb-3 mt-3">
+        <p id="completed" class="text-success m-0">@(Math.Round(Model.PercentOfTime * 100, 1))%
+            completed</p>
+
+        <div class="progress " style="flex-grow: 1;">
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar"
+                style="width: @(Math.Round(Model.PercentOfTime * 100, 1))%"
+                aria-valuenow="@(Math.Round(Model.PercentOfTime * 100, 1))" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
 }

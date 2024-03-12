@@ -27,24 +27,7 @@
             <partial name="_TourDetailsPartial" model="@Model" />
 
             <div>
-                <div class="d-flex gap-2 mt-4 flex-wrap">
-                    @foreach (var waypoint in Model.Waypoints)
-                    {
-                        @if (waypoint.Type != WaypointType.Road)
-                        {
-                            <div class="d-flex align-items-center">
-                                <a class="text-secondary" asp-action="Details" asp-controller="Waypoint"
-                                    asp-route-id="@waypoint.Id">
-                                    <strong class="d-block pe-2">@waypoint.Name</strong>
-                                </a>
-                                @if (@Model.Waypoints.Last() != waypoint)
-                                {
-                                    <ion-icon class="text-primary" name="arrow-forward"></ion-icon>
-                                }
-                            </div>
-                        }
-                    }
-                </div>
+                <partial name="_WaypointsTourPartial" model="@Model.Waypoints" />
             </div>
         </div>
         <div class="d-flex justify-content-between mt-4">
