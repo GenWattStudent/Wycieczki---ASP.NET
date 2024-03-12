@@ -1,8 +1,32 @@
-﻿@{
+﻿@using Book.App.Helpers
+@using Book.App.ViewModels
+@model HomeViewModel
+
+@{
     ViewData["Title"] = "BOOKMANIA - Home Page";
 }
 
 <div>
+    @if (Model.Tour != null && Model.Book != null)
+    {
+        var sliderData = new ImageSliderModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
+        <div class="alert alert-primary" role="alert">
+            <div class="d-flex">
+                <partial name="_ImageSliderPartial" model="@sliderData" />
+                <a asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
+                    <h4>@Model.Tour.Name</h4>
+                </a>
+            </div>
+            <p data-toggle="tooltip" data-placement="top" title="@Model.Tour.Description">
+                @Model.Tour.Description.Truncate(150)</p>
+            <partial name="_TourStatusPartial" model="@Model.Book" />
+            <strong class="d-flex align-items-center gap-2">
+                <ion-icon name="calendar-number"></ion-icon>
+                Start at @Model.Tour.StartDate
+            </strong>
+        </div>
+    }
+
     <div class="text-center">
         <h1>Explore the World with Exciting Tours!</h1>
         <img class="img-fluid rounded mt-4" src="~/images/landscape2.jpg" alt="">

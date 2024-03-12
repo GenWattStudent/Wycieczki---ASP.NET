@@ -45,6 +45,15 @@ public class BookService
                                   .ToListAsync();
     }
 
+    public async Task<TourModel?> GetClosestTourByUserId(int userId)
+    {
+        var userWithTours = GetToursByUserIdQueryable(userId);
+        return await userWithTours.SelectMany(t => t)
+                                  .Where(t => t.StartDate >= DateTime.Now || t.EndDate >= DateTime.Now)
+                                  .OrderBy(t => t.StartDate)
+                                  .FirstOrDefaultAsync();
+    }
+
     public async Task AddTourToUser(int userId, int tourId)
     {
         var user = await _context.Users.Include(u => u.Tours).FirstOrDefaultAsync(u => u.Id == userId);
@@ -68,6 +77,11 @@ public class BookService
         if (tour.MaxUsers <= tour.Users.Count)
         {
             throw new Exception("Tour is full");
+        }
+
+        if (user.Tours.Any(t => t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate))
+        {
+            throw new Exception("User already booked a tour in this time");
         }
 
         user.Tours.Add(tour);

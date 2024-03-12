@@ -4,6 +4,7 @@ using Book.App.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Book.App.ViewModels;
+using Book.App.Services;
 
 namespace Book.App.Controllers;
 
@@ -11,27 +12,26 @@ namespace Book.App.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly BookService _bookService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, BookService bookService)
     {
+        _bookService = bookService;
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        ClaimsViewModel ClaimsViewModel = new ClaimsViewModel
+        var closestTour = await _bookService.GetClosestTourByUserId(int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+        var homeViewModel = new HomeViewModel { Tour = closestTour };
+        if (closestTour != null)
         {
-            Name = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
-            Role = User.FindFirst(ClaimTypes.Role) != null ? (Role)Enum.Parse(typeof(Role), User.FindFirst(ClaimTypes.Role)?.Value) : Role.User
-        };
+            homeViewModel.Book = _bookService.GetBookViewModel(closestTour);
+        }
 
-        return View(ClaimsViewModel);
+        return View(homeViewModel);
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

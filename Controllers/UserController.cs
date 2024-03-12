@@ -103,13 +103,13 @@ public class UserController : Controller
 
     public IActionResult UserInfo()
     {
-        ClaimsViewModel ClaimsViewModel = new ClaimsViewModel
+        var userViewModel = new UserViewModel
         {
             Name = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
             Role = User.FindFirst(ClaimTypes.Role) != null ? (Role)Enum.Parse(typeof(Role), User.FindFirst(ClaimTypes.Role)?.Value) : Role.User
         };
 
-        return View(ClaimsViewModel);
+        return View(userViewModel);
     }
 
     [Authorize]

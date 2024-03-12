@@ -15,4 +15,14 @@ public static class Helpers
         return acceptedActions.Contains(currentAction) && acceptedControllers.Contains(currentController) ?
             cssClass : String.Empty;
     }
+
+    public static string Truncate(this string value, int length)
+    {
+        if (value.Length <= length)
+        {
+            return value;
+        }
+
+        return value.Substring(0, length) + "...";
+    }
 }

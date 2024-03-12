@@ -9,9 +9,17 @@
     <h1>You Tours History</h1>
 </header>
 
-<ul class="gap-3 p-0 justify-content-center">
-    @foreach (var tour in Model.Books)
-    {
-        <partial name="_BookTourItemPartial" model="tour" />
-    }
-</ul>
+
+@if (Model.Books.Count == 0)
+{
+    <p class="alert alert-warning h2">You have not been at any tour yet.</p>
+}
+else
+{
+    <ul class="gap-3 p-0 justify-content-center">
+        @foreach (var tour in Model.Books)
+        {
+            <partial name="_BookTourItemPartial" model="tour" />
+        }
+    </ul>
+}
