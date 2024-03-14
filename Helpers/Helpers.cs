@@ -1,3 +1,5 @@
+using Book.App.Repositories;
+using Book.App.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Book.App.Helpers;
@@ -24,5 +26,17 @@ public static class Helpers
         }
 
         return value.Substring(0, length) + "...";
+    }
+
+    public static void AddMyServices(this IServiceCollection services)
+    {
+        services.AddTransient<TourService>();
+        services.AddTransient<UserService>();
+        services.AddTransient<TokenService>();
+        services.AddTransient<BookService>();
+        services.AddTransient<FileService>();
+        services.AddTransient<WaypointService>();
+        services.AddTransient<UserRepository>();
+        services.AddTransient<GeoService>();
     }
 }

@@ -15,15 +15,17 @@ public class TokenService
         _configuration = configuration;
     }
 
-    public string GenerateToken(string username, Role role, int id)
+    public string GenerateToken(string username, Role role, int id, string? imagePath, string? email)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
         var claims = new[] {
             new Claim(ClaimTypes.Name, username),
             new Claim(ClaimTypes.Role, role.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, id.ToString())
+            new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+            new Claim("ImagePath", imagePath ?? string.Empty),
+            new Claim(ClaimTypes.Email, email ?? string.Empty)
         };
 
         var tokenDescriptor = new JwtSecurityToken(
@@ -40,7 +42,7 @@ public class TokenService
     public ClaimsPrincipal GetPrincipal(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+        var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"));
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

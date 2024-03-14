@@ -70,7 +70,7 @@ public class UserController : Controller
                 return View(loginModel);
             }
 
-            var token = _tokenService.GenerateToken(user.Username, user.Role, user.Id);
+            var token = _tokenService.GenerateToken(user.Username, user.Role, user.Id, user.ImagePath, user.Contact?.Email);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {
