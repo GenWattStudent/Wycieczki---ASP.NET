@@ -101,12 +101,35 @@ public class UserController : Controller
 
         if (user == null)
         {
-            return BadRequest();
+            return RedirectToAction("Logout");
         }
 
         var userViewModel = new UserViewModel(user);
 
         return View(userViewModel);
+    }
+
+    public async Task<IActionResult> EditUserInfo(UserViewModel userInfo)
+    {
+        Console.WriteLine("EditUserInfo " + userInfo.RegisterModel.Image);
+        try
+        {
+            var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
+
+            if (user == null)
+            {
+                return RedirectToAction("Logout");
+            }
+
+            await _userService.EditUserInfo(userInfo.RegisterModel, user);
+
+            return RedirectToAction("UserInfo");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error editing user info");
+            return BadRequest();
+        }
     }
 
     [Authorize]
@@ -155,5 +178,11 @@ public class UserController : Controller
             _logger.LogError(ex, "Error creating admin");
             return BadRequest();
         }
+    }
+
+    public async Task<IActionResult> DeleteImage()
+    {
+        await _userService.DeleteImage(User.FindFirst(ClaimTypes.Name)?.Value);
+        return RedirectToAction("UserInfo");
     }
 }

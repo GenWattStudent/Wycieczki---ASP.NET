@@ -70,8 +70,8 @@
 
         <label for="ZipCode">Zip Code</label>
         <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Address.ZipCode, new { @class = "form-control w-100", placeholder = "Your zip code...", })
-            @Html.ValidationMessageFor(model => model.Address.ZipCode, "", new { @class = "field-validation-error text-danger" })
+            @Html.TextBoxFor(model => model.Address.Zip, new { @class = "form-control w-100", placeholder = "Your zip code...", })
+            @Html.ValidationMessageFor(model => model.Address.Zip, "", new { @class = "field-validation-error text-danger" })
         </div>
 
         <label for="image">Avatar</label>

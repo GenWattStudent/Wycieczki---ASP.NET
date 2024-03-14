@@ -15,4 +15,24 @@ public class AddressModel
     public string Country { get; set; } = string.Empty;
     public int UserId { get; set; }
     public UserModel User { get; set; } = new();
+
+    public AddressModel(Address address)
+    {
+        Street = address.Street;
+        City = address.City;
+        Zip = address.Zip;
+        Country = address.Country;
+    }
+
+    public AddressModel()
+    {
+    }
+
+    public void SetAddress(Address address)
+    {
+        Street = address.Street;
+        City = address.City;
+        Zip = address.Zip;
+        Country = address.Country;
+    }
 }

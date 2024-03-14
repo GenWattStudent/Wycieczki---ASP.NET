@@ -38,7 +38,7 @@ public class UserModel
         {
             Street = registerModel.Address.Street,
             City = registerModel.Address.City,
-            Zip = registerModel.Address.ZipCode,
+            Zip = registerModel.Address.Zip,
             Country = registerModel.Address.Country
         };
         Preferences = new PreferencesModel();
