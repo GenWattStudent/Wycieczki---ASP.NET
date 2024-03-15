@@ -138,4 +138,20 @@ public class BookService
 
         return bookViewModel;
     }
+
+    public async Task DeleteUserInTour(int userId, int tourId)
+    {
+        var user = await _context.Users.Include(u => u.Tours).FirstOrDefaultAsync(u => u.Id == userId);
+        var tour = await _context.Tours.Include(t => t.Users).FirstOrDefaultAsync(t => t.Id == tourId);
+
+        if (user != null && tour != null)
+        {
+            user.Tours.Remove(tour);
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            throw new Exception("User or tour not found");
+        }
+    }
 }

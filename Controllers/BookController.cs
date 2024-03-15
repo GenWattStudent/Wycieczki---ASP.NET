@@ -121,4 +121,19 @@ public class BookController : Controller
 
         return View(booksViewModel);
     }
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteUserInTour(int id, int tourId)
+    {
+        try
+        {
+            await _bookService.DeleteUserInTour(id, tourId);
+
+            return RedirectToAction("TourDetails", "Tour", new { id = tourId });
+        }
+        catch (Exception)
+        {
+            return RedirectToAction("Index");
+        }
+    }
 }

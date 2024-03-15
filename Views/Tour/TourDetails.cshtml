@@ -7,11 +7,13 @@
 
 @{
     var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     var sliderData = new ImageSliderModel
             {
                 Images = Model.Images,
                 SliderId = Model.Id,
             };
+    var index = 0;
 }
 
 <section class="card">
@@ -57,34 +59,71 @@
 
 <div id="map" class="mt-4 rounded"></div>
 
-<section class="mt-3">
-    @if (Model.Users.Count > 0)
-    {
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
-            aria-expanded="false" aria-controls="collapseExample">
-            Users booked this trip
-        </button>
+@if (role == "Admin")
+{
+    <section class="mt-3">
+        @if (Model.Users.Count > 0)
+        {
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+                Users booked this trip
+            </button>
 
-        <div class="collapse mt-2" id="collapseExample">
-            @foreach (var user in Model.Users)
-            {
-                <div class="card card-body">
-                    <img src="@user.ImagePath" />
-                    <p>@user.Username</p>
-                </div>
-            }
+            <div class="collapse mt-2" id="collapseExample">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Phone number</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            index++;
+                            <tr>
+                                <th scope="row">@index</th>
+                                <td>@user.Username</td>
+                                @if (user.Contact != null)
+                                {
+                                    <td>@user.Contact.Email</td>
+                                }
+                                else
+                                {
+                                    <td>Not provided</td>
+                                }
+                                @if (user.Contact != null)
+                                {
+                                    <td>@user.Contact.Phone</td>
+                                }
+                                else
+                                {
+                                    <td>Not provided</td>
+                                }
 
-
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-warning" role="alert">
-            No one has booked this trip yet
-        </div>
-    }
-</section>
-
+                                <td>
+                                    <a class="btn btn-danger" asp-action="DeleteUserInTour" asp-controller="Book"
+                                        asp-route-id="@user.Id" asp-route-tourId="@Model.Id">
+                                        <ion-icon name="close-outline"></ion-icon>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                No one has booked this trip yet
+            </div>
+        }
+    </section>
+}
 
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

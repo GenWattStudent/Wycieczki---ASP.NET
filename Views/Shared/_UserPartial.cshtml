@@ -7,7 +7,7 @@
 
 <div class="d-flex gap-2">
     <a asp-action="UserInfo" asp-controller="User" data-toggle="tooltip" data-placement="bottom" title="@userName">
-        <img class="rounded" style="width: 50px; height: 50px;" src="@imagePath" alt="@userName">
+        <partial name="_UserImagePartial" model="imagePath" />
     </a>
     <span class="devider-y"></span>
     <a class="d-flex align-items-center" asp-action="Logout" asp-controller="User">

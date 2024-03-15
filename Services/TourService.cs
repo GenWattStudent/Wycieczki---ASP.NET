@@ -66,7 +66,7 @@ public class TourService
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _dbContext.Tours.Include(t => t.Waypoints).ThenInclude(w => w.Images).Include(t => t.Users).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
+        return await _dbContext.Tours.Include(t => t.Waypoints).ThenInclude(w => w.Images).Include(t => t.Users).ThenInclude(u => u.Contact).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public void SaveImages(List<IFormFile> images, string folder, out List<string> imageUrls)

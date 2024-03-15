@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Book.App.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -86,7 +87,12 @@ app.UseStatusCodePages(async context =>
 });
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".glb"] = "model/gltf-binary";
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
 
 app.UseAuthentication();
 app.UseRouting();

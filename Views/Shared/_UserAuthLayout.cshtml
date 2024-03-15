@@ -18,13 +18,23 @@
             </main>
         </div>
 
-        <footer class="border-top footer text-muted">
-            <div class="container">
+        <div class="d-flex justify-content-center" style="overflow-x:hidden;" id="earth"></div>
+
+        <footer id="footer" class="border-top footer text-muted">
+            <div class="container p-2">
                 &copy; 2024 - Bookmania - All rights reserved
             </div>
         </footer>
     </div>
 
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@@0.162.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@@0.162.0/examples/jsm/"
+        }
+    }
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -32,8 +42,11 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
+
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
+
+    <script type="module" src="~/js/three/earth.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
