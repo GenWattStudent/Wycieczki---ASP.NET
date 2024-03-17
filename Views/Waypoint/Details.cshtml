@@ -1,28 +1,83 @@
-@model WaypointModel
+@using Book.App.ViewModels
+@model WaypointViewModel
 
 @{
-    ViewData["Title"] = "Waypoint - " + Model.Name;
+    ViewData["Title"] = "Waypoint - " + Model.Waypoint.Name;
     var sliderData = new ImageSliderModel
             {
-                Images = Model.Images,
-                SliderId = Model.TourId
+                Images = Model.Waypoint.Images,
+                SliderId = Model.Waypoint.TourId
             };
+    var index = 0;
 }
 
-<a class="text-dark" asp-action="TourDetails" asp-controller="Tour" asp-route-id="Model.TourId">
-    Go to the tour - <strong class="text-primary">@Model.Tour.Name</strong>
+<a class="text-dark" asp-action="TourDetails" asp-controller="Tour" asp-route-id="Model.Waypoint.TourId">
+    Go to the tour - <strong class="text-primary">@Model.Waypoint.Tour.Name</strong>
 </a>
 
 <div class="card mt-2">
     <header class="card-header text-primary">
-        <h2>@Model.Name</h2>
+        <h2>@Model.Waypoint.Name</h2>
     </header>
 
     <partial name="_ImageSliderPartial" model="@sliderData" />
 
     <div class="card-body">
-        <p class="alert alert-dark">@Model.Description</p>
-        <p>Latitude: <span class="badge bg-primary">@Math.Round(Model.Latitude, 4)</span></p>
-        <p>Longitude: <span class="badge bg-primary">@Math.Round(Model.Longitude, 4)</span></p>
+        <p class="alert alert-dark">@Model.Waypoint.Description</p>
+        <p>Latitude: <span class="badge bg-primary">@Math.Round(Model.Waypoint.Latitude, 4)</span></p>
+        <p>Longitude: <span class="badge bg-primary">@Math.Round(Model.Waypoint.Longitude, 4)</span></p>
     </div>
 </div>
+
+@if (Model.Weather != null)
+{
+    <h1 class="text-center mt-2 text-primary">Weather - 15 days</h1>
+    <div class="grid gap-2 flex-wrap mt-2">
+        @foreach (var weather in Model.Weather.Days)
+        {
+            <div class="card weather-card">
+                <div class="card-body">
+                    <div class="text-center ">
+                        <h5 class="text-primary">
+                            @if (index == 0)
+                            {
+                                <strong>Today</strong>
+                            }
+                            else
+                            {
+                                <div class="d-flex gap-2 justify-content-center w-100">
+                                    <span>@DateTime.Parse(weather.Datetime).ToString("yyyy/MM/dd")</span>
+                                    <span>@DateTime.Parse(weather.Datetime).DayOfWeek.ToString().Substring(0, 3)</span>
+                                </div>
+                            }
+                        </h5>
+                        <h3>@weather.Temp&deg</h3>
+                        <img src="~/icons/weather/@(weather.Icon).png" alt="@weather.Icon" />
+                        <p class="text-info font-weight-bold">@weather.Description</p>
+                    </div>
+                    <span class="devider-x w-100 d-flex" style=""></span>
+                    <div class="mt-2 d-flex flex-wrap justify-content-between">
+                        <span>Pressure: @weather.Pressure hPa</span>
+                        <span>Humidity: @weather.Humidity %</span>
+                        <span>Wind: @weather.Windspeed m/s</span>
+                        <span>Visibility: @weather.Visibility km</span>
+                    </div>
+                    <span class="devider-x w-100 d-flex mt-2" style=""></span>
+                    <div class="mt-2 d-flex flex-wrap justify-content-between">
+                        <span class="text-info font-weight-bold">
+                            Sunrise: @DateTime.Parse(weather.Sunrise).ToString("HH:mm")</span>
+                        <span class="text-info font-weight-bold">
+                            Sunset: @DateTime.Parse(weather.Sunset).ToString("HH:mm")</span>
+                    </div>
+                </div>
+            </div>
+            index++;
+        }
+    </div>
+}
+else
+{
+    <div>
+        <span>No weather data available</span>
+    </div>
+}

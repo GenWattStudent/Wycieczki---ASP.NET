@@ -48,7 +48,7 @@ html {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   grid-gap: 1rem;
 }
 
@@ -161,4 +161,27 @@ html {
 
 .carousel {
   background-color: #52525255;
+}
+
+.weather-card {
+  background: linear-gradient(
+    90deg,
+    rgb(208 209 175) 0%,
+    rgb(204 206 209) 39%,
+    rgb(154 187 223) 100%
+  );
+  background-size: 150% 150%;
+  animation: gradient 10s infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

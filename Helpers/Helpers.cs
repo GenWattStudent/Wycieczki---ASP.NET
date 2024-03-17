@@ -38,5 +38,6 @@ public static class Helpers
         services.AddTransient<WaypointService>();
         services.AddTransient<UserRepository>();
         services.AddTransient<GeoService>();
+        services.AddTransient<WeatherService>();
     }
 }

@@ -1,5 +1,6 @@
 using Book.App.Models;
 using Book.App.Services;
+using Book.App.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +9,12 @@ namespace Book.App.Controllers;
 public class WaypointController : Controller
 {
     private readonly WaypointService _waypointService;
+    private readonly WeatherService _weatherService;
 
-
-    public WaypointController(WaypointService waypointService)
+    public WaypointController(WaypointService waypointService, WeatherService weatherService)
     {
         _waypointService = waypointService;
+        _weatherService = weatherService;
     }
 
     [Authorize(Roles = "Admin")]
@@ -77,6 +79,12 @@ public class WaypointController : Controller
             return Redirect(referrer);
         }
 
-        return View(waypoint);
+        var weather = await _weatherService.GetWeather(waypoint.Latitude, waypoint.Longitude);
+        var waypointViewModel = new WaypointViewModel
+        {
+            Waypoint = waypoint,
+            Weather = weather
+        };
+        return View(waypointViewModel);
     }
 }

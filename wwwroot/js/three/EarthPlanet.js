@@ -73,7 +73,7 @@ export default class EarthPlanet {
       this.changeTexture(this.assets.dayTexture, this.earth)
       this.isDay = true
       console.log('day')
-    } else if (hours >= 18 && this.isDay) {
+    } else if (hours >= 18 && (this.isDay || this.isDay === null)) {
       this.changeTexture(this.assets.nightTexture, this.earth)
       this.isDay = false
       console.log('night')
