@@ -139,11 +139,9 @@
 
         if (model.waypoints.$values.length > 0) {
             const userMap = new UserMap(model.waypoints.$values);
-            const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
-                return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
-            }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
-
-            userMap.map.setView(middleLatLong, 13);
+            const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
+            const bounds = L.latLngBounds(latLngs);
+            userMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
         }
     </script>
 }

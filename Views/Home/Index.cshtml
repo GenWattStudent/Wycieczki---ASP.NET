@@ -24,8 +24,6 @@
                 <ion-icon name="calendar-number"></ion-icon>
                 Start at @Model.Tour.StartDate
             </strong>
-
-            <div class="rounded" id="earth"></div>
         </div>
     }
 
@@ -52,61 +50,3 @@
         </a>
     </button>
 </div>
-
-@section Scripts {
-    <script type="module">
-        import EarthScene from './js/three/earth.js';
-        import { Waypoint } from './js/Waypoint.js';
-        import { latLongToVector3 } from './js/three/helpers.js';
-
-        const waypoints = @Html.Raw(Json.Serialize(Model.Tour.Waypoints));
-        const earthScene = new EarthScene();
-        const waypointsObj = [];
-
-        function getTypeFromEnum(type) {
-            switch (type) {
-                case 0:
-                    return 'start'
-                case 1:
-                    return 'marker'
-                case 2:
-                    return 'end'
-                case 4:
-                    return 'indicator'
-                default:
-                    return 'road'
-            }
-        }
-
-        waypoints.$values.forEach(waypoint => {
-            const waypointData = new Waypoint(
-                waypoint.latitude,
-                waypoint.longitude,
-                waypoint.id,
-                waypoint.name,
-                waypoint.description,
-                getTypeFromEnum(waypoint.type),
-                waypoint.images,
-                true,
-                waypoint.isRoad
-            )
-
-            waypointsObj.push(waypointData);
-        });
-
-        earthScene.earth.setWaypoints(waypointsObj)
-        earthScene.setHeight(250)
-        earthScene.setWidth($('#tour-info').width())
-        earthScene.enableZoom(true)
-        earthScene.earth.loadAssets().then(() => {
-            earthScene.earth.drawEarth()
-
-            earthScene.earth.setTextureBasedOnTime()
-            earthScene.earth.drawRoad()
-            earthScene.earth.isAnimate = false
-            earthScene.earth.zoom = 5.2
-            earthScene.earth.updateCamera(latLongToVector3(waypointsObj[ 0 ].lat, waypointsObj[ 0 ].lng, earthScene.earth.earthRadius, 0.01))
-            earthScene.animate()
-        })
-    </script>
-}

@@ -2,9 +2,10 @@ import * as THREE from 'three'
 import { latLongToVector3, serArc3D } from './helpers.js'
 import Waypoint3D from './Waypoint3D.js'
 import Car from './Car.js'
+import { Map } from '../map.js'
 
 export default class EarthPlanet {
-  constructor(scene, camera, isAnimate = true) {
+  constructor(scene, camera, isAnimate = true, assets) {
     this.scene = scene
     this.isAnimate = isAnimate
     this.waypoints = []
@@ -15,30 +16,11 @@ export default class EarthPlanet {
     this.waypointsObjects = []
     this.textObjects = []
     this.earthRadius = 5
-    this.isLoading = true
     this.points = []
-    this.isDay = true
-    this.car = new Car(this.scene)
-    this.nightTexture = null
-    this.dayTexture = null
-    this.loadingManager = new THREE.LoadingManager()
+    this.isDay = null
+    this.car = new Car(this.scene, assets)
     this.zoom = 10
-  }
-
-  loadAssets = () => {
-    return new Promise((resolve, reject) => {
-      const loader = new THREE.TextureLoader(this.loadingManager)
-      loader.load('/images/three/8k_earth_day.jpg', (dayTexture) => {
-        this.dayTexture = dayTexture
-        loader.load('/images/three/8k_earth_night.jpg', (nightTexture) => {
-          this.nightTexture = nightTexture
-          this.car.loadAssets().then(() => {
-            this.isLoading = false
-            resolve({ dayTexture, nightTexture })
-          })
-        })
-      })
-    })
+    this.assets = assets
   }
 
   drawEarth() {
@@ -61,6 +43,13 @@ export default class EarthPlanet {
     })
   }
 
+  setZoom(zoom) {
+    this.zoom = zoom
+    this.waypointsObjects.forEach((waypoint) => {
+      waypoint.setRadius()
+    })
+  }
+
   create = () => {
     const earthGeometry = new THREE.SphereGeometry(this.earthRadius, 32, 32)
     const earthMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -71,26 +60,27 @@ export default class EarthPlanet {
   }
 
   changeTexture = (texture, obj) => {
+    // obj.material.needsUpdate = true
+    obj.material.generateMipmaps = true
     obj.material.map = texture
-    obj.material.map.needsUpdate = true
   }
 
   setTextureBasedOnTime = () => {
     const date = new Date()
     const hours = date.getHours()
 
-    if (hours >= 6 && hours < 18 && !this.isDay) {
-      this.changeTexture(this.dayTexture, this.earth)
+    if (hours >= 6 && hours < 18 && (!this.isDay || this.isDay === null)) {
+      this.changeTexture(this.assets.dayTexture, this.earth)
       this.isDay = true
+      console.log('day')
     } else if (hours >= 18 && this.isDay) {
-      this.changeTexture(this.nightTexture, this.earth)
+      this.changeTexture(this.assets.nightTexture, this.earth)
       this.isDay = false
+      console.log('night')
     }
   }
 
   animate() {
-    if (this.isLoading) return
-
     this.setTextureBasedOnTime()
     if (this.isAnimate && this.currentPoint < this.points.length - 1) {
       if (this.currentPoint === 0 && !this.isDrawn) {
@@ -133,12 +123,11 @@ export default class EarthPlanet {
   }
 
   drawRoad() {
-    if (this.isLoading) return
-
     this.waypoints.forEach((waypoint, index) => {
+      const waypointType = Map.getTypeFromEnum(waypoint.type)
       if (
         index < this.waypoints.length - 1 &&
-        waypoint.type !== 'indicator' &&
+        waypointType !== 'indicator' &&
         this.waypoints[index + 1].type !== 'indicator'
       ) {
         const positions = serArc3D(
@@ -151,11 +140,11 @@ export default class EarthPlanet {
         this.scene.add(arc)
       }
 
-      if (waypoint.type !== 'road' && waypoint.type !== 'indicator') {
+      if (waypointType !== 'road' && waypointType !== 'indicator') {
         this.createWaypoint(waypoint)
       }
 
-      if (waypoint.type === 'indicator') {
+      if (waypointType === 'indicator') {
         let lookAt
         if (this.points[index + 1]) {
           // If there is a next waypoint, make the car look at it
@@ -185,7 +174,6 @@ export default class EarthPlanet {
     // Rotate the car to match the surface of the sphere
     this.car.car.up.copy(carPosition.clone().normalize())
     this.car.car.lookAt(lookat)
-    console.log(this.car.car.position)
   }
 
   createWaypoint(waypointData) {
@@ -194,9 +182,11 @@ export default class EarthPlanet {
       waypointData.lng,
       waypointData.name,
       this.camera,
-      this.earthRadius
+      this.earthRadius,
+      this.zoom,
+      this.assets
     )
-    console.log(this.isDay)
+
     waypoint.draw(this.scene, this.isDay ? 0x000000 : 0xffffff)
     this.waypointsObjects.push(waypoint)
   }

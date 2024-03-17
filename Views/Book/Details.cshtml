@@ -58,10 +58,10 @@
 
         @if (Model.TourModel.StartDate > DateTime.Now)
         {
-            <form asp-action="Book" asp-controller="Book" method="post" class="mt-2">
+            <form asp-action="Delete" asp-controller="Book" method="post" class="mt-2">
                 <input type="hidden" name="id" value="@Model.TourModel.Id" />
-                <button class="btn btn-primary">
-                    Book this trip
+                <button class="btn btn-danger">
+                    Cancel tour
                 </button>
             </form>
         }
@@ -89,6 +89,8 @@
 
 <div id="map" class="mt-4 rounded"></div>
 
+<div class="mt-2" id="earth"></div>
+
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -103,6 +105,9 @@
     <script type="module">
         import { UserMap } from '/js/userMap.js';
         import { TourData } from '/js/tourData.js';
+        import { Waypoint } from '/js/Waypoint.js';
+        import { Map } from '/js/map.js';
+        import { setupGlob, EarthOptions } from '/js/three/setupGlob.js';
 
         $(document).ready(function () {
             const model = @Html.Raw(Json.Serialize(Model.TourModel));
@@ -138,16 +143,28 @@
                 userMap.updateTourIndicator(data.tourLat, data.tourLon);
             }
 
+            function glob(waypoints) {
+        @* const waypoints = @Html.Raw(Json.Serialize(Model.TourModel.Waypoints)); *@
+                        const distance = @Model.Distance;
+
+                if (distance > 70) {
+
+
+                    const earthOptions = new EarthOptions($('#map').width(), $('#map').height(), 7);
+
+                    setupGlob(waypoints, earthOptions);
+                }
+            }
+
             if (model.waypoints.$values.length > 0) {
                 const userMap = new UserMap(model.waypoints.$values, tourLat, tourLon);
                 if (!isTourEnded) setInterval(() => updateTourData(userMap), 1000);
                 else tourEnded();
-
-                const middleLatLong = model.waypoints.$values.map(w => [ w.latitude, w.longitude ]).reduce((acc, val) => {
-                    return [ acc[ 0 ] + val[ 0 ], acc[ 1 ] + val[ 1 ] ];
-                }, [ 0, 0 ]).map(v => v / model.waypoints.$values.length);
-
-                userMap.map.setView(middleLatLong, 13);
+                console.log(userMap.waypoints)
+                const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
+                const bounds = L.latLngBounds(latLngs);
+                userMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
+                glob(userMap.waypoints)
             }
         });
     </script>

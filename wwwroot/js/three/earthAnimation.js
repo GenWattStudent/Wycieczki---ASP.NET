@@ -1,5 +1,6 @@
 import EarthScene from './earth.js'
 import { Waypoint } from '../Waypoint.js'
+import { Assets } from './Assets.js'
 
 const waypoint1 = new Waypoint(
   51.5074,
@@ -34,10 +35,13 @@ const waypoint4 = new Waypoint(
 waypoint4.type = 'end'
 
 const waypoints = [waypoint1, waypoint2, waypoint3, waypoint4]
-const earthScence = new EarthScene()
 
-earthScence.earth.setWaypoints(waypoints)
-earthScence.earth.loadAssets().then(() => {
+const assets = new Assets()
+
+assets.loadAssets().then(() => {
+  const earthScence = new EarthScene(assets)
+  earthScence.earth.setWaypoints(waypoints)
+
   earthScence.earth.drawEarth()
   earthScence.animate()
 })

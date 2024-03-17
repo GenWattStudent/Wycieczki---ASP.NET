@@ -4,25 +4,25 @@ import {
   waypointMarker,
   startMarker,
   tourIndicator,
+  noMarker,
 } from './markers.js'
-const key = 'udRsGNqnZuvxREFK3GeD'
+
 export class Map {
   constructor() {
-    this.map = L.map('map').setView([51.505, -0.09], 13)
-    L.maptilerLayer({
-      apiKey: key,
-      style: '04f9d487-86a6-463f-a5c7-4d4103d7818a',
-    }).addTo(this.map)
     this.waypoints = []
+    this.map = L.map('map').setView([51.505, -0.09], 13)
+    $.get('/Tour/GetMapKey', (res) => {
+      L.maptilerLayer({
+        apiKey: res.key,
+        style: '04f9d487-86a6-463f-a5c7-4d4103d7818a',
+      }).addTo(this.map)
+    })
   }
 
   createWayPointPopup(title, description, images, id, isUser = false) {
-    console.log(images, 'Asdsadasdsa')
-
     if (images.length && images[0] instanceof File) {
       images = images.map((image) => URL.createObjectURL(image))
     } else if (images.$values) {
-      console.log(images, 'images')
       images = images.$values.map((image) => image.imageUrl)
     } else {
       images = []
@@ -64,7 +64,7 @@ export class Map {
 
   createEditPopup(waypointData) {
     const { name, description, images } = waypointData
-    console.log(images, 'images')
+
     const imageDivs = images
       .map(
         (image, index) => `
@@ -113,7 +113,7 @@ export class Map {
 
   removeWayPoint(id) {
     const waypoint = this.waypoints.find((w) => w.id == id)
-    console.log(waypoint, 'waypoint')
+
     if (waypoint) {
       this.map.removeLayer(waypoint.marker)
       this.waypoints = this.waypoints.filter((w) => w.id != id)
@@ -143,7 +143,22 @@ export class Map {
       case 'indicator':
         return tourIndicator
       default:
-        return defaultMarker
+        return noMarker
+    }
+  }
+
+  static getTypeFromEnum(type) {
+    switch (type) {
+      case 0:
+        return 'start'
+      case 1:
+        return 'marker'
+      case 2:
+        return 'end'
+      case 4:
+        return 'indicator'
+      default:
+        return 'road'
     }
   }
 

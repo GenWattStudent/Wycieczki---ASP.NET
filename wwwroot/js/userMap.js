@@ -31,29 +31,27 @@ export class UserMap extends Map {
       true,
       waypoint.isRoad
     )
-
+    console.log(waypointData)
     waypointData.isTourIndicator = waypoint.isTourIndicator
 
     this.waypoints.push(waypointData)
-    console.log(waypointData, 'waypointData')
+    const type = this.getTypeFromEnum(waypointData.type)
     this.createMarker(
       waypointData,
       false,
       false,
       true,
-      this.getIcon(this.getTypeFromEnum(waypointData.type))
+      this.getIcon(type === 'road' ? '' : type)
     )
 
     this.connectWaypointsWithLine(this.waypoints)
   }
 
   updateTourIndicator(lat, long) {
-    console.log(this.waypoints)
     const tourIndicator = this.waypoints.find(
       (waypoint) => waypoint.isTourIndicator
     )
 
-    console.log(tourIndicator, 'tourIndicator')
     if (tourIndicator) {
       tourIndicator.latitude = lat
       tourIndicator.longitude = long

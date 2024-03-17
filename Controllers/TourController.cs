@@ -129,4 +129,10 @@ public class TourController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
+    public IActionResult GetMapKey()
+    {
+        var mapTilerKey = Environment.GetEnvironmentVariable("MAP_TILER_KEY");
+        return Json(new { key = mapTilerKey });
+    }
 }

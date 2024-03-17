@@ -30,3 +30,8 @@ export const tourIndicator = L.divIcon({
   html: '<span class="border-success"></span><span class="border-success"></span><span class="border-success"></span><ion-icon name="people-circle"></ion-icon>',
   iconAnchor: [15, 15],
 })
+
+export const noMarker = L.divIcon({
+  className: 'no-marker',
+  iconAnchor: [8, 8],
+})

@@ -78,8 +78,12 @@ public class BookService
         {
             throw new Exception("Tour is full");
         }
-
-        if (user.Tours.Any(t => t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate))
+        Console.WriteLine("user: " + user.Tours.Any(t => t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate));
+        if (user.Tours.Any(t =>
+            t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate
+        || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate
+        || t.StartDate <= tour.StartDate && t.EndDate >= tour.StartDate
+        || t.StartDate <= tour.EndDate && t.EndDate >= tour.EndDate))
         {
             throw new Exception("User already booked a tour in this time");
         }

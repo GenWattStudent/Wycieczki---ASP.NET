@@ -3,7 +3,7 @@ import EarthPlanet from './EarthPlanet.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 export default class EarthScene {
-  constructor() {
+  constructor(assets) {
     this.scene = new THREE.Scene()
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -30,7 +30,7 @@ export default class EarthScene {
     this.directionalLight = new THREE.DirectionalLight(0xffffff, 1)
     this.directionalLight.position.set(5, 3, 5)
 
-    this.earth = new EarthPlanet(this.scene, this.camera)
+    this.earth = new EarthPlanet(this.scene, this.camera, true, assets)
     this.scene.add(this.directionalLight)
 
     window.addEventListener('resize', this.resize.bind(this))
