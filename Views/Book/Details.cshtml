@@ -115,6 +115,7 @@
             const tourLon = @tourLon;
             let isTourEnded = new Date(model.endDate) < new Date();
             let isTourStarted = new Date(model.startDate) < new Date();
+            let earthScene
 
             function reloadWhenTourStarts() {
                 if (!isTourStarted && new Date(model.startDate) < new Date()) {
@@ -141,18 +142,19 @@
                 $('#distanceToNextWaypoint').html(`${data.distance.toFixed(3)} km to <strong class="text-primary">${data.nextWaypoint.name}</strong>`);
 
                 userMap.updateTourIndicator(data.tourLat, data.tourLon);
+                if (earthScene) {
+                    earthScene.updateTourLatLong(data.tourLat, data.tourLon, data.nextWaypoint)
+                }
             }
 
             function glob(waypoints) {
-        @* const waypoints = @Html.Raw(Json.Serialize(Model.TourModel.Waypoints)); *@
-                        const distance = @Model.Distance;
+                const distance = @Model.Distance;
 
                 if (distance > 70) {
-
-
                     const earthOptions = new EarthOptions($('#map').width(), $('#map').height(), 7);
-
-                    setupGlob(waypoints, earthOptions);
+                    setupGlob(waypoints, earthOptions).then(earth => {
+                        earthScene = earth;
+                    });
                 }
             }
 

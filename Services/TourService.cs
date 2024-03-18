@@ -21,6 +21,11 @@ public class TourService
         return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate >= DateTime.Now).ToListAsync();
     }
 
+    public async Task<List<TourModel>> GetActiveTours()
+    {
+        return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate <= DateTime.Now && t.EndDate >= DateTime.Now).ToListAsync();
+    }
+
     public async Task AddTour(TourModel tour, AddTourModel addTourModel, List<string> imageUrls)
     {
         foreach (var waypoint in addTourModel.Waypoints)

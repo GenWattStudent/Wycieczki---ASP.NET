@@ -30,8 +30,8 @@
                         id = $"deleteForm-{Model.Id}",
                     }))
                     {
-                        <button type="button" data-toggle="modal" data-target="#deleteConfirmModal" data-toggle="tooltip"
-                            data-placement="top" title="Delete @Model.Name tour" class="btn p-0">
+                        <button type="button" data-toggle="modal" data-target="#deleteConfirmModal-@Model.Id"
+                            data-toggle="tooltip" data-placement="top" title="Delete @Model.Name tour" class="btn p-0">
                             <ion-icon name="trash-outline"></ion-icon>
                         </button>
                     }
@@ -65,8 +65,8 @@
     </div>
 </li>
 
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="deleteConfirmModal-@Model.Id" tabindex="-1" role="dialog"
+    aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -89,7 +89,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const model = @Json.Serialize(Model);
-
+        console.log(model);
         document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
             document.getElementById(`deleteForm-${model.id}`).submit();
         });

@@ -16,9 +16,9 @@ export class Assets {
     const meshLoader = new GLTFLoader()
 
     return new Promise((resolve, reject) => {
-      loader.load('/images/three/8k_earth_day.jpg', (dayTexture) => {
+      loader.load('/images/three/earth_day.jpg', (dayTexture) => {
         this.dayTexture = dayTexture
-        loader.load('/images/three/8k_earth_night.jpg', (nightTexture) => {
+        loader.load('/images/three/earth_night.jpg', (nightTexture) => {
           this.nightTexture = nightTexture
           fontLoader.load(
             'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',

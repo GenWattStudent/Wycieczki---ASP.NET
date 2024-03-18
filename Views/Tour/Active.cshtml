@@ -1,0 +1,17 @@
+@{
+    ViewBag.Title = "Active Tours";
+}
+
+@model List<TourModel>
+
+<header>
+    <h2>Active Tours</h2>
+</header>
+
+
+<ul class="grid-tour gap-3 p-0 justify-content-center">
+    @foreach (var tour in Model)
+    {
+        <partial name="_TourPartial" model="tour" />
+    }
+</ul>

@@ -19,8 +19,7 @@
 
 <body>
     <header>
-        <nav
-            class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-primary border-bottom box-shadow mb-3 d-block">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-primary border-bottom box-shadow mb-3 d-block">
             <div class="container-fluid">
                 <a class="navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
                     asp-action="Index">
@@ -34,36 +33,41 @@
             </div>
             <div class="collapse justify-content-between container-fluid">
                 <ul class="navbar-nav flex-row">
-                    <li class="nav-item pe-2">
-                        <a class="nav-link text-light pl-0 @Html.IsActive("Home", "Index")" asp-area=""
-                            asp-controller="Home" asp-action="Index">Home <span></span></a>
-                    </li>
-                    @if (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin")
-                    {
-                        <li class="nav-item  pe-2">
-                            <a class="nav-link text-light @Html.IsActive("Tour", "AddTour")" asp-area=""
-                                asp-controller="Tour" asp-action="AddTour">
-                                Add Tour
-                                <span></span>
-                            </a>
-                        </li>
-                    }
-                    <li class="nav-item pe-2">
-                        <a class="nav-link text-light @Html.IsActive("Tour", "Tours")" asp-area="" asp-controller="Tour"
-                            asp-action="Tours">
-                            Tours
-                            <span></span>
-                        </a>
-                    </li>
-                    <li class="nav-item pe-2 @Html.IsActive("Book", "Index")">
-                        <a class="nav-link text-light" asp-area="" asp-controller="Book" asp-action="Index">
-                            Your Book Tours
-                            <span></span>
-                        </a>
-                    </li>
+                    <div class="d-none d-sm-block">
+                        <div class="d-flex">
+                            <li class="nav-item pe-2">
+                                <a class="nav-link text-light pl-0 @Html.IsActive("Home", "Index")" asp-area=""
+                                    asp-controller="Home" asp-action="Index">Home <span></span></a>
+                            </li>
+                            @if (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin")
+                            {
+                                <li class="nav-item pe-2">
+                                    <a class="nav-link text-light @Html.IsActive("Tour", "AddTour")" asp-area=""
+                                        asp-controller="Tour" asp-action="AddTour">
+                                        Add Tour
+                                        <span></span>
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item pe-2">
+                                <a class="nav-link text-light @Html.IsActive("Tour", "Tours")" asp-area=""
+                                    asp-controller="Tour" asp-action="Tours">
+                                    Tours
+                                    <span></span>
+                                </a>
+                            </li>
+                            <li class="nav-item pe-2 @Html.IsActive("Book", "Index")">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Book" asp-action="Index">
+                                    Your Book Tours
+                                    <span></span>
+                                </a>
+                            </li>
+                        </div>
+                    </div>
                 </ul>
             </div>
         </nav>
+
     </header>
     <div class="container">
         <main role="main" class="pb-3">
@@ -106,14 +110,14 @@
         }
     }
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
+
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>

@@ -11,7 +11,7 @@
     {
         var sliderData = new ImageSliderModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
         <div class="alert alert-primary" role="alert" id="tour-info">
-            <div class="d-flex">
+            <div class="d-flex gap-2">
                 <partial name="_ImageSliderPartial" model="@sliderData" />
                 <a asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
                     <h4>@Model.Tour.Name</h4>

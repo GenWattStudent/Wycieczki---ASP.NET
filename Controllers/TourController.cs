@@ -135,4 +135,11 @@ public class TourController : Controller
         var mapTilerKey = Environment.GetEnvironmentVariable("MAP_TILER_KEY");
         return Json(new { key = mapTilerKey });
     }
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Active()
+    {
+        var tours = await _tourService.GetActiveTours();
+        return View(tours);
+    }
 }

@@ -1,17 +1,53 @@
-@using Microsoft.AspNetCore.Identity
+@using Book.App.Helpers;
 
 @{
     var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
     var imagePath = User.FindFirst("ImagePath")?.Value;
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 }
 
-<div class="d-flex gap-2">
-    <a asp-action="UserInfo" asp-controller="User" data-toggle="tooltip" data-placement="bottom" title="@userName">
+<div class="d-none d-sm-block">
+    <div class="d-flex gap-2">
+        <a asp-action="UserInfo" asp-controller="User" data-toggle="tooltip" data-placement="bottom" title="@userName">
+            <partial name="_UserImagePartial" model="imagePath" />
+        </a>
+        <span class="devider-y"></span>
+        <a class="d-flex align-items-center" asp-action="Logout" asp-controller="User">
+            <strong class="text-light m-0">Logout</strong>
+        </a>
+        <span class="devider-y"></span>
+    </div>
+</div>
+
+<div class="dropdown d-block d-sm-none ">
+    <div class="p-0 pe-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup=" true"
+        aria-expanded="false">
         <partial name="_UserImagePartial" model="imagePath" />
-    </a>
-    <span class="devider-y"></span>
-    <a class="d-flex align-items-center" asp-action="Logout" asp-controller="User">
-        <strong class="text-light m-0">Logout</strong>
-    </a>
-    <span class="devider-y"></span>
+    </div>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+        @if (role == "Admin")
+        {
+            <a class="dropdown-item @Html.IsActive("Tour", "AddTour")" asp-area="" asp-controller="Tour"
+                asp-action="AddTour">
+                Add Tour
+            </a>
+        }
+
+        <a class="dropdown-item @Html.IsActive("Tour", "Tours")" asp-area="" asp-controller="Tour" asp-action="Tours">
+            Tours
+        </a>
+        <a class="dropdown-item @Html.IsActive("Book", "Index")" asp-area="" asp-controller="Book" asp-action="Index">
+            Your Book Tours
+        </a>
+
+        <div class="dropdown-divider"></div>
+
+        <a class="dropdown-item @Html.IsActive("User", "UserInfo")" asp-action="UserInfo" asp-controller="User"
+            data-toggle="tooltip" data-placement="bottom" title="@userName">
+            <strong>@userName</strong>
+        </a>
+        <a class="dropdown-item" asp-action="Logout" asp-controller="User">
+            <strong class=" m-0">Logout</strong>
+        </a>
+    </div>
 </div>

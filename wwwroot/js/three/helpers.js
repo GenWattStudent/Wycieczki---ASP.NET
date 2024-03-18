@@ -1,17 +1,26 @@
 import * as THREE from 'three'
 
-export function latLongToVector3(lat, lon, radius, heigth) {
-  var phi = (lat * Math.PI) / 180
-  var theta = ((lon - 180) * Math.PI) / 180
+const DEGREE_TO_RADIAN = Math.PI / 180
+const GLOBE_RADIUS = 4
 
-  var x = -(radius + heigth) * Math.cos(phi) * Math.cos(theta)
-  var y = (radius + heigth) * Math.sin(phi)
-  var z = (radius + heigth) * Math.cos(phi) * Math.sin(theta)
+export function latLongToVector3(lat, lng, radius, heigth) {
+  const phi = (90 - lat) * DEGREE_TO_RADIAN
+  const theta = (lng + 180) * DEGREE_TO_RADIAN
 
-  return new THREE.Vector3(x, y, z)
+  return new THREE.Vector3(
+    -radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta)
+  )
 }
 
-export function serArc3D(pointStart, pointEnd, smoothness, clockWise) {
+export function serArc3D(
+  pointStart,
+  pointEnd,
+  smoothness,
+  clockWise,
+  earthRadius = 4.1
+) {
   const cb = new THREE.Vector3()
   const ab = new THREE.Vector3()
   const normal = new THREE.Vector3()
@@ -22,15 +31,21 @@ export function serArc3D(pointStart, pointEnd, smoothness, clockWise) {
 
   normal.copy(cb).normalize()
 
-  const angle = pointStart.angleTo(pointEnd)
+  let angle = pointStart.angleTo(pointEnd)
 
-  if (clockWise) angle = Math.PI * 2 - angleValue
+  if (clockWise) angle = Math.PI * 2 - angle
 
   const angleDelta = angle / (smoothness - 1)
 
   let positions = []
   for (let i = 0; i < smoothness; i++) {
+    // Calculate the vertex position on the sphere's surface
     let vertex = pointStart.clone().applyAxisAngle(normal, angleDelta * i)
+
+    // Project the vertex onto the sphere's surface
+    const direction = vertex.clone().normalize()
+    vertex = direction.multiplyScalar(earthRadius)
+
     positions.push(vertex.x, vertex.y, vertex.z)
   }
 

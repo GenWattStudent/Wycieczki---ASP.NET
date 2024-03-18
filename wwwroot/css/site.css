@@ -43,7 +43,7 @@ html {
 }
 
 #map {
-  height: 400px;
+  height: 500px;
 }
 
 .grid {
@@ -52,7 +52,19 @@ html {
   grid-gap: 1rem;
 }
 
-.active {
+.grid-tour {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .grid-tour {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+.nav-item .active {
   scale: 1.1;
   font-weight: bolder;
 }

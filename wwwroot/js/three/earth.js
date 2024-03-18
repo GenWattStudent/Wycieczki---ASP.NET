@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import EarthPlanet from './EarthPlanet.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { latLongToVector3 } from './helpers.js'
 
 export default class EarthScene {
   constructor(assets) {
@@ -59,6 +60,21 @@ export default class EarthScene {
       requestAnimationFrame(animation)
     }
     animation()
+  }
+
+  updateTourLatLong(lat, long, waypoint) {
+    // this.earth.updateCamera(
+    //   latLongToVector3(lat, long, this.earth.earthRadius, 0.01)
+    // )
+    this.earth.updateCar(
+      latLongToVector3(lat, long, this.earth.earthRadius, 0.01),
+      latLongToVector3(
+        waypoint.latitude,
+        waypoint.longitude,
+        this.earth.earthRadius,
+        0.01
+      )
+    )
   }
 
   resize() {

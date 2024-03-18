@@ -16,7 +16,7 @@ export default class Waypoint3D {
   }
 
   draw(scene, textColor) {
-    const geometry = new THREE.SphereGeometry(this.zoom / 48, 32, 32)
+    const geometry = new THREE.SphereGeometry(this.zoom / 64, 32, 32)
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
     const sphere = new THREE.Mesh(geometry, material)
     sphere.position.copy(this.position)

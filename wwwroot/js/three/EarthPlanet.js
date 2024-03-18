@@ -15,7 +15,7 @@ export default class EarthPlanet {
     this.camera = camera
     this.waypointsObjects = []
     this.textObjects = []
-    this.earthRadius = 5
+    this.earthRadius = 4
     this.points = []
     this.isDay = null
     this.car = new Car(this.scene, assets)
@@ -28,7 +28,7 @@ export default class EarthPlanet {
   }
 
   setWaypoints(waypoints) {
-    this.waypoints = waypoints
+    this.waypoints = waypoints.filter((w) => w.type !== 3)
     this.setPoints(waypoints)
   }
 
@@ -60,7 +60,6 @@ export default class EarthPlanet {
   }
 
   changeTexture = (texture, obj) => {
-    // obj.material.needsUpdate = true
     obj.material.generateMipmaps = true
     obj.material.map = texture
   }
@@ -72,11 +71,9 @@ export default class EarthPlanet {
     if (hours >= 6 && hours < 18 && (!this.isDay || this.isDay === null)) {
       this.changeTexture(this.assets.dayTexture, this.earth)
       this.isDay = true
-      console.log('day')
     } else if (hours >= 18 && (this.isDay || this.isDay === null)) {
       this.changeTexture(this.assets.nightTexture, this.earth)
       this.isDay = false
-      console.log('night')
     }
   }
 
@@ -163,17 +160,19 @@ export default class EarthPlanet {
   }
 
   updateCar(nextPosition, lookat) {
-    const sphereCenter = new THREE.Vector3(0, 0, 0) // Replace with the center of your sphere
+    const sphereCenter = new THREE.Vector3(0, 0, 0)
     const carPosition = nextPosition
       .clone()
       .sub(sphereCenter)
       .normalize()
       .multiplyScalar(this.earthRadius)
+
     this.car.car.position.copy(carPosition)
 
     // Rotate the car to match the surface of the sphere
     this.car.car.up.copy(carPosition.clone().normalize())
     this.car.car.lookAt(lookat)
+    console.log(this.car.car.position)
   }
 
   createWaypoint(waypointData) {
