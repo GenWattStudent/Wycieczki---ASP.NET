@@ -1,7 +1,9 @@
 import * as THREE from 'three'
+import { geoInterpolate } from 'https://cdn.jsdelivr.net/npm/d3-geo@3/+esm'
 
 const DEGREE_TO_RADIAN = Math.PI / 180
-const GLOBE_RADIUS = 4
+const CURVE_MIN_ALTITUDE = 0.05
+const CURVE_MAX_ALTITUDE = 0.2
 
 export function latLongToVector3(lat, lng, radius, heigth) {
   const phi = (90 - lat) * DEGREE_TO_RADIAN
@@ -14,13 +16,33 @@ export function latLongToVector3(lat, lng, radius, heigth) {
   )
 }
 
-export function serArc3D(
-  pointStart,
-  pointEnd,
-  smoothness,
-  clockWise,
-  earthRadius = 4.1
-) {
+export function clamp(num, min, max) {
+  return num <= min ? min : num >= max ? max : num
+}
+
+export function serArc3DLatLong(pointStart, pointEnd, earthRadius) {
+  // start and end points
+  const start = latLongToVector3(pointStart.lat, pointStart.lng, earthRadius)
+  const end = latLongToVector3(pointEnd.lat, pointEnd.lng, earthRadius)
+
+  // altitude
+  const altitude = clamp(start.distanceTo(end) * 0.75, CURVE_MIN_ALTITUDE, CURVE_MAX_ALTITUDE)
+
+  // 2 control points
+  const interpolate = geoInterpolate([pointStart.lng, pointStart.lat], [pointEnd.lng, pointEnd.lat])
+  const midCoord1 = interpolate(0.25)
+  const midCoord2 = interpolate(0.75)
+  const mid1 = latLongToVector3(midCoord1[1], midCoord1[0], earthRadius + altitude)
+  const mid2 = latLongToVector3(midCoord2[1], midCoord2[0], earthRadius + altitude)
+
+  return {
+    start,
+    end,
+    spline: new THREE.CubicBezierCurve3(start, mid1, mid2, end),
+  }
+}
+
+export function serArc3D(pointStart, pointEnd, smoothness, clockWise, earthRadius = 4.1) {
   const cb = new THREE.Vector3()
   const ab = new THREE.Vector3()
   const normal = new THREE.Vector3()

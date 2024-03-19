@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { latLongToVector3, serArc3D } from './helpers.js'
+import { latLongToVector3, serArc3D, serArc3DLatLong } from './helpers.js'
 import Waypoint3D from './Waypoint3D.js'
 import Car from './Car.js'
 import { Map } from '../map.js'
@@ -28,18 +28,14 @@ export default class EarthPlanet {
   }
 
   setWaypoints(waypoints) {
+    console.log(waypoints)
     this.waypoints = waypoints.filter((w) => w.type !== 3)
     this.setPoints(waypoints)
   }
 
   setPoints(waypoints) {
     this.points = waypoints.map((waypoint) => {
-      return latLongToVector3(
-        waypoint.lat,
-        waypoint.lng,
-        this.earthRadius,
-        0.01
-      )
+      return latLongToVector3(waypoint.lat, waypoint.lng, this.earthRadius, 0.01)
     })
   }
 
@@ -91,13 +87,8 @@ export default class EarthPlanet {
         this.lerpProgress
       )
 
-      const positions = serArc3D(
-        this.points[this.currentPoint],
-        nextPosition,
-        100,
-        false
-      )
-
+      const positions = serArc3D(this.points[this.currentPoint], nextPosition, 100, false, this.earthRadius)
+      console.log('positions')
       const arc = this.createArc(positions)
       this.scene.add(arc)
 
@@ -123,17 +114,12 @@ export default class EarthPlanet {
     this.waypoints.forEach((waypoint, index) => {
       const waypointType = Map.getTypeFromEnum(waypoint.type)
       if (
-        index < this.waypoints.length - 1 &&
+        index < this.waypoints.length - 2 &&
         waypointType !== 'indicator' &&
         this.waypoints[index + 1].type !== 'indicator'
       ) {
-        const positions = serArc3D(
-          this.points[index],
-          this.points[index + 1],
-          100,
-          false
-        )
-        const arc = this.createArc(positions)
+        const { spline } = serArc3DLatLong(waypoint, this.waypoints[index + 1], this.earthRadius)
+        const arc = this.createArcRoad(spline.getPoints(50))
         this.scene.add(arc)
       }
 
@@ -150,9 +136,7 @@ export default class EarthPlanet {
           // If there is no next waypoint, make the car continue looking in the same direction
           const prevPoint = this.points[index - 1]
           const currentPoint = this.points[index]
-          lookAt = new THREE.Vector3()
-            .subVectors(currentPoint, prevPoint)
-            .add(currentPoint)
+          lookAt = new THREE.Vector3().subVectors(currentPoint, prevPoint).add(currentPoint)
         }
         this.updateCar(this.points[index], lookAt)
       }
@@ -161,18 +145,13 @@ export default class EarthPlanet {
 
   updateCar(nextPosition, lookat) {
     const sphereCenter = new THREE.Vector3(0, 0, 0)
-    const carPosition = nextPosition
-      .clone()
-      .sub(sphereCenter)
-      .normalize()
-      .multiplyScalar(this.earthRadius)
+    const carPosition = nextPosition.clone().sub(sphereCenter).normalize().multiplyScalar(this.earthRadius)
 
     this.car.car.position.copy(carPosition)
 
     // Rotate the car to match the surface of the sphere
     this.car.car.up.copy(carPosition.clone().normalize())
     this.car.car.lookAt(lookat)
-    console.log(this.car.car.position)
   }
 
   createWaypoint(waypointData) {
@@ -190,25 +169,21 @@ export default class EarthPlanet {
     this.waypointsObjects.push(waypoint)
   }
 
-  createArc(positions) {
+  createArcRoad(points) {
+    const geometry = new THREE.BufferGeometry().setFromPoints(points)
+    const material = new THREE.LineBasicMaterial({ color: 0x0000ff })
+    return new THREE.Line(geometry, material)
+  }
+
+  createArc(points) {
     const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3)
-    )
-    return new THREE.Line(
-      geometry,
-      new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth: 2 })
-    )
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3))
+    return new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth: 2 }))
   }
 
   updateCamera(nextPosition) {
     const spherePosition = this.earth.position // Replace with the actual position of the sphere
-    const cameraOffset = nextPosition
-      .clone()
-      .sub(spherePosition)
-      .normalize()
-      .multiplyScalar(this.zoom)
+    const cameraOffset = nextPosition.clone().sub(spherePosition).normalize().multiplyScalar(this.zoom)
     this.camera.position.copy(spherePosition).add(cameraOffset)
     this.camera.lookAt(spherePosition)
   }
