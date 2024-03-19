@@ -22,10 +22,10 @@ public class TourController : Controller
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [Authorize]
-    public async Task<IActionResult> Tours()
+    public async Task<IActionResult> Tours(FilterModel filterModel)
     {
         _logger.LogInformation("Getting all tours");
-        var tours = await _tourService.GetTours();
+        var tours = await _tourService.GetTours(filterModel);
         return View(tours);
     }
 

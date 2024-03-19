@@ -1,0 +1,115 @@
+@using Book.App.Models
+@model FilterModel
+
+<p>
+    <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
+        aria-controls="collapseExample">
+        Filters
+    </a>
+</p>
+
+<div class="collapse mb-2" id="collapseExample">
+    <div class="card card-body">
+        @using (Html.BeginForm("Tours", "Tour", FormMethod.Get))
+        {
+            <label for="searchString">Search Title</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.SearchString, new
+                    {
+                        @class = "form-control w-100",
+                        placeholder = "Search title",
+                    })
+            </div>
+
+            <div class="d-flex justify-content-between mt-1">
+                <div>
+                    <label for="minPrice">Min Price</label>
+
+                    <div class="input-group mt-1 d-flex flex-column">
+                        @Html.TextBoxFor(model => model.MinPrice, new
+                            {
+                                @class = "form-control w-100",
+                                placeholder = "Min price",
+                            })
+                        @Html.ValidationMessageFor(model => model.MinPrice, "", new
+                            {
+                                @class = "field-validation-error text-danger"
+                            })
+                    </div>
+                </div>
+
+                <div>
+                    <label for="maxPrice">Max Price</label>
+                    <div class="input-group mt-1 d-flex flex-column">
+                        @Html.TextBoxFor(model => model.MaxPrice, new
+                            {
+                                @class = "form-control w-100",
+                                placeholder = "Max price",
+                            })
+                        @Html.ValidationMessageFor(model => model.MaxPrice, "", new
+                            {
+                                @class = "field-validation-error text-danger"
+                            })
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-4 mt-2">
+                <div>
+                    <span class="mt-1 mb-1">Sort By</span>
+
+                    <div class="form-check">
+                        @Html.RadioButtonFor(model => model.OrderBy, "date", new
+                            {
+                                @class = "form-check-input",
+                                id = "date"
+                            })
+                        <label class="form-check-label" for="date">
+                            Date
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        @Html.RadioButtonFor(model => model.OrderBy, "price", new
+                            {
+                                @class = "form-check-input",
+                                id = "price"
+                            })
+                        <label class="form-check-label" for="price">
+                            Price
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="mt-1 mb-1">Sort Order</span>
+
+                    <div class="form-check">
+                        @Html.RadioButtonFor(model => model.OrderDirection, "asc", new
+                            {
+                                @class = "form-check-input",
+                                id = "asc"
+                            })
+                        <label class="form-check-label" for="asc">
+                            Asc
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        @Html.RadioButtonFor(model => model.OrderDirection, "desc", new
+                            {
+                                @class = "form-check-input",
+                                id = "desc"
+                            })
+                        <label class="form-check-label" for="desc">
+                            Desc
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <input type="submit" value="Filter" class="btn btn-primary" />
+            </div>
+        }
+    </div>
+</div>

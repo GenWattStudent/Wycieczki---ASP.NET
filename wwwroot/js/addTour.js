@@ -1,37 +1,21 @@
 import { adminMap } from './adminMap.js'
 
-document.querySelector('form').addEventListener('submit', function (e) {
+document.querySelector('form').addEventListener('submit', async function (e) {
   e.preventDefault()
 
   const formData = new FormData()
   formData.append('Name', document.querySelector('input[name="Name"]').value)
-  formData.append(
-    'Description',
-    document.querySelector('textarea[name="Description"]').value
-  )
+  formData.append('Description', document.querySelector('textarea[name="Description"]').value)
   formData.append('Price', document.querySelector('input[name="Price"]').value)
-  formData.append(
-    'MaxUsers',
-    document.querySelector('input[name="MaxUsers"]').value
-  )
-  formData.append(
-    'StartDate',
-    document.querySelector('input[name="StartDate"]').value
-  )
-  formData.append(
-    'EndDate',
-    document.querySelector('input[name="EndDate"]').value
-  )
+  formData.append('MaxUsers', document.querySelector('input[name="MaxUsers"]').value)
+  formData.append('StartDate', document.querySelector('input[name="StartDate"]').value)
+  formData.append('EndDate', document.querySelector('input[name="EndDate"]').value)
 
   const data = adminMap.waypoints.map((waypoint) => waypoint.getSubmitData())
   console.log(data)
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data[i].images.length; j++) {
-      formData.append(
-        `Waypoints[${i}].Images`,
-        data[i].images[j],
-        'image-name.jpg'
-      )
+      formData.append(`Waypoints[${i}].Images`, data[i].images[j], 'image-name.jpg')
     }
 
     formData.append(`Waypoints[${i}][name]`, data[i].name)
@@ -48,20 +32,16 @@ document.querySelector('form').addEventListener('submit', function (e) {
     formData.append(`images`, imageFiles[i].file)
   }
   // Send the form data to the server
-  fetch('/Tour/AddTour', {
-    method: 'POST',
-    body: formData,
-  })
-    .then((data) => {
-      if (data.ok) {
-        window.location.href = '/Tour/Tours'
-      } else {
-        data.json().then((json) => {
-          console.log(json)
-        })
-      }
+  try {
+    const res = await fetch('/Tour/AddTour', {
+      method: 'POST',
+      body: formData,
     })
-    .catch((error) => {
-      console.error('Error:', error)
-    })
+    console.log(res)
+    const resData = await res.text()
+    // assing html response to page
+    document.querySelector('html').innerHTML = resData
+  } catch (error) {
+    console.error(error)
+  }
 })

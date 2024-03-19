@@ -96,8 +96,9 @@ public class BookController : Controller
 
             return RedirectToAction("Index");
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            TempData["ErrorMessage"] = e.Message;
             return RedirectToAction("Index");
         }
     }

@@ -21,6 +21,48 @@ public class TourService
         return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate >= DateTime.Now).ToListAsync();
     }
 
+    public async Task<List<TourModel>> GetTours(FilterModel filterModel)
+    {
+        var tours = _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate >= DateTime.Now);
+
+        if (!string.IsNullOrEmpty(filterModel.SearchString))
+        {
+            tours = tours.Where(t => t.Name.Contains(filterModel.SearchString));
+        }
+
+        if (filterModel.MinPrice > 0)
+        {
+            tours = tours.Where(t => t.Price >= filterModel.MinPrice);
+        }
+
+        if (filterModel.MaxPrice > 0)
+        {
+            tours = tours.Where(t => t.Price <= filterModel.MaxPrice);
+        }
+
+        if (filterModel.StartDate != null)
+        {
+            tours = tours.Where(t => t.StartDate >= filterModel.StartDate);
+        }
+
+        if (filterModel.EndDate != null)
+        {
+            tours = tours.Where(t => t.EndDate <= filterModel.EndDate);
+        }
+
+        switch (filterModel.OrderBy)
+        {
+            case OrderBy.Date:
+                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.StartDate) : tours.OrderByDescending(t => t.StartDate);
+                break;
+            case OrderBy.Price:
+                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.Price) : tours.OrderByDescending(t => t.Price);
+                break;
+        }
+
+        return await tours.ToListAsync();
+    }
+
     public async Task<List<TourModel>> GetActiveTours()
     {
         return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate <= DateTime.Now && t.EndDate >= DateTime.Now).ToListAsync();
