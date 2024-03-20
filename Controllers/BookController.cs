@@ -76,7 +76,7 @@ public class BookController : Controller
         catch (Exception e)
         {
             TempData["ErrorMessage"] = e.Message;
-            return RedirectToAction("TourDetails", "Tour", new { id = id });
+            return RedirectToAction("TourDetails", "Tour", new { id });
         }
     }
 

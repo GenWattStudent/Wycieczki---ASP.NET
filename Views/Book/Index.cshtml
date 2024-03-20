@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Your tours";
+    var tours = Model.Books.Select(b => b.TourModel).ToList();
 }
 
 <div class="alert alert-primary" role="alert">
@@ -10,6 +11,10 @@
 </div>
 
 <h1 class="text-uppercase">Your tours</h1>
+
+<div class="d-flex justify-content-end">
+    <partial name="_TotalPricePartial" model="@tours" />
+</div>
 
 @if (Model.Books.Count() == 0)
 {

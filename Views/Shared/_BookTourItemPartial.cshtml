@@ -21,6 +21,7 @@
     <div class="p-2">
         <p class="mt-2">@Model.TourModel.Description</p>
         <partial name="_TourStatusPartial" model="@Model" />
+        <h5 class="mt-2">Price: <span class="text-danger">@Model.TourModel.Price zł</span></h5>
         <div class="d-flex gap-2">
             <a asp-action="Details" asp-controller="Book" asp-route-id="@Model.TourModel.Id">
                 <button class="btn btn-primary">

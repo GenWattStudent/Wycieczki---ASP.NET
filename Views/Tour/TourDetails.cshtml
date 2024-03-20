@@ -31,7 +31,7 @@
                 <partial name="_WaypointsTourPartial" model="@Model.Waypoints" />
             </div>
         </div>
-        <div class="d-flex justify-content-between mt-4">
+        <div class="d-flex justify-content-between mt-4 gap-2">
             @if (Model.Users.Count >= Model.MaxUsers && Model.Users.FirstOrDefault(u => u.Id == userId) == null)
             {
                 <button class="btn btn-danger" disabled>Full</button>

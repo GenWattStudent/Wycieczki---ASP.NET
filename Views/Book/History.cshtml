@@ -3,12 +3,16 @@
 
 @{
     ViewData["Title"] = "Tour History";
+    var tours = Model.Books.Select(b => b.TourModel).ToList();
 }
 
 <header>
     <h1>Your Tours History</h1>
 </header>
 
+<div class="d-flex justify-content-end">
+    <partial name="_TotalPricePartial" model="@tours" />
+</div>
 
 @if (Model.Books.Count == 0)
 {

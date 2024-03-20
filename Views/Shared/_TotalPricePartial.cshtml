@@ -1,0 +1,11 @@
+@using Book.App.Models
+@using System.Linq
+@model List<TourModel>
+
+@{
+    var totalPrice = Model.Sum(x => x.Price);
+}
+
+<div>
+    <h4>Total Price: <span class="text-danger">@totalPrice zł</span></h4>
+</div>

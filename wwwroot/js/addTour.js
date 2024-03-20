@@ -38,10 +38,14 @@ document.querySelector('form').addEventListener('submit', async function (e) {
       body: formData,
     })
     console.log(res)
-    const resData = await res.text()
-    // assing html response to page
-    document.querySelector('html').innerHTML = resData
+    const resData = await res.json()
+    if (!resData.error) {
+      window.location.href = '/Tour/Tours'
+    } else {
+      toastr.error(resData.error)
+    }
   } catch (error) {
+    window.location.href = '/Tour/AddTour'
     console.error(error)
   }
 })

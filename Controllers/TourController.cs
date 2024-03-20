@@ -45,7 +45,8 @@ public class TourController : Controller
 
         if (!ModelState.IsValid)
         {
-            return View(tour);
+            var errorMessage = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            return Json(new { error = errorMessage });
         }
 
         if (addTourModel.Images != null && addTourModel.Images.Count > 0)

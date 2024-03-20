@@ -114,7 +114,7 @@ export default class EarthPlanet {
     this.waypoints.forEach((waypoint, index) => {
       const waypointType = Map.getTypeFromEnum(waypoint.type)
       if (
-        index < this.waypoints.length - 2 &&
+        index < this.waypoints.length - 1 &&
         waypointType !== 'indicator' &&
         this.waypoints[index + 1].type !== 'indicator'
       ) {
@@ -178,7 +178,7 @@ export default class EarthPlanet {
   createArc(points) {
     const geometry = new THREE.BufferGeometry()
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3))
-    return new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth: 2 }))
+    return new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth: 3.5 }))
   }
 
   updateCamera(nextPosition) {
