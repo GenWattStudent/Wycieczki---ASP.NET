@@ -46,12 +46,12 @@ public class BookController : Controller
             return RedirectToAction("Login", "Account");
         }
 
-        var userTours = await _bookService.GetActiveAndFutureToursByUserId(int.Parse(userId));
+        var userReservations = await _bookService.GetUserActiveAndFutureReservations(int.Parse(userId));
         var booksViewModel = new BooksViewModel();
 
-        foreach (var tour in userTours)
+        foreach (var reservation in userReservations)
         {
-            booksViewModel.Books.Add(_bookService.GetBookViewModel(tour));
+            booksViewModel.Books.Add(_bookService.GetBookViewModel(reservation.Tour));
         }
 
         return View(booksViewModel);
@@ -112,12 +112,12 @@ public class BookController : Controller
             return RedirectToAction("Login", "Account");
         }
 
-        var bookedTours = await _bookService.GetToursHistoryByUserId(int.Parse(userId));
+        var reservations = await _bookService.GetReservationsHistoryByUserId(int.Parse(userId));
         var booksViewModel = new BooksViewModel();
 
-        foreach (var tour in bookedTours)
+        foreach (var reservation in reservations)
         {
-            booksViewModel.Books.Add(_bookService.GetBookViewModel(tour));
+            booksViewModel.Books.Add(_bookService.GetBookViewModel(reservation.Tour));
         }
 
         return View(booksViewModel);
@@ -128,7 +128,7 @@ public class BookController : Controller
     {
         try
         {
-            await _bookService.DeleteUserInTour(id, tourId);
+            await _bookService.DeleteReservation(id, tourId);
 
             return RedirectToAction("TourDetails", "Tour", new { id = tourId });
         }

@@ -41,14 +41,14 @@
         <p class="card-text">@Model.Description</p>
         <partial name="_TourDetailsPartial" model="@Model" />
 
-        @if (Model.Users.Count >= Model.MaxUsers)
+        @if (Model.Reservations.Count >= Model.MaxUsers)
         {
             <p class="text-danger mt-2 d-block mb-0">
                 <ion-icon class="me-1" name="alert"></ion-icon>
                 This trip is already full!
             </p>
         }
-        @if (userId != null && Model.Users.Any(u => u.Id == int.Parse(userId)))
+        @if (userId != null && Model.Reservations.Any(r => r.User.Id == int.Parse(userId)))
         {
             <p class="text-success d-flex align-items-center">
                 <ion-icon class="me-1" name="checkbox"></ion-icon>

@@ -11,14 +11,15 @@
     {
         var sliderData = new ImageSliderModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
         <div class="alert alert-primary" role="alert" id="tour-info">
-            <div class="d-flex gap-2">
-                <partial name="_ImageSliderPartial" model="@sliderData" />
-                <a asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
-                    <h4>@Model.Tour.Name</h4>
-                </a>
-            </div>
+            <partial name="_ImageSliderPartial" model="@sliderData" />
+
+            <a class="mt-2 d-block" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
+                <h4>@Model.Tour.Name</h4>
+            </a>
+
             <p data-toggle="tooltip" data-placement="top" title="@Model.Tour.Description">
-                @Model.Tour.Description.Truncate(150)</p>
+                @Model.Tour.Description.Truncate(150)
+            </p>
             <partial name="_TourStatusPartial" model="@Model.Book" />
             <strong class="d-flex align-items-center gap-2">
                 <ion-icon name="calendar-number"></ion-icon>
@@ -29,7 +30,7 @@
 
     <div class="text-center">
         <h1>Explore the World with Exciting Tours!</h1>
-        <img class="img-fluid rounded mt-4" src="~/images/landscape2.jpg" alt="">
+        <img class="img-fluid rounded mt-4" style="max-width: 500px;" src="~/images/landscape2.jpg" alt="Sample image">
         <p class="mt-4"><span class="h4">W</span>elcome to our world of adventure! Embark on unforgettable journeys and
             discover the beauty of
             diverse

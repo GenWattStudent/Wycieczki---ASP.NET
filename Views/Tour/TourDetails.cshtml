@@ -32,11 +32,12 @@
             </div>
         </div>
         <div class="d-flex justify-content-between mt-4 gap-2">
-            @if (Model.Users.Count >= Model.MaxUsers && Model.Users.FirstOrDefault(u => u.Id == userId) == null)
+            @if (Model.Users.Count >= Model.MaxUsers && Model.Reservations.FirstOrDefault(r => r.User.Id == userId) ==
+            null)
             {
                 <button class="btn btn-danger" disabled>Full</button>
             }
-            else if (Model.Users.FirstOrDefault(u => u.Id == userId) == null)
+            else if (Model.Reservations.FirstOrDefault(r => r.User.Id == userId) == null)
             {
                 <form asp-action="BookTour" asp-controller="Book" method="post">
                     <input type="hidden" name="id" value="@Model.Id" />
@@ -62,7 +63,7 @@
 @if (role == "Admin")
 {
     <section class="mt-3">
-        @if (Model.Users.Count > 0)
+        @if (Model.Reservations.Count > 0)
         {
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
                 aria-expanded="false" aria-controls="collapseExample">
@@ -81,23 +82,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var user in Model.Users)
+                        @foreach (var reservation in Model.Reservations)
                         {
                             index++;
                             <tr>
                                 <th scope="row">@index</th>
-                                <td>@user.Username</td>
-                                @if (user.Contact != null)
+                                <td>@reservation.User.Username</td>
+                                @if (reservation.User.Contact != null)
                                 {
-                                    <td>@user.Contact.Email</td>
+                                    <td>@reservation.User.Contact.Email</td>
                                 }
                                 else
                                 {
                                     <td>Not provided</td>
                                 }
-                                @if (user.Contact != null)
+                                @if (reservation.User.Contact != null)
                                 {
-                                    <td>@user.Contact.Phone</td>
+                                    <td>@reservation.User.Contact.Phone</td>
                                 }
                                 else
                                 {
@@ -106,7 +107,7 @@
 
                                 <td>
                                     <a class="btn btn-danger" asp-action="DeleteUserInTour" asp-controller="Book"
-                                        asp-route-id="@user.Id" asp-route-tourId="@Model.Id">
+                                        asp-route-id="@reservation.User.Id" asp-route-tourId="@Model.Id">
                                         <ion-icon name="close-outline"></ion-icon>
                                     </a>
                                 </td>

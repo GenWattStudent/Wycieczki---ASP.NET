@@ -1,3 +1,4 @@
+using Book.App.Filters;
 using Book.App.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,37 +19,17 @@ public class TourService
 
     public async Task<List<TourModel>> GetTours()
     {
-        return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate >= DateTime.Now).ToListAsync();
+        return await _dbContext.Tours.Include(t => t.Images)
+                                    .Include(t => t.Reservations).ThenInclude(r => r.User)
+                                    .Where(t => t.StartDate >= DateTime.Now).ToListAsync();
     }
 
     public async Task<List<TourModel>> GetTours(FilterModel filterModel)
     {
-        var tours = _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate >= DateTime.Now);
+        var tours = _dbContext.Tours.Include(t => t.Images).Include(t => t.Reservations).ThenInclude(r => r.User).Where(t => t.StartDate >= DateTime.Now);
+        var filters = new List<IFilter> { new SearchFilter(filterModel.SearchString), new PriceFilter(filterModel.MinPrice, filterModel.MaxPrice) };
 
-        if (!string.IsNullOrEmpty(filterModel.SearchString))
-        {
-            tours = tours.Where(t => t.Name.Contains(filterModel.SearchString));
-        }
-
-        if (filterModel.MinPrice > 0)
-        {
-            tours = tours.Where(t => t.Price >= filterModel.MinPrice);
-        }
-
-        if (filterModel.MaxPrice > 0)
-        {
-            tours = tours.Where(t => t.Price <= filterModel.MaxPrice);
-        }
-
-        if (filterModel.StartDate != null)
-        {
-            tours = tours.Where(t => t.StartDate >= filterModel.StartDate);
-        }
-
-        if (filterModel.EndDate != null)
-        {
-            tours = tours.Where(t => t.EndDate <= filterModel.EndDate);
-        }
+        tours = filters.Aggregate(tours, (current, filter) => filter.Process(current));
 
         switch (filterModel.OrderBy)
         {
@@ -79,15 +60,7 @@ public class TourService
                 SaveImages(waypoint.Images, _waypointFolder, out waypointImageUrl);
             }
 
-            tour.Waypoints.Add(new WaypointModel
-            {
-                Name = waypoint.Name,
-                Latitude = waypoint.Lat,
-                Longitude = waypoint.Lng,
-                Description = waypoint.Description,
-                IsRoad = waypoint.IsRoad,
-                Type = waypoint.Type
-            });
+            tour.Waypoints.Add(new WaypointModel(waypoint));
 
             foreach (var imageUrl in waypointImageUrl)
             {
@@ -113,7 +86,10 @@ public class TourService
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _dbContext.Tours.Include(t => t.Waypoints).ThenInclude(w => w.Images).Include(t => t.Users).ThenInclude(u => u.Contact).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
+        return await _dbContext.Tours
+                            .Include(t => t.Waypoints).ThenInclude(w => w.Images)
+                            .Include(t => t.Reservations).ThenInclude(r => r.User).ThenInclude(u => u.Contact)
+                            .Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public void SaveImages(List<IFormFile> images, string folder, out List<string> imageUrls)
@@ -162,12 +138,7 @@ public class TourService
 
             if (dbTour != null)
             {
-                dbTour.Name = tour.Name;
-                dbTour.Description = tour.Description;
-                dbTour.Price = tour.Price;
-                dbTour.StartDate = tour.StartDate;
-                dbTour.EndDate = tour.EndDate;
-                dbTour.MaxUsers = tour.MaxUsers;
+                dbTour.EditTour(tour);
 
                 // Add new images
                 foreach (var imageUrl in imageUrls)
@@ -201,16 +172,9 @@ public class TourService
                         });
                     }
 
-                    dbTour.Waypoints.Add(new WaypointModel
-                    {
-                        Name = waypoint.Name,
-                        Latitude = waypoint.Lat,
-                        Longitude = waypoint.Lng,
-                        Description = waypoint.Description,
-                        Images = imagesToAdd,
-                        IsRoad = waypoint.IsRoad,
-                        Type = waypoint.Type
-                    });
+                    var newWaypoint = new WaypointModel(waypoint);
+                    newWaypoint.Images = imagesToAdd;
+                    dbTour.Waypoints.Add(newWaypoint);
                 }
 
                 await _dbContext.SaveChangesAsync();

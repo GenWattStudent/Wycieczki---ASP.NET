@@ -6,10 +6,10 @@
     Layout = "~/Views/Shared/_UserAuthLayout.cshtml";
 }
 
-<div>
-    <header class="container mt-4 d-flex align-items-center gap-2">
-        <img style="min-width: 50px; min-height: 50px;" src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
-        <h1>Register To <strong class="text-primary">Bookmania</strong></h1>
+<div style="background-color: #e5e3e3a7;margin-top: 5rem;" class="p-3 rounded">
+    <header class="container d-flex align-items-center gap-2 justify-content-md-center">
+        <img style="min-width: 50px; min-height: 50px; max-width: 150px; max-height: 150px;" src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
+        <h1 class="text-center">Register To <strong class="text-primary">Bookmania</strong></h1>
     </header>
     
     @using (Html.BeginForm("Register", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))

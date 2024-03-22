@@ -20,6 +20,7 @@ public class UserModel
     [Required]
     public Role Role { get; set; } = Role.User;
     public List<TourModel> Tours { get; set; } = new();
+    public List<ReservationModel> Reservations { get; set; } = new();
     public ContactModel? Contact { get; set; }
     public PreferencesModel Preferences { get; set; }
     public AddressModel? Address { get; set; }

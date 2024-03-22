@@ -23,4 +23,18 @@ public class WaypointModel
     public TourModel Tour { get; set; } = new();
     public bool IsRoad { get; set; }
     public WaypointType Type { get; set; }
+
+    public WaypointModel()
+    {
+    }
+
+    public WaypointModel(AddTourWaypointsModel waypoint)
+    {
+        Name = waypoint.Name;
+        Description = waypoint.Description;
+        Latitude = waypoint.Lat;
+        Longitude = waypoint.Lng;
+        IsRoad = waypoint.IsRoad;
+        Type = waypoint.Type;
+    }
 }

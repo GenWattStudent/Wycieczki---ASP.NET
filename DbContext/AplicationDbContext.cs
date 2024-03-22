@@ -15,4 +15,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<PreferencesModel> Preferences { get; set; }
     public DbSet<ContactModel> Contacts { get; set; }
     public DbSet<AddressModel> Addresses { get; set; }
+    public DbSet<ReservationModel> Reservations { get; set; }
 }

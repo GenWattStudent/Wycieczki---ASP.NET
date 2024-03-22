@@ -15,42 +15,35 @@ public class BookService
         _geoService = geoService;
     }
 
-    public IQueryable<List<TourModel>> GetToursByUserIdQueryable(int userId)
+    public IQueryable<ReservationModel> GetUserReservationsQueryable(int userId)
     {
-        return _context.Users
-            .Include(u => u.Tours)
-            .ThenInclude(t => t.Images)
-            .Include(u => u.Tours)
-            .ThenInclude(t => t.Waypoints)
-            .Where(u => u.Id == userId).Select(u => u.Tours);
+        return _context.Reservations.Include(r => r.User)
+                                    .Include(r => r.Tour).ThenInclude(t => t.Images)
+                                    .Include(r => r.Tour).ThenInclude(t => t.Waypoints).ThenInclude(w => w.Images)
+                                    .Where(r => r.User.Id == userId).AsQueryable();
     }
 
-    public async Task<List<TourModel>> GetActiveAndFutureToursByUserId(int userId)
+    public async Task<List<ReservationModel>> GetUserActiveAndFutureReservations(int userId)
     {
-        var userWithTours = GetToursByUserIdQueryable(userId);
+        var reservations = GetUserReservationsQueryable(userId);
 
-        return await userWithTours.SelectMany(t => t)
-                                  .Where(t => t.StartDate >= DateTime.Now || t.EndDate >= DateTime.Now)
-                                  .OrderBy(t => t.StartDate)
+        return await reservations.Where(r => r.Tour.StartDate >= DateTime.Now || r.Tour.EndDate >= DateTime.Now).OrderBy(r => r.Tour.StartDate)
                                   .ToListAsync();
     }
 
-    public async Task<List<TourModel>> GetToursHistoryByUserId(int userId)
+    public async Task<List<ReservationModel>> GetReservationsHistoryByUserId(int userId)
     {
-        var userWithTours = GetToursByUserIdQueryable(userId);
+        var reservations = GetUserReservationsQueryable(userId);
 
-        return await userWithTours.SelectMany(t => t)
-                                  .Where(t => t.EndDate < DateTime.Now)
-                                  .OrderByDescending(t => t.StartDate)
-                                  .ToListAsync();
+        return await reservations.Where(r => r.Tour.EndDate < DateTime.Now).OrderByDescending(r => r.Tour.StartDate).ToListAsync();
     }
 
-    public async Task<TourModel?> GetClosestTourByUserId(int userId)
+    public async Task<ReservationModel?> GetClosestReservation(int userId)
     {
-        var userWithTours = GetToursByUserIdQueryable(userId);
-        return await userWithTours.SelectMany(t => t)
-                                  .Where(t => t.StartDate >= DateTime.Now || t.EndDate >= DateTime.Now)
-                                  .OrderBy(t => t.StartDate)
+        var reservations = GetUserReservationsQueryable(userId);
+
+        return await reservations.OrderBy(r => r.Tour.StartDate)
+                                  .ThenBy(r => r.Tour.EndDate)
                                   .FirstOrDefaultAsync();
     }
 
@@ -78,7 +71,7 @@ public class BookService
         {
             throw new Exception("Tour is full");
         }
-        Console.WriteLine("user: " + user.Tours.Any(t => t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate));
+
         if (user.Tours.Any(t =>
             t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate
         || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate
@@ -88,36 +81,39 @@ public class BookService
             throw new Exception("User already booked a tour in this time");
         }
 
-        user.Tours.Add(tour);
+        var reservation = new ReservationModel
+        {
+            User = user,
+            Tour = tour
+        };
+
+        user.Reservations.Add(reservation);
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteCancelTour(int userId, int tourId)
     {
-        var user = await _context.Users.Include(u => u.Tours).FirstOrDefaultAsync(u => u.Id == userId);
-        var tour = await _context.Tours.FirstOrDefaultAsync(t => t.Id == tourId);
+        var reservation = await _context.Reservations.Include(r => r.User).Include(r => r.Tour).FirstOrDefaultAsync(r => r.User.Id == userId && r.Tour.Id == tourId);
 
-        if (tour.StartDate < DateTime.Now && tour.EndDate > DateTime.Now)
+        if (reservation == null)
+        {
+            throw new Exception("Reservation not found");
+        }
+
+        _context.Reservations.Remove(reservation);
+        await _context.SaveChangesAsync();
+
+        if (reservation.Tour.StartDate < DateTime.Now && reservation.Tour.EndDate > DateTime.Now)
         {
             throw new Exception("Tour already started");
-        }
-
-        if (user != null && tour != null)
-        {
-            user.Tours.Remove(tour);
-            await _context.SaveChangesAsync();
-        }
-        else
-        {
-            throw new Exception("User or tour not found");
         }
     }
 
     public async Task<TourModel?> GetTourById(int userId, int tourId)
     {
-        var tour = await _context.Tours.Include(t => t.Users).Include(t => t.Waypoints).ThenInclude(w => w.Images).Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == tourId && t.Users.Any(u => u.Id == userId));
+        var reservation = await GetUserReservationsQueryable(userId).FirstOrDefaultAsync(r => r.User.Id == userId);
 
-        return tour;
+        return reservation != null ? reservation.Tour : null;
     }
 
     public BookViewModel GetBookViewModel(TourModel tour)
@@ -143,14 +139,13 @@ public class BookService
         return bookViewModel;
     }
 
-    public async Task DeleteUserInTour(int userId, int tourId)
+    public async Task DeleteReservation(int userId, int tourId)
     {
-        var user = await _context.Users.Include(u => u.Tours).FirstOrDefaultAsync(u => u.Id == userId);
-        var tour = await _context.Tours.Include(t => t.Users).FirstOrDefaultAsync(t => t.Id == tourId);
+        var reservation = await _context.Reservations.Include(r => r.User).Include(r => r.Tour).FirstOrDefaultAsync(r => r.User.Id == userId && r.Tour.Id == tourId);
 
-        if (user != null && tour != null)
+        if (reservation != null)
         {
-            user.Tours.Remove(tour);
+            _context.Reservations.Remove(reservation);
             await _context.SaveChangesAsync();
         }
         else

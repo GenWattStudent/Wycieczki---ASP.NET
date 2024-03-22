@@ -22,11 +22,13 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var closestTour = await _bookService.GetClosestTourByUserId(int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
-        var homeViewModel = new HomeViewModel { Tour = closestTour };
-        if (closestTour != null)
+        var reservation = await _bookService.GetClosestReservation(int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+        var homeViewModel = new HomeViewModel();
+
+        if (reservation != null)
         {
-            homeViewModel.Book = _bookService.GetBookViewModel(closestTour);
+            homeViewModel.Tour = reservation.Tour;
+            homeViewModel.Book = _bookService.GetBookViewModel(reservation.Tour);
         }
 
         return View(homeViewModel);

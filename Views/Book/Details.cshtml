@@ -152,7 +152,6 @@
                 const distance = @Model.Distance;
 
                 if (distance > 70) {
-                    console.log('Glob', $('#map').height())
                     const earthOptions = new EarthOptions(window.innerWidth - $('#earth').offset().left * 2, $('#map').height(), 7);
                     const earth = setupGlob(waypoints, earthOptions).then(earth => {
                         earthScene = earth;

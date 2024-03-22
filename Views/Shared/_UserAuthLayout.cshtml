@@ -21,14 +21,15 @@
         <div class="d-flex justify-content-center position-relative position-absolute"
             style="overflow-x:hidden; top: 0px; z-index: -1;" id="earth">
             <div class="h4 position-absolute d-flex gap-3 text-primary"
-                style="left: 50%; top: .5rem; transform: translateX(-50%);">
+                style="left: 50%; top: .5rem; transform: translateX(-50%); z-index: 3">
                 <ion-icon style="margin-top: 2px;" id="time-icon"></ion-icon>
                 <span id="time"></span>
                 <span id="country"></span>
             </div>
         </div>
 
-        <footer id="footer" class="border-top footer text-muted">
+        <footer style="background-color: #e5e3e3a7; bottom: 0px;" id="footer"
+            class="border-top footer text-primary position-fixed w-100">
             <div class="container p-2">
                 &copy; 2024 - Bookmania - All rights reserved
             </div>
