@@ -22,7 +22,6 @@ namespace Book.App.Controllers
                     return View("NotFound");
 
                 case 401:
-                    TempData["ErrorMessage"] = "Sorry, you are not authorized to access this resource";
                     return RedirectToAction("Login", "User");
 
                 default:

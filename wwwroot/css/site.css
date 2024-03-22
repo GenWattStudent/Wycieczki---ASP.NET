@@ -43,7 +43,7 @@ html {
 }
 
 #map {
-  height: 500px;
+  height: 25rem;
 }
 
 .grid {
@@ -176,14 +176,9 @@ html {
 }
 
 .weather-card {
-  background: linear-gradient(
-    90deg,
-    rgb(208 209 175) 0%,
-    rgb(204 206 209) 39%,
-    rgb(154 187 223) 100%
-  );
-  background-size: 150% 150%;
-  animation: gradient 10s infinite;
+  background: linear-gradient(90deg, rgb(190, 191, 168) 0%, rgb(199, 208, 221) 39%, rgb(152, 166, 180) 100%);
+  background-size: 170% 150%;
+  animation: gradient 7s infinite;
 }
 
 @keyframes gradient {

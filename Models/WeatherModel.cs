@@ -30,7 +30,7 @@ public class DayWeather
     public List<string> Preciptype { get; set; }
     public double Pressure { get; set; }
     public double Snow { get; set; }
-    public double Snowdepth { get; set; }
+    public double? SnowDepth { get; set; }
     public double Windgust { get; set; }
     public double Windspeed { get; set; }
     public double Winddir { get; set; }

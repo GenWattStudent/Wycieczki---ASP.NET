@@ -15,7 +15,7 @@ export default class EarthPlanet {
     this.camera = camera
     this.waypointsObjects = []
     this.textObjects = []
-    this.earthRadius = 4
+    this.earthRadius = 3.5
     this.points = []
     this.isDay = null
     this.car = new Car(this.scene, assets)
@@ -47,7 +47,7 @@ export default class EarthPlanet {
   }
 
   create = () => {
-    const earthGeometry = new THREE.SphereGeometry(this.earthRadius, 32, 32)
+    const earthGeometry = new THREE.SphereGeometry(this.earthRadius, 48, 48)
     const earthMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
     const earth = new THREE.Mesh(earthGeometry, earthMaterial)
 

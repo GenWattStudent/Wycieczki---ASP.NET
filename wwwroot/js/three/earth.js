@@ -6,12 +6,7 @@ import { latLongToVector3 } from './helpers.js'
 export default class EarthScene {
   constructor(assets) {
     this.scene = new THREE.Scene()
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    )
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
     this.height = null
     this.width = null
     this.renderer = new THREE.WebGLRenderer()
@@ -56,7 +51,7 @@ export default class EarthScene {
       !this.earth.isLoading ? this.earth.animate() : null
       this.controls.update()
       this.renderer.render(this.scene, this.camera)
-      // this.renderer.setClearColor(0xffffff, 0)
+      this.renderer.setClearColor(0xffffff, 0)
       requestAnimationFrame(animation)
     }
     animation()
@@ -68,12 +63,7 @@ export default class EarthScene {
     // )
     this.earth.updateCar(
       latLongToVector3(lat, long, this.earth.earthRadius, 0.01),
-      latLongToVector3(
-        waypoint.latitude,
-        waypoint.longitude,
-        this.earth.earthRadius,
-        0.01
-      )
+      latLongToVector3(waypoint.latitude, waypoint.longitude, this.earth.earthRadius, 0.01)
     )
   }
 
@@ -91,7 +81,7 @@ export default class EarthScene {
     if (!this.width) {
       width = window.innerWidth
     }
-
+    console.log('height', height, width)
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)

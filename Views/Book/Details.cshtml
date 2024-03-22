@@ -152,9 +152,13 @@
                 const distance = @Model.Distance;
 
                 if (distance > 70) {
-                    const earthOptions = new EarthOptions($('#map').width(), $('#map').height(), 7);
-                    setupGlob(waypoints, earthOptions).then(earth => {
+                    console.log('Glob', $('#map').height())
+                    const earthOptions = new EarthOptions(window.innerWidth - $('#earth').offset().left * 2, $('#map').height(), 7);
+                    const earth = setupGlob(waypoints, earthOptions).then(earth => {
                         earthScene = earth;
+                        window.addEventListener('resize', () => {
+                            earth.setWidth(window.innerWidth - $('#earth').offset().left * 2)
+                        });
                     });
                 }
             }
