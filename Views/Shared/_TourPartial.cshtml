@@ -1,6 +1,5 @@
 @model TourModel
 @{
-    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     var sliderData = new ImageSliderModel
             {
@@ -9,34 +8,14 @@
             };
 }
 
-<li class="card">
+<li class="card glassmorphism">
     <partial name="_ImageSliderPartial" model="@sliderData" />
     <div class="card-body d-flex flex-column">
         <div class="d-flex justify-content-between">
             <header>
                 <h2 class="card-title">@Model.Name</h2>
             </header>
-            @if (role == "Admin")
-            {
-                <div class="d-flex" style="height: fit-content;">
-                    <a asp-action="EditTour" asp-controller="Tour" asp-route-id="@Model.Id">
-                        <button data-toggle="tooltip" data-placement="top" title="Edit @Model.Name tour"
-                            class="btn pt-0 pe-2">
-                            <ion-icon name="create-outline"></ion-icon>
-                        </button>
-                    </a>
-                    @using (Html.BeginForm("DeleteTour", "Tour", new { id = Model.Id }, FormMethod.Post, true, new
-                    {
-                        id = $"deleteForm-{Model.Id}",
-                    }))
-                    {
-                        <button type="button" data-toggle="modal" data-target="#deleteConfirmModal-@Model.Id"
-                            data-toggle="tooltip" data-placement="top" title="Delete @Model.Name tour" class="btn p-0">
-                            <ion-icon name="trash-outline"></ion-icon>
-                        </button>
-                    }
-                </div>
-            }
+            <partial name="_AdminTourActions" model="@Model" />
         </div>
         <p class="card-text">@Model.Description</p>
         <partial name="_TourDetailsPartial" model="@Model" />

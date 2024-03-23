@@ -10,7 +10,7 @@
     @if (Model.Tour != null && Model.Book != null)
     {
         var sliderData = new ImageSliderModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
-        <div class="alert alert-primary" role="alert" id="tour-info">
+        <div class="alert alert-primary glassmorphism" role="alert" id="tour-info">
             <partial name="_ImageSliderPartial" model="@sliderData" />
 
             <a class="mt-2 d-block" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
@@ -29,9 +29,18 @@
     }
 
     <div class="text-center">
-        <h1>Explore the World with Exciting Tours!</h1>
-        <img class="img-fluid rounded mt-4" style="max-width: 500px;" src="~/images/landscape2.jpg" alt="Sample image">
-        <p class="mt-4"><span class="h4">W</span>elcome to our world of adventure! Embark on unforgettable journeys and
+        <h1 class="glassmorphism p-3 rounded text-primary">Explore the World with Exciting Tours!</h1>
+        <div class="glassmorphism mt-3 p-3 rounded">
+            <figure class="m-0">
+                <img class="img-fluid rounded" src="~/images/landscape2.jpg" alt="Sample image">
+                <figcaption class="text-center mt-2">Discover the beauty of diverse destinations with our curated
+                    selection of tours.
+                </figcaption>
+            </figure>
+        </div>
+        <p class="mt-3 glassmorphism p-3 rounded"><span class="h4">W</span>elcome to our world of adventure! Embark on
+            unforgettable
+            journeys and
             discover the beauty of
             diverse
             destinations with our curated selection of tours. Whether you seek cultural immersion, thrilling outdoor
@@ -40,12 +49,12 @@
             dreams
             into reality!
         </p>
-        <cite>
+        <cite class="glassmorphism p-3 mt-3 rounded d-block">
             <span class="text-primary">"Explore the World with Exciting Tours!"</span> - Your Gateway to Unforgettable
             Adventures.
         </cite>
     </div>
-    <button class="btn btn-primary mt-4">
+    <button class="btn btn-primary mt-3">
         <a class="text-light text-decoration-none" asp-action="Tours" asp-controller="Tour">
             Explore Tours
         </a>

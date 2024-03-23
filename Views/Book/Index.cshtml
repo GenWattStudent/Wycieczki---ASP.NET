@@ -10,10 +10,12 @@
     <a asp-action="History" asp-controller="Book">Check your tour history!</a>
 </div>
 
-<h1 class="text-uppercase">Your tours</h1>
+<div class="glassmorphism p-3 rounded">
+    <h1 class="text-uppercase">Your tours</h1>
 
-<div class="d-flex justify-content-end">
-    <partial name="_TotalPricePartial" model="@tours" />
+    <div class="d-flex justify-content-end">
+        <partial name="_TotalPricePartial" model="@tours" />
+    </div>
 </div>
 
 @if (Model.Books.Count() == 0)

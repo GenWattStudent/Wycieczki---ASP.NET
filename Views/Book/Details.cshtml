@@ -10,8 +10,8 @@
             };
 }
 
-<section class="card">
-    <div class="card-header d-flex gap-2">
+<section class="card glassmorphism">
+    <div class="card-header">
 
         @if (sliderData.Images.Count > 0)
         {
@@ -20,20 +20,9 @@
             </div>
         }
 
-        <h4 class="card-title text-primary">
+        <h4 class="card-title text-primary mt-4">
             @Model.TourModel.Name
-            @if (Model.TourModel.StartDate > DateTime.Now)
-            {
-                <span class="badge bg-warning text-dark">Upcoming</span>
-            }
-            else if (Model.TourModel.EndDate < DateTime.Now)
-            {
-                <span class="badge bg-danger">Ended</span>
-            }
-            else
-            {
-                <span class="badge bg-success">Ongoing</span>
-            }
+            <partial name="_TourActivityPartial" model="@Model.TourModel" />
         </h4>
     </div>
 
@@ -48,9 +37,9 @@
 
                 <div class="d-flex justify-content-between mt-1">
                     <strong class="text-secondary">Distance: @Math.Round(Model.Distance, 3) km</strong>
-                    <strong id="passed" class="text-secondary">Passed @(Math.Round(Model.Distance *
-                        Model.PercentOfTime,
-                        3)) km</strong>
+                    <strong id="passed" class="text-secondary">
+                        Passed @(Math.Round(Model.Distance * Model.PercentOfTime, 3)) km
+                    </strong>
                 </div>
                 <partial name="_TourStatusPartial" model="@Model" />
             </div>

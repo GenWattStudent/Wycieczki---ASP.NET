@@ -111,7 +111,7 @@ public class BookService
 
     public async Task<TourModel?> GetTourById(int userId, int tourId)
     {
-        var reservation = await GetUserReservationsQueryable(userId).FirstOrDefaultAsync(r => r.User.Id == userId);
+        var reservation = await GetUserReservationsQueryable(userId).FirstOrDefaultAsync(r => r.Tour.Id == tourId);
 
         return reservation != null ? reservation.Tour : null;
     }

@@ -8,17 +8,17 @@
             };
 }
 
-<li class="list-group-item p-0 mt-2">
-    <div class="d-flex gap-2">
+<li class="list-group-item p-0 mt-3 glassmorphism">
+    <div class="d-flex">
         <header class="card-header w-100">
             <partial name="_ImageSliderPartial" model="@sliderData" />
-            <a class="text-decoration-none text-primary" asp-action="Details" asp-controller="Book"
+            <a class="text-decoration-none text-primary mt-3 d-block" asp-action="Details" asp-controller="Book"
                 asp-route-id="@Model.TourModel.Id">
                 <h2>@Model.TourModel.Name</h2>
             </a>
         </header>
     </div>
-    <div class="p-2">
+    <div class="p-3">
         <p class="mt-2">@Model.TourModel.Description</p>
         <partial name="_TourStatusPartial" model="@Model" />
         <h5 class="mt-2">Price: <span class="text-danger">@Model.TourModel.Price zł</span></h5>

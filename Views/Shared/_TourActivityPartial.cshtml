@@ -1,0 +1,14 @@
+@model TourModel
+
+@if (Model.StartDate > DateTime.Now)
+{
+    <span class="badge bg-warning text-dark">Upcoming</span>
+}
+else if (Model.EndDate < DateTime.Now)
+{
+    <span class="badge bg-danger">Ended</span>
+}
+else
+{
+    <span class="badge bg-success">Ongoing</span>
+}

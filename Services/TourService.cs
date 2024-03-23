@@ -49,20 +49,36 @@ public class TourService
         return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate <= DateTime.Now && t.EndDate >= DateTime.Now).ToListAsync();
     }
 
-    public async Task AddTour(TourModel tour, AddTourModel addTourModel, List<string> imageUrls)
+    public async Task SaveTourImages(List<IFormFile> images, TourModel tour)
+    {
+        var imageUrls = await SaveImages(images, _tourFolder);
+
+        foreach (var imageUrl in imageUrls)
+        {
+            if (!tour.Images.Any(i => i.ImageUrl == imageUrl))
+            {
+                tour.Images.Add(new ImageModel
+                {
+                    ImageUrl = imageUrl
+                });
+            }
+        }
+    }
+
+    public async Task AddTour(TourModel tour, AddTourModel addTourModel)
     {
         foreach (var waypoint in addTourModel.Waypoints)
         {
-            List<string> waypointImageUrl = new();
+            List<string> waypointImageUrls = new();
 
             if (waypoint.Images != null)
             {
-                SaveImages(waypoint.Images, _waypointFolder, out waypointImageUrl);
+                waypointImageUrls = await SaveImages(waypoint.Images, _waypointFolder);
             }
 
             tour.Waypoints.Add(new WaypointModel(waypoint));
 
-            foreach (var imageUrl in waypointImageUrl)
+            foreach (var imageUrl in waypointImageUrls)
             {
                 tour.Waypoints.Last().Images.Add(new ImageModel
                 {
@@ -71,12 +87,9 @@ public class TourService
             }
         }
 
-        foreach (var imageUrl in imageUrls)
+        if (addTourModel.Images != null && addTourModel.Images.Count > 0)
         {
-            tour.Images.Add(new ImageModel
-            {
-                ImageUrl = imageUrl
-            });
+            await SaveTourImages(addTourModel.Images, tour);
         }
 
         _dbContext.Tours.Add(tour);
@@ -92,32 +105,17 @@ public class TourService
                             .Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public void SaveImages(List<IFormFile> images, string folder, out List<string> imageUrls)
+    public async Task<List<string>> SaveImages(List<IFormFile> images, string folder)
     {
-        imageUrls = new List<string>();
+        var imageUrls = new List<string>();
 
         foreach (var image in images)
         {
-            SaveImage(image, folder, out string imageUrl);
-            imageUrls.Add(imageUrl);
-        }
-    }
-
-    public void SaveImage(IFormFile image, string folder, out string imageUrl)
-    {
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", folder, fileName);
-
-        if (!Directory.Exists(Path.GetDirectoryName(filePath)))
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            var path = await _fileService.SaveFile(image, folder);
+            imageUrls.Add(path);
         }
 
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            image.CopyTo(fileStream);
-        }
-        imageUrl = $"/images/{folder}/{fileName}";
+        return imageUrls;
     }
 
     public void RemoveImage(string imageUrl)
@@ -129,7 +127,7 @@ public class TourService
         }
     }
 
-    public async Task EditTour(TourModel tour, EditTourModel editTourModel, List<string> imageUrls)
+    public async Task EditTour(TourModel tour, EditTourModel editTourModel)
     {
         // Edit tour, add images. Update waypoints that already existed in db and add new ones
         using (var transaction = _dbContext.Database.BeginTransaction())
@@ -140,18 +138,6 @@ public class TourService
             {
                 dbTour.EditTour(tour);
 
-                // Add new images
-                foreach (var imageUrl in imageUrls)
-                {
-                    if (!dbTour.Images.Any(i => i.ImageUrl == imageUrl))
-                    {
-                        dbTour.Images.Add(new ImageModel
-                        {
-                            ImageUrl = imageUrl
-                        });
-                    }
-                }
-
                 // Add new waypoints
                 foreach (var waypoint in editTourModel.Waypoints.Where(wm => wm.Id == 0))
                 {
@@ -159,7 +145,7 @@ public class TourService
 
                     if (waypoint.Images != null)
                     {
-                        SaveImages(waypoint.Images, _waypointFolder, out imageUrlsToAdd);
+                        imageUrlsToAdd = await SaveImages(waypoint.Images, _waypointFolder);
                     }
 
                     var imagesToAdd = new List<ImageModel>();
@@ -175,6 +161,11 @@ public class TourService
                     var newWaypoint = new WaypointModel(waypoint);
                     newWaypoint.Images = imagesToAdd;
                     dbTour.Waypoints.Add(newWaypoint);
+                }
+
+                if (editTourModel.Images != null && editTourModel.Images.Count > 0)
+                {
+                    await SaveTourImages(editTourModel.Images, dbTour);
                 }
 
                 await _dbContext.SaveChangesAsync();

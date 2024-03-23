@@ -6,17 +6,17 @@
     var tours = Model.Books.Select(b => b.TourModel).ToList();
 }
 
-<header>
+<header class="glassmorphism p-3 rounded">
     <h1>Your Tours History</h1>
 </header>
 
-<div class="d-flex justify-content-end">
+<div class="d-flex justify-content-end glassmorphism mt-3 p-3 rounded">
     <partial name="_TotalPricePartial" model="@tours" />
 </div>
 
 @if (Model.Books.Count == 0)
 {
-    <p class="alert alert-warning h2">You have not been at any tour yet.</p>
+    <p class="alert alert-warning h2 mt-3">You have not been at any tour yet.</p>
 }
 else
 {

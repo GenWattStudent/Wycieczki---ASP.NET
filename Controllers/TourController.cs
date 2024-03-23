@@ -39,8 +39,6 @@ public class TourController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddTour([FromForm] AddTourModel addTourModel)
     {
-        List<string> imageUrls = new List<string>();
-
         var tour = new TourModel(addTourModel);
 
         if (!ModelState.IsValid)
@@ -49,12 +47,7 @@ public class TourController : Controller
             return Json(new { error = errorMessage });
         }
 
-        if (addTourModel.Images != null && addTourModel.Images.Count > 0)
-        {
-            _tourService.SaveImages(addTourModel.Images, _tourFolder, out imageUrls);
-        }
-
-        await _tourService.AddTour(tour, addTourModel, imageUrls);
+        await _tourService.AddTour(tour, addTourModel);
 
         return RedirectToAction("Tours");
     }
@@ -63,7 +56,6 @@ public class TourController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditTour(EditTourModel editTourModel)
     {
-        List<string> imageUrls = new List<string>();
         var tour = new TourModel(editTourModel);
 
         if (ModelState.IsValid == false)
@@ -71,12 +63,7 @@ public class TourController : Controller
             return View(tour);
         }
 
-        if (editTourModel.Images != null && editTourModel.Images.Count > 0)
-        {
-            _tourService.SaveImages(editTourModel.Images, _tourFolder, out imageUrls);
-        }
-
-        await _tourService.EditTour(tour, editTourModel, imageUrls);
+        await _tourService.EditTour(tour, editTourModel);
 
         return RedirectToAction("Tours");
     }

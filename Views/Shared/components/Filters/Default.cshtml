@@ -1,15 +1,14 @@
 @using Book.App.Models
 @model FilterModel
 
-<p>
-    <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
-        aria-controls="collapseExample">
-        Filters
-    </a>
-</p>
 
-<div class="collapse mb-2" id="collapseExample">
-    <div class="card card-body">
+<a class="btn btn-primary mb-3" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
+    aria-controls="collapseExample">
+    Filters
+</a>
+
+<div class="collapse mb-3" id="collapseExample">
+    <div class="card card-body glassmorphism">
         @using (Html.BeginForm("Tours", "Tour", FormMethod.Get))
         {
             <label for="searchString">Search Title</label>

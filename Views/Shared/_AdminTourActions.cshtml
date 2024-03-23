@@ -1,0 +1,26 @@
+@model TourModel
+@{
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+@if (role == "Admin")
+{
+    <div class="d-flex" style="height: fit-content;">
+        <a asp-action="EditTour" asp-controller="Tour" asp-route-id="@Model.Id">
+            <button data-toggle="tooltip" data-placement="top" title="Edit @Model.Name tour" class="btn pt-0 pe-2">
+                <ion-icon name="create-outline"></ion-icon>
+            </button>
+        </a>
+        @using (Html.BeginForm("DeleteTour", "Tour", new { id = Model.Id }, FormMethod.Post, true, new
+        {
+            id = $"deleteForm-{Model.Id}",
+        }))
+        {
+            <button type="button" data-toggle="modal" data-target="#deleteConfirmModal-@Model.Id" class="btn p-0">
+                <div data-toggle="tooltip" data-placement="top" title="Delete @Model.Name tour">
+                    <ion-icon name="trash-outline"></ion-icon>
+                </div>
+            </button>
+        }
+    </div>
+}

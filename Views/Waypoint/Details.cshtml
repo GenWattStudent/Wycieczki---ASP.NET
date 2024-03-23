@@ -10,12 +10,13 @@
             };
     var index = 0;
 }
+<div class="glassmorphism p-3 rounded">
+    <a class="text-dark" asp-action="TourDetails" asp-controller="Tour" asp-route-id="Model.Waypoint.TourId">
+        Go to the tour - <strong class="text-primary">@Model.Waypoint.Tour.Name</strong>
+    </a>
+</div>
 
-<a class="text-dark" asp-action="TourDetails" asp-controller="Tour" asp-route-id="Model.Waypoint.TourId">
-    Go to the tour - <strong class="text-primary">@Model.Waypoint.Tour.Name</strong>
-</a>
-
-<div class="card mt-2">
+<div class="card mt-3 glassmorphism">
     <header class="card-header text-primary">
         <h2>@Model.Waypoint.Name</h2>
     </header>
@@ -31,8 +32,10 @@
 
 @if (Model.Weather != null)
 {
-    <h1 class="text-center mt-2 text-primary">Weather - 15 days</h1>
-    <div class="grid gap-2 flex-wrap mt-2">
+    <div class="glassmorphism p-3 rounded mt-3">
+        <h1 class="text-primary">Weather - 15 days</h1>
+    </div>
+    <div class="grid gap-2 flex-wrap mt-3">
         @foreach (var weather in Model.Weather.Days)
         {
             <div class="card weather-card">

@@ -1,6 +1,4 @@
-﻿@using Book.App.Helpers;
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 
 <head>
@@ -17,8 +15,8 @@
     <link rel="stylesheet" href="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.css" />
 </head>
 
-<body>
-    <header>
+<body class="background">
+    <header id="nav">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-primary border-bottom box-shadow mb-3 d-block">
             <div class="container-fluid">
                 <a class="navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
@@ -31,45 +29,11 @@
                     <partial name="_UserPartial" />
                 </div>
             </div>
-            <div class="collapse justify-content-between container-fluid">
-                <ul class="navbar-nav flex-row">
-                    <div class="d-none d-sm-block">
-                        <div class="d-flex">
-                            <li class="nav-item pe-2">
-                                <a class="nav-link text-light pl-0 @Html.IsActive("Home", "Index")" asp-area=""
-                                    asp-controller="Home" asp-action="Index">Home <span></span></a>
-                            </li>
-                            @if (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin")
-                            {
-                                <li class="nav-item pe-2">
-                                    <a class="nav-link text-light @Html.IsActive("Tour", "AddTour")" asp-area=""
-                                        asp-controller="Tour" asp-action="AddTour">
-                                        Add Tour
-                                        <span></span>
-                                    </a>
-                                </li>
-                            }
-                            <li class="nav-item pe-2">
-                                <a class="nav-link text-light @Html.IsActive("Tour", "Tours")" asp-area=""
-                                    asp-controller="Tour" asp-action="Tours">
-                                    Tours
-                                    <span></span>
-                                </a>
-                            </li>
-                            <li class="nav-item pe-2 @Html.IsActive("Book", "Index")">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Book" asp-action="Index">
-                                    Your Book Tours
-                                    <span></span>
-                                </a>
-                            </li>
-                        </div>
-                    </div>
-                </ul>
-            </div>
+            <partial name="_NavPartial" />
         </nav>
 
     </header>
-    <div class="container">
+    <div class="container" style="overflow-y: auto; overflow-x: hidden;" id="main">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -96,7 +60,7 @@
         </div>
     </div>
 
-    <footer class=" border-top footer text-muted position-relative">
+    <footer class="border-top footer glassmorphism">
         <div class="container">
             &copy; 2024 - Bookmania - All rights reserved
         </div>
@@ -135,6 +99,16 @@
             toastr.error("@TempData["ErrorMessage"].ToString()");
         </script>
     }
+
+    <script>
+        $(document).ready(function () {
+            const footer = $("footer");
+            const main = $("#main");
+            const mainHeight = window.innerHeight - footer.height() - main.offset().top;
+
+            main.css("height", mainHeight);
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

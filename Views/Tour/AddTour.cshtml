@@ -5,7 +5,11 @@
     ViewData["Title"] = "Add Tour";
 }
 
-<div>
+<header class="glassmorphism p-3 rounded">
+    <h2>Add Tour</h2>
+</header>
+
+<div class="card glassmorphism p-3 mt-3">
     @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         <partial name="_TourFormPartial" model="Model" />

@@ -9,19 +9,21 @@
     var role = User.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
 }
 
-@if (role == "Admin")
-{
-    <a asp-action="Active" asp-controller="Tour">See Active Tours</a>
-}
+<div class="glassmorphism p-3 rounded mb-3">
+    @if (role == "Admin")
+    {
+        <a asp-action="Active" asp-controller="Tour">See Active Tours</a>
+    }
 
-@if (Model.Count == 0)
-{
-    <h3 class="mt-2">No tours available</h3>
-}
-else
-{
-    <h5 class="text-muted">Available @Model.Count tour(s)</h5>
-}
+    @if (Model.Count == 0)
+    {
+        <h3 class="mt-2">No tours available</h3>
+    }
+    else
+    {
+        <h5>Available @Model.Count tour(s)</h5>
+    }
+</div>
 
 @await Component.InvokeAsync("Filters")
 
