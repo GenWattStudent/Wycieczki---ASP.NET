@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Book.App.Models;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
 namespace Book.App.Services;
@@ -9,9 +10,11 @@ public class WeatherService
     private static string key = Environment.GetEnvironmentVariable("OPEN_WEATHER_API_KEY");
     private string url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
     private HttpClient _client = new HttpClient();
+    private readonly IDistributedCache _cache;
 
-    public WeatherService()
+    public WeatherService(IDistributedCache cache)
     {
+        _cache = cache;
         if (key == null)
         {
             throw new Exception("Open Weather API Key not found");
@@ -20,14 +23,30 @@ public class WeatherService
         _client.BaseAddress = new Uri(url);
     }
 
-
-    public async Task<WeatherModel> GetWeather(double lat, double lon)
+    public async Task<WeatherModel> GetWeatherFromApi(double lat, double lon)
     {
         var response = await _client.GetAsync($"{url}{lat},{lon}?key={key}&include=days&unitGroup=metric");
         var content = await response.Content.ReadAsStringAsync();
-        var fullUrl = $"{url}{lat},{lon}?key={key}";
-        Console.WriteLine(content + " " + fullUrl);
         var weatherData = JsonConvert.DeserializeObject<WeatherModel>(content);
+        return weatherData;
+    }
+
+
+    public async Task<WeatherModel?> GetWeather(double lat, double lon)
+    {
+        if (string.IsNullOrEmpty(_cache.GetString($"{lat},{lon}")))
+        {
+            var weatherData = await GetWeatherFromApi(lat, lon);
+            var cacheOptions = new DistributedCacheEntryOptions();
+            cacheOptions.SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+            Console.WriteLine("Setting cache");
+            _cache.SetString($"{lat},{lon}", JsonConvert.SerializeObject(weatherData), cacheOptions);
+            return weatherData;
+        }
+
+        Console.WriteLine("Getting from cache");
+        var cachedData = _cache.GetString($"{lat},{lon}");
+        return JsonConvert.DeserializeObject<WeatherModel>(cachedData ?? "");
 
         // var weatherData = new WeatherModel
         // {
@@ -104,7 +123,7 @@ public class WeatherService
         // }
         // };
 
-        return weatherData;
+        // return weatherData;
     }
 
 }

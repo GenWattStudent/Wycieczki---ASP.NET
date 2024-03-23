@@ -35,7 +35,11 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 builder.Services.AddMyServices();
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-
+builder.Services.AddDistributedRedisCache(options =>
+{
+    options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
+    options.InstanceName = "BookApp_";
+});
 // Setup authentication JWT
 builder.Services.AddAuthentication(x =>
 {
