@@ -9,25 +9,31 @@
     <h2>Add Tour</h2>
 </header>
 
-<div class="card glassmorphism p-3 mt-3">
+<div class="">
     @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
-        <partial name="_TourFormPartial" model="Model" />
-        <div id="preview" class="d-flex mt-2"></div>
+        <div class="glassmorphism p-3 mt-3 rounded">
+            <partial name="_TourFormPartial" model="Model" />
+            <div id="preview" class="d-flex mt-2"></div>
+        </div>
 
         @Html.Hidden("images", "", new { id = "images" })
 
-        <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
+        <div class="glassmorphism p-3 mt-3 rounded">
+            <strong class="d-block">Click on the waypoint to update it.</strong>
 
-        <div id="waypoint-form" class="mt-2"></div>
-
-        <div class="position-relative mt-2 ">
-            <partial name="_MapTools" />
-            <div id="map" class="rounded mt-2"></div>
+            <div id="waypoint-form" class="mt-2"></div>
         </div>
 
-        <div class="d-flex flex-column">
-            <input class="btn btn-primary mt-3" type="submit" value="Submit">
+        <div class="glassmorphism p-3 mt-3 rounded">
+            <div class="position-relative">
+                <partial name="_MapTools" />
+                <div id="map" class="rounded mt-2"></div>
+            </div>
+
+            <div class="d-flex flex-column">
+                <input class="btn btn-primary mt-3" type="submit" value="Submit">
+            </div>
         </div>
     }
 </div>

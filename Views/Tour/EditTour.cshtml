@@ -8,12 +8,14 @@
     <h2>Edit - <span class="text-primary">@Model.Name</span></h2>
 </header>
 
-<div class="glassmorphism p-3 rounded mt-3">
+<div class="">
     @using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
-        <partial name="_TourFormPartial" model="Model" />
+        <div class="glassmorphism p-3 rounded mt-3">
+            <partial name="_TourFormPartial" model="Model" />
+        </div>
 
-        <div class="mt-2">
+        <div class="glassmorphism p-3 rounded mt-3">
             <h2>Gallery</h2>
             <div id="preview" class="d-flex">
                 <partial name="_ImagesPartial" model="Model" />
@@ -21,13 +23,17 @@
         </div>
 
         @Html.Hidden("Id", Model.Id, new { id = "Id" })
-        <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
+        <div class="glassmorphism p-3 rounded mt-3">
+            <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
 
-        <div id="waypoint-form" class="mt-2"></div>
+            <div id="waypoint-form" class="mt-2"></div>
+        </div>
 
-        <partial name="_MapTools" />
+        <div class="glassmorphism p-3 rounded mt-3">
+            <partial name="_MapTools" />
 
-        <div id="map" class="mt-2"></div>
+            <div id="map" class="mt-2"></div>
+        </div>
 
         <div class="d-flex flex-column">
             <input class="btn btn-primary mt-3" type="submit" value="Submit">

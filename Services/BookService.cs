@@ -44,6 +44,7 @@ public class BookService
 
         return await reservations.OrderBy(r => r.Tour.StartDate)
                                   .ThenBy(r => r.Tour.EndDate)
+                                  .Where(r => r.Tour.StartDate >= DateTime.Now || r.Tour.EndDate >= DateTime.Now)
                                   .FirstOrDefaultAsync();
     }
 

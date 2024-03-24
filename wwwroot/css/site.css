@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik+Scribble&display=swap'); */
 html {
   font-size: 14px;
 }
@@ -19,6 +21,10 @@ html {
 html {
   position: relative;
   min-height: 100%;
+}
+
+body * {
+  font-family: 'Roboto', sans-serif;
 }
 
 .devider-y {
@@ -183,25 +189,38 @@ html {
 
 .background {
   background-image: url(/images/bg.jpg);
-  background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  animation: gradient 20s infinite;
+  background-repeat: no-repeat;
 }
 
 .glassmorphism {
-  background-color: rgba(255, 255, 255, 0.527) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(7px);
-  box-shadow: 0 8px 24px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.35);
+}
+
+.glass-2 {
+  background-color: rgb(0 123 255 / 30%) !important;
+  box-shadow: 0 0px 12px 0 rgb(0 123 255 / 25%) !important;
 }
 
 @keyframes gradient {
   0% {
-    background-position: 0% 50%;
+    background-position: 0% 0%;
+    background-size: 100% 100%;
+  }
+  25% {
+    background-position: 100% 50%;
+    background-size: 130% 150%;
   }
   50% {
-    background-position: 100% 50%;
+    background-position: 50% 0%;
+    background-size: 120% 140%;
   }
   100% {
     background-position: 0% 50%;
+    background-size: 100% 100%;
   }
 }
