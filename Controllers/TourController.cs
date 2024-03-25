@@ -12,7 +12,6 @@ public class TourController : Controller
 {
     private readonly ILogger<TourController> _logger;
     private readonly TourService _tourService;
-    private readonly string _tourFolder = "Tours";
 
     public TourController(ILogger<TourController> logger, TourService tourService)
     {

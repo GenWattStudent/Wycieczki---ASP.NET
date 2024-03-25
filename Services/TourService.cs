@@ -79,7 +79,7 @@ public class TourService
             await SaveTourImages(addTourModel.Images, tour);
         }
 
-        await _tourRepository.Add(tour);
+        _tourRepository.Add(tour);
         await _tourRepository.SaveAsync();
     }
 
@@ -102,48 +102,54 @@ public class TourService
     }
     public async Task EditTour(TourModel tour, EditTourModel editTourModel)
     {
-        // Edit tour, add images. Update waypoints that already existed in db and add new ones
         using (var transaction = _dbContext.Database.BeginTransaction())
         {
-            var dbTour = await GetTour(tour.Id);
-
-            if (dbTour != null)
+            try
             {
-                dbTour.EditTour(tour);
+                var dbTour = await GetTour(tour.Id);
 
-                // Add new waypoints
-                foreach (var waypoint in editTourModel.Waypoints.Where(wm => wm.Id == 0))
+                if (dbTour != null)
                 {
-                    List<string> imageUrlsToAdd = new();
+                    dbTour.EditTour(tour);
 
-                    if (waypoint.Images != null)
+                    // Add new waypoints
+                    foreach (var waypoint in editTourModel.Waypoints.Where(wm => wm.Id == 0))
                     {
-                        imageUrlsToAdd = await SaveImages(waypoint.Images, _waypointFolder);
-                    }
+                        List<string> imageUrlsToAdd = new();
 
-                    var imagesToAdd = new List<ImageModel>();
-
-                    foreach (var imageUrl in imageUrlsToAdd)
-                    {
-                        imagesToAdd.Add(new ImageModel
+                        if (waypoint.Images != null)
                         {
-                            ImageUrl = imageUrl
-                        });
+                            imageUrlsToAdd = await SaveImages(waypoint.Images, _waypointFolder);
+                        }
+
+                        var imagesToAdd = new List<ImageModel>();
+
+                        foreach (var imageUrl in imageUrlsToAdd)
+                        {
+                            imagesToAdd.Add(new ImageModel
+                            {
+                                ImageUrl = imageUrl
+                            });
+                        }
+
+                        var newWaypoint = new WaypointModel(waypoint);
+                        newWaypoint.Images = imagesToAdd;
+                        dbTour.Waypoints.Add(newWaypoint);
                     }
 
-                    var newWaypoint = new WaypointModel(waypoint);
-                    newWaypoint.Images = imagesToAdd;
-                    dbTour.Waypoints.Add(newWaypoint);
+                    if (editTourModel.Images != null && editTourModel.Images.Count > 0)
+                    {
+                        await SaveTourImages(editTourModel.Images, dbTour);
+                    }
+
+                    await _tourRepository.SaveAsync();
+
+                    transaction.Commit();
                 }
-
-                if (editTourModel.Images != null && editTourModel.Images.Count > 0)
-                {
-                    await SaveTourImages(editTourModel.Images, dbTour);
-                }
-
-                await _tourRepository.SaveAsync();
-
-                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
             }
         }
     }

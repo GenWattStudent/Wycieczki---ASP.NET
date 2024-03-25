@@ -21,12 +21,12 @@ public class Repository<T> : IRepository<T> where T : class
         return await _dbContext.Set<T>().FindAsync(id);
     }
 
-    public async Task Add(T entity)
+    public void Add(T entity)
     {
         _dbContext.Set<T>().Add(entity);
     }
 
-    public async Task Update(T entity)
+    public void Update(T entity)
     {
         _dbContext.Set<T>().Update(entity);
     }
@@ -34,6 +34,12 @@ public class Repository<T> : IRepository<T> where T : class
     public async Task Delete(int id)
     {
         var entity = await GetById(id);
+
+        if (entity == null)
+        {
+            return;
+        }
+
         _dbContext.Set<T>().Remove(entity);
     }
 

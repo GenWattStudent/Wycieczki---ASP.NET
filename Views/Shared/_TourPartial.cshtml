@@ -1,3 +1,4 @@
+@using Book.App.Helpers
 @model TourModel
 @{
     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -17,7 +18,7 @@
             </header>
             <partial name="_AdminTourActions" model="@Model" />
         </div>
-        <p class="card-text">@Model.Description</p>
+        <p class="card-text">@Model.Description.Truncate(250)</p>
         <partial name="_TourDetailsPartial" model="@Model" />
 
         @if (Model.Reservations.Count >= Model.MaxUsers)
@@ -68,7 +69,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const model = @Json.Serialize(Model);
-        console.log(model);
+
         document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
             document.getElementById(`deleteForm-${model.id}`).submit();
         });

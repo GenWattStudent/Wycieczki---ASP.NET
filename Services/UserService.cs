@@ -29,7 +29,7 @@ public class UserService
             userModel.ImagePath = await _fileService.SaveFile(registerModel.Image, _userImageFolder);
         }
 
-        await _userRepository.Add(userModel);
+        _userRepository.Add(userModel);
         await _userRepository.SaveAsync();
     }
 
@@ -61,7 +61,7 @@ public class UserService
 
         userModel.Password = PasswordHash;
 
-        await _userRepository.Add(userModel);
+        _userRepository.Add(userModel);
         await _userRepository.SaveAsync();
     }
 

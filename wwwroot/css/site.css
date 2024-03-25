@@ -66,7 +66,7 @@ body * {
 
 @media (min-width: 768px) {
   .grid-tour {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
   }
 }
 
@@ -174,11 +174,12 @@ body * {
 .carousel-control-prev,
 .carousel-control-next {
   width: 2rem !important;
-  background-color: #5252528f;
+  background-color: #7777778f;
+  backdrop-filter: blur(16px);
 }
 
 .carousel {
-  background-color: #52525255;
+  /* background-color: #a5a5a555; */
 }
 
 .weather-card {
@@ -223,4 +224,42 @@ body * {
     background-position: 0% 0%;
     background-size: 100% 100%;
   }
+}
+/* Time line styles */
+.checkpoint {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkpoint:nth-child(odd) {
+  align-items: flex-start;
+}
+
+.checkpoint:nth-child(even) {
+  align-items: flex-end;
+}
+
+.line {
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  height: 100%;
+  top: 0;
+}
+
+.line-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  left: -50%;
+  transform: translateX(-20%);
+}
+
+.line .line-dot:nth-last-of-type(1) {
+  top: 15px;
+}
+
+.line .line-dot:nth-last-of-type(2) {
+  top: 65%;
 }

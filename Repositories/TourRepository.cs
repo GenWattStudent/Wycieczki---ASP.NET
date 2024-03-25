@@ -12,7 +12,11 @@ public class TourRepository : Repository<TourModel>, ITourRepository
 
     public async Task<List<TourModel>> GetActiveTours()
     {
-        return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate <= DateTime.Now && t.EndDate >= DateTime.Now).ToListAsync();
+        return await _dbContext.Tours.
+                        Include(t => t.Images)
+                        .Include(t => t.Users)
+                        .Where(t => t.StartDate <= DateTime.Now && t.EndDate >= DateTime.Now)
+                        .ToListAsync();
     }
 
     public async Task<TourModel?> GetTour(int id)
@@ -33,7 +37,10 @@ public class TourRepository : Repository<TourModel>, ITourRepository
 
     public async Task<List<TourModel>> GetTours(FilterModel filterModel)
     {
-        var tours = _dbContext.Tours.Include(t => t.Images).Include(t => t.Reservations).ThenInclude(r => r.User).Where(t => t.StartDate >= DateTime.Now);
+        var tours = _dbContext.Tours
+            .Include(t => t.Images)
+            .Include(t => t.Reservations).ThenInclude(r => r.User)
+            .Where(t => t.StartDate >= DateTime.Now);
         var filters = new List<IFilter> { new SearchFilter(filterModel.SearchString), new PriceFilter(filterModel.MinPrice, filterModel.MaxPrice) };
 
         tours = filters.Aggregate(tours, (current, filter) => filter.Process(current));
@@ -50,6 +57,4 @@ public class TourRepository : Repository<TourModel>, ITourRepository
 
         return await tours.ToListAsync();
     }
-
-
 }
