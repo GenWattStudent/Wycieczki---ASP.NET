@@ -1,52 +1,39 @@
 using Book.App.Filters;
 using Book.App.Models;
+using Book.App.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
 
 public class TourService
 {
+    private readonly ITourRepository _tourRepository;
     private readonly ApplicationDbContext _dbContext;
-    private readonly string _tourFolder = "Tours";
-    private readonly string _waypointFolder = "waypoints";
     private readonly FileService _fileService;
 
-    public TourService(ApplicationDbContext dbContext, FileService fileService)
+    private readonly string _tourFolder = "Tours";
+    private readonly string _waypointFolder = "waypoints";
+
+    public TourService(ITourRepository tourRepository, FileService fileService, ApplicationDbContext dbContext)
     {
-        _dbContext = dbContext;
+        _tourRepository = tourRepository;
         _fileService = fileService;
+        _dbContext = dbContext;
     }
 
     public async Task<List<TourModel>> GetTours()
     {
-        return await _dbContext.Tours.Include(t => t.Images)
-                                    .Include(t => t.Reservations).ThenInclude(r => r.User)
-                                    .Where(t => t.StartDate >= DateTime.Now).ToListAsync();
+        return await _tourRepository.GetTours();
     }
 
     public async Task<List<TourModel>> GetTours(FilterModel filterModel)
     {
-        var tours = _dbContext.Tours.Include(t => t.Images).Include(t => t.Reservations).ThenInclude(r => r.User).Where(t => t.StartDate >= DateTime.Now);
-        var filters = new List<IFilter> { new SearchFilter(filterModel.SearchString), new PriceFilter(filterModel.MinPrice, filterModel.MaxPrice) };
-
-        tours = filters.Aggregate(tours, (current, filter) => filter.Process(current));
-
-        switch (filterModel.OrderBy)
-        {
-            case OrderBy.Date:
-                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.StartDate) : tours.OrderByDescending(t => t.StartDate);
-                break;
-            case OrderBy.Price:
-                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.Price) : tours.OrderByDescending(t => t.Price);
-                break;
-        }
-
-        return await tours.ToListAsync();
+        return await _tourRepository.GetTours(filterModel);
     }
 
     public async Task<List<TourModel>> GetActiveTours()
     {
-        return await _dbContext.Tours.Include(t => t.Images).Include(t => t.Users).Where(t => t.StartDate <= DateTime.Now && t.EndDate >= DateTime.Now).ToListAsync();
+        return await _tourRepository.GetActiveTours();
     }
 
     public async Task SaveTourImages(List<IFormFile> images, TourModel tour)
@@ -92,17 +79,13 @@ public class TourService
             await SaveTourImages(addTourModel.Images, tour);
         }
 
-        _dbContext.Tours.Add(tour);
-
-        await _dbContext.SaveChangesAsync();
+        await _tourRepository.Add(tour);
+        await _tourRepository.SaveAsync();
     }
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _dbContext.Tours
-                            .Include(t => t.Waypoints).ThenInclude(w => w.Images)
-                            .Include(t => t.Reservations).ThenInclude(r => r.User).ThenInclude(u => u.Contact)
-                            .Include(t => t.Images).FirstOrDefaultAsync(t => t.Id == id);
+        return await _tourRepository.GetTour(id);
     }
 
     public async Task<List<string>> SaveImages(List<IFormFile> images, string folder)
@@ -117,16 +100,6 @@ public class TourService
 
         return imageUrls;
     }
-
-    public void RemoveImage(string imageUrl)
-    {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('/'));
-        if (File.Exists(filePath))
-        {
-            File.Delete(filePath);
-        }
-    }
-
     public async Task EditTour(TourModel tour, EditTourModel editTourModel)
     {
         // Edit tour, add images. Update waypoints that already existed in db and add new ones
@@ -168,43 +141,43 @@ public class TourService
                     await SaveTourImages(editTourModel.Images, dbTour);
                 }
 
-                await _dbContext.SaveChangesAsync();
+                await _tourRepository.SaveAsync();
 
                 transaction.Commit();
             }
         }
     }
 
-    public void DeleteTour(int id)
+    public async Task DeleteTour(int id)
     {
         using (var transaction = _dbContext.Database.BeginTransaction())
         {
             try
             {
-                var tour = _dbContext.Tours.Include(t => t.Waypoints).Include(t => t.Images).FirstOrDefault(t => t.Id == id);
+                var tour = await _tourRepository.GetTour(id);
 
                 if (tour != null)
                 {
                     foreach (var image in tour.Images)
                     {
-                        RemoveImage(image.ImageUrl);
+                        await _fileService.DeleteFile(image.ImageUrl);
                     }
 
                     // remove images from db
                     _dbContext.Images.RemoveRange(tour.Images);
-                    _dbContext.SaveChanges();
 
-                    _dbContext.Tours.Remove(tour);
+                    await _tourRepository.SaveAsync();
+                    await _tourRepository.Delete(tour.Id);
                     // Delete all waypoints images
                     foreach (var waypoint in tour.Waypoints)
                     {
                         foreach (var image in waypoint.Images)
                         {
-                            RemoveImage(image.ImageUrl);
+                            await _fileService.DeleteFile(image.ImageUrl);
                         }
                     }
 
-                    _dbContext.SaveChanges();
+                    await _tourRepository.SaveAsync();
                 }
 
                 transaction.Commit();
@@ -213,17 +186,6 @@ public class TourService
             {
                 transaction.Rollback();
             }
-        }
-    }
-
-    public async Task DeleteImage(int id)
-    {
-        var image = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == id);
-        if (image != null)
-        {
-            RemoveImage(image.ImageUrl);
-            _dbContext.Images.Remove(image);
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

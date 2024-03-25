@@ -19,12 +19,12 @@
     </div>
 </div>
 
-<div class="dropdown d-block d-sm-none ">
+<div class="dropdown d-block d-sm-none">
     <div class="p-0 pe-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup=" true"
         aria-expanded="false">
         <partial name="_UserImagePartial" model="imagePath" />
     </div>
-    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+    <div class="dropdown-menu dropdown-menu-right glassmorphism" aria-labelledby="dropdownMenuLink">
         @if (role == "Admin")
         {
             <a class="dropdown-item @Html.IsActive("Tour", "AddTour")" asp-area="" asp-controller="Tour"

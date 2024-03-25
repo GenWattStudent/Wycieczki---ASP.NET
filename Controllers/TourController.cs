@@ -87,8 +87,7 @@ public class TourController : Controller
             return NotFound();
         }
 
-        _tourService.DeleteTour(id);
-        Console.WriteLine((await _tourService.GetTours()).Count);
+        await _tourService.DeleteTour(id);
         return Redirect("/Tour/Tours");
     }
 
@@ -101,15 +100,6 @@ public class TourController : Controller
             return RedirectToAction("AddTour");
         }
         return View(tour);
-    }
-
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> DeleteImage(int id, int tourId)
-    {
-        await _tourService.DeleteImage(id);
-        var tour = await _tourService.GetTour(tourId);
-        Console.WriteLine((await _tourService.GetTours()).Count);
-        return View("EditTour", tour);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

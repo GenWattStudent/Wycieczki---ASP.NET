@@ -13,7 +13,7 @@ export default class EarthScene {
     this.resize()
     $('#earth').append(this.renderer.domElement)
 
-    this.camera.position.z = 10
+    this.camera.position.z = 8
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.mouseButtons = {

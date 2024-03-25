@@ -11,7 +11,7 @@
     var index = 0;
 }
 <div class="glassmorphism p-3 rounded">
-    <a class="text-dark" asp-action="TourDetails" asp-controller="Tour" asp-route-id="Model.Waypoint.TourId">
+    <a class="text-dark" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Waypoint.TourId">
         Go to the tour - <strong class="text-primary">@Model.Waypoint.Tour.Name</strong>
     </a>
 </div>

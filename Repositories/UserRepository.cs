@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Repositories;
 
-public class UserRepository : Repository<UserModel>
+public class UserRepository : Repository<UserModel>, IUserRepository
 {
     public UserRepository(ApplicationDbContext dbContext) : base(dbContext)
     {

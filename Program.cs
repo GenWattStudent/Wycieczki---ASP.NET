@@ -32,9 +32,10 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
 
-builder.Services.AddMyServices();
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddMyServices();
+
 builder.Services.AddDistributedRedisCache(options =>
 {
     options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");

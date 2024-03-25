@@ -6,11 +6,11 @@ namespace Book.App.Services;
 
 public class UserService
 {
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly string _userImageFolder = "users";
     private readonly FileService _fileService;
 
-    public UserService(UserRepository userRepository, FileService fileService)
+    public UserService(IUserRepository userRepository, FileService fileService)
     {
         _userRepository = userRepository;
         _fileService = fileService;

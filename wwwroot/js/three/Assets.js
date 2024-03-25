@@ -20,16 +20,13 @@ export class Assets {
         this.dayTexture = dayTexture
         loader.load('/images/three/earth_night.jpg', (nightTexture) => {
           this.nightTexture = nightTexture
-          fontLoader.load(
-            'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',
-            (font) => {
-              this.font = font
-              meshLoader.load('/images/three/m.glb', (carMesh) => {
-                this.carMesh = carMesh
-                resolve()
-              })
-            }
-          )
+          fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+            this.font = font
+            meshLoader.load('/images/three/m.glb', (carMesh) => {
+              this.carMesh = carMesh
+              resolve()
+            })
+          })
         })
       })
     })

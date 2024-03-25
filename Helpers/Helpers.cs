@@ -1,4 +1,5 @@
 using Book.App.Repositories;
+using Book.App.Repositories.UnitOfWork;
 using Book.App.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -30,13 +31,21 @@ public static class Helpers
 
     public static void AddMyServices(this IServiceCollection services)
     {
+        // Repositories
+        services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IReservationRepository, ReservationRepository>();
+        services.AddTransient<ITourRepository, TourRepository>();
+        services.AddTransient<IImageRepository, ImageRepository>();
+        services.AddTransient<ReservationUnitOfWork>();
+
+        // Services
+        services.AddTransient<ImageService>();
         services.AddTransient<TourService>();
         services.AddTransient<UserService>();
         services.AddTransient<TokenService>();
         services.AddTransient<BookService>();
         services.AddTransient<FileService>();
         services.AddTransient<WaypointService>();
-        services.AddTransient<UserRepository>();
         services.AddTransient<GeoService>();
         services.AddTransient<WeatherService>();
     }

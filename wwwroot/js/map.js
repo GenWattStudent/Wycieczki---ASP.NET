@@ -1,11 +1,4 @@
-import {
-  defaultMarker,
-  endMarker,
-  waypointMarker,
-  startMarker,
-  tourIndicator,
-  noMarker,
-} from './markers.js'
+import { defaultMarker, endMarker, waypointMarker, startMarker, tourIndicator, noMarker } from './markers.js'
 
 export class Map {
   constructor() {
@@ -53,11 +46,7 @@ export class Map {
           </a>
         </div>
   
-        ${
-          !isUser
-            ? `<button id="remove-${id}" type="button" class="btn btn-primary mt-2 w-100">Remove</button>`
-            : ''
-        }
+        ${!isUser ? `<button id="remove-${id}" type="button" class="btn btn-primary mt-2 w-100">Remove</button>` : ''}
       </div>
     `
   }
@@ -70,14 +59,12 @@ export class Map {
         (image, index) => `
       <div class="carousel-item ${index === 0 ? 'active' : ''}">
         <div class="position-relative d-flex justify-content-center" style="z-index=1;">
-          <a href="/Tour/DeleteImage/?id=${image.id}&tourId=${
+          <a href="/Image/DeleteImage/?id=${image.id}&tourId=${
           waypointData.id
         }" style="right: 50%; transform: translateX(50%); top: 5px; z-index:100l" class="position-absolute text-light h3 bg-danger m-0">
               <ion-icon name="close-outline"></ion-icon>
           </a>
-          <img src="${
-            image.imageUrl
-          }" style="height: 100px; object-fit: cover;" />
+          <img src="${image.imageUrl}" style="height: 100px; object-fit: cover;" />
         </div>
       </div>
     `
@@ -124,9 +111,7 @@ export class Map {
 
   connectWaypointsWithLine(waypoints) {
     this.clearLines()
-    const latlngs = waypoints
-      .filter((w) => !w.isTourIndicator)
-      .map((w) => [w.lat, w.lng])
+    const latlngs = waypoints.filter((w) => !w.isTourIndicator).map((w) => [w.lat, w.lng])
     L.polyline(latlngs, { color: 'blue' }).addTo(this.map)
   }
 
@@ -162,17 +147,8 @@ export class Map {
     }
   }
 
-  createMarker(
-    waypointData,
-    edit = false,
-    draggable = false,
-    isUser = false,
-    icon = defaultMarker
-  ) {
-    const marker = L.marker(
-      { lat: waypointData.lat, lng: waypointData.lng },
-      { draggable, icon }
-    ).addTo(this.map)
+  createMarker(waypointData, edit = false, draggable = false, isUser = false, icon = defaultMarker) {
+    const marker = L.marker({ lat: waypointData.lat, lng: waypointData.lng }, { draggable, icon }).addTo(this.map)
 
     const popup = edit
       ? this.createEditPopup(waypointData)
@@ -205,9 +181,7 @@ export class Map {
         if (!edit && !isUser)
           document
             .getElementById(`remove-${waypointData.id}`)
-            .addEventListener('click', () =>
-              this.removeWayPoint(waypointData.id)
-            )
+            .addEventListener('click', () => this.removeWayPoint(waypointData.id))
       })
 
     if (!edit && !isUser)

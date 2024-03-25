@@ -10,27 +10,29 @@
     @if (Model.Tour != null && Model.Book != null)
     {
         var sliderData = new ImageSliderModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
-                            <div class="alert alert-primary glassmorphism" role="alert" id="tour-info">
-                                <a class="mt-2 d-block" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
-                                    <h4>@Model.Tour.Name</h4>
-                                </a>
 
-                                <p data-toggle="tooltip" data-placement="top" title="@Model.Tour.Description">
+        <div class="alert alert-primary glassmorphism" role="alert" id="tour-info">
+            <a class="mt-2 d-block" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">
+                <h4>@Model.Tour.Name</h4>
+            </a>
+
+            <p data-toggle="tooltip" data-placement="top" title="@Model.Tour.Description">
                 @Model.Tour.Description.Truncate(150)
-                                </p>
-                                <partial name="_TourStatusPartial" model="@Model.Book" />
-                                <strong class="d-flex align-items-center gap-2">
-                                    <ion-icon name="calendar-number"></ion-icon>
-                                    Start at @Model.Tour.StartDate
-                                </strong>
-                            </div>
+            </p>
+            <partial name="_TourStatusPartial" model="@Model.Book" />
+            <strong class="d-flex align-items-center gap-2">
+                <ion-icon name="calendar-number"></ion-icon>
+                Start at @Model.Tour.StartDate
+            </strong>
+        </div>
     }
 
     <div class="text-center">
         <h1 class="glassmorphism p-3 rounded text-primary">Explore the World with Exciting Tours!</h1>
         <div class="glassmorphism mt-3 p-3 rounded">
             <figure class="m-0">
-                <img class="img-fluid rounded" src="~/images/landscape2.jpg" alt="Sample image">
+                <img class="img-fluid rounded" style="max-height: 450px;" src="~/images/landscape2.jpg"
+                    alt="Sample image">
                 <figcaption class="text-center mt-2"><cite>Discover the beauty of diverse destinations with our curated
                         selection of tours.</cite>
                 </figcaption>
@@ -58,156 +60,3 @@
         </a>
     </button>
 </div>
-
-@section Scripts {
-                        <script>
-        @* $(function () { *@
-        @* const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
-
-            class Particle {
-                constructor(x, y, color, effect) {
-                    this.x = x - 500;
-                    this.y = y;
-                    this.size = 2;
-                    this.baseX = x;
-                    this.baseY = y;
-                    this.dx = Math.random() * 2 - 1;
-                    this.dy = Math.random() * 2 - 1;
-                    this.color = color;
-                    this.speed = 8;
-                    this.effect = effect
-                    this.isPlaced = false
-                }
-
-                draw(ctx) {
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.rect(this.x, this.y, this.size, this.size);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-
-                update(ctx) {
-                    if (this.isPlaced) {
-                        return
-                    }
-                    // Calculate the distance to the base position
-                    const dx = this.baseX - this.x;
-                    const dy = this.baseY - this.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    // If the particle is close to its base position, stop moving
-                    if (distance < 4.2) {
-                        this.dx = 0;
-                        this.dy = 0;
-                        this.x = this.baseX;
-                        this.y = this.baseY;
-                        this.isPlaced = true
-
-                        // check if in row every particle is placed
-                        const row = this.effect.particles.filter(p => p.y === this.y)
-                        if (row.every(p => p.isPlaced)) {
-                            console.log('row is filled')
-                            this.effect.clearY++;
-                            this.effect.deletedRow = true
-                        }
-
-                    } else {
-                        // Otherwise, move the particle towards its base position
-                        this.dx = dx / distance;
-                        this.dy = dy / distance;
-                        this.x += this.dx * this.speed;
-                        this.y += this.dy * this.speed;
-                    }
-                }
-            }
-
-            class Effect {
-                constructor(img) {
-                    this.img = img
-                    this.imageData = []
-                    this.particles = []
-                    this.skip = 2 // Increase the skip value to create particles for fewer pixels
-                    this.addParticlesInterval = 10; // Interval in milliseconds to add more particles
-                    this.lastAddParticlesTime = Date.now();
-                    this.particlesX = 0;
-                    this.particlesY = 0;
-                    this.prevParticlesY = 0;
-                    this.particlesStoped = 0
-                    this.isNext = false
-                    this.deletedRow = false; // Store the indices of deleted rows
-                    this.clearY = 0
-                }
-
-                init() {
-                    canvas.width = this.img.width;
-                    canvas.height = this.img.height;
-                    ctx.drawImage(this.img, 0, 0, canvas.width, canvas.height);
-                    this.imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                }
-
-                createParticles(number) {
-                    for (let n = 0; n < number; n++) {
-                        const x = this.particlesX;
-                        const y = this.particlesY;
-                        const i = (y * this.img.width + x) * 4;
-                        const r = this.imageData.data[ i ];
-                        const g = this.imageData.data[ i + 1 ];
-                        const b = this.imageData.data[ i + 2 ];
-                        const color = `rgb(${r}, ${g}, ${b})`;
-                        this.particles.push(new Particle(x, y, color, this));
-
-                        // Update the position for the next particle
-                        this.particlesX += this.skip;
-                        if (this.particlesX >= this.img.width) {
-                            this.particlesX = 0;
-                            this.particlesY += this.skip;
-                        }
-                    }
-                }
-
-                draw(ctx) {
-                    // Clear the canvas except the filled rows
-                    ctx.clearRect(0, this.clearY + this.skip, canvas.width, this.img.height);
-
-                    // Draw particles
-                    this.particles.forEach(particle => {
-                        particle.draw(ctx);
-                    });
-
-                    if (this.deletedRow) {
-                        // Draw the filled rows
-                        this.particles = this.particles.filter((particle, i) => !particle.isPlaced);
-
-                        this.deletedRow = false
-                    }
-                }
-
-                update(ctx) {
-                    this.particles.forEach(particle => {
-                        particle.update(ctx);
-                    });
-
-                    // Add more particles over time
-                    if (Date.now() - this.lastAddParticlesTime > this.addParticlesInterval) {
-                        this.createParticles(250); // Create particles for 10 more rows
-                        this.lastAddParticlesTime = Date.now();
-                    }
-
-                }
-            }
-
-            const effect = new Effect(document.getElementById('img'));
-            effect.init();
-
-            function animate() {
-                effect.update(ctx);
-                effect.draw(ctx);
-                requestAnimationFrame(animate);
-            }
-
-            animate();
-        }); *@
-                        </script>
-}

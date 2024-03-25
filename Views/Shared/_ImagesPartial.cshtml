@@ -4,7 +4,7 @@
 @foreach (var image in Model.Images)
 {
     <div class="position-relative">
-        <a style="right: 10px;" class="position-absolute text-light h3 bg-danger m-0" asp-controller="Tour"
+        <a style="right: 10px;" class="position-absolute text-light h3 bg-danger m-0" asp-controller="Image"
             asp-action="DeleteImage" asp-route-id="@image.Id" asp-route-tourId="@Model.Id"
             onclick="return confirm('Are you sure you want to delete this image?')">
             <ion-icon name="close-outline"></ion-icon>
