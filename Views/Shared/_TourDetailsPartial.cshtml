@@ -2,33 +2,40 @@
 
 <span class="devider-x w-100 d-block"></span>
 
-<div class="d-flex align-items-center gap-2 pt-2">
-    <ion-icon name="person"></ion-icon>
-    <strong>Max: </strong>
-    <strong>@Model.MaxUsers</strong>
-</div>
-
-<div class="d-flex align-items-center gap-2">
-    <ion-icon name="person"></ion-icon>
-    <strong>Current: </strong>
-    <strong>@Model.Reservations.Count</strong>
-</div>
-
-<div class="d-flex justify-content-between align-items-center">
-    <div>
-        <ion-icon name="calendar-number"></ion-icon>
-        <strong>Start:</strong>
-        <strong>@Model.StartDate.ToLocalTime().ToString("d")</strong>
+<div class="d-flex justify-content-between align-items-center pt-2">
+    <div class="d-flex align-items-center gap-2">
+        <ion-icon name="person"></ion-icon>
+        <strong>Max: </strong>
+        <strong>@Model.MaxUsers</strong>
     </div>
-    <span class="dash"></span>
-    <div>
-        <strong>End:</strong>
-        <strong>@Model.EndDate.ToLocalTime().ToString("d")</strong>
+
+    <div class="d-flex align-items-center gap-2">
+        <ion-icon name="person"></ion-icon>
+        <strong>Current: </strong>
+        <strong>@Model.Reservations.Count</strong>
     </div>
 </div>
 
 <div class="d-flex justify-content-between">
-    <strong>@Model.StartDate.ToLocalTime().ToString("t")</strong>
+    <strong>Start</strong>
+    <strong>End</strong>
+</div>
+
+<div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex gap-2 align-items-center">
+        <ion-icon name="calendar-number"></ion-icon>
+        <strong>@Model.StartDate.ToLocalTime().ToString("d")</strong>
+    </div>
+    <span class="dash"></span>
+
+    <strong>@Model.EndDate.ToLocalTime().ToString("d")</strong>
+</div>
+
+<div class="d-flex justify-content-between">
+    <div class="d-flex gap-2 align-items-center">
+        <ion-icon name="time"></ion-icon>
+        <strong>@Model.StartDate.ToLocalTime().ToString("t")</strong>
+    </div>
     <strong>@Model.EndDate.ToLocalTime().ToString("t")</strong>
 </div>
 
