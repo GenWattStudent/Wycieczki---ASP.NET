@@ -23,17 +23,33 @@ public class TourService
 
     public async Task<List<TourModel>> GetTours()
     {
-        return await _tourRepository.GetTours();
+        return await _tourRepository.GetTours().ToListAsync();
     }
 
     public async Task<List<TourModel>> GetTours(FilterModel filterModel)
     {
-        return await _tourRepository.GetTours(filterModel);
+        var tours = _tourRepository.GetTours();
+        var filters = new List<IFilter> { new SearchFilter(filterModel.SearchString), new PriceFilter(filterModel.MinPrice, filterModel.MaxPrice) };
+
+        tours = filters.Aggregate(tours, (current, filter) => filter.Process(current));
+
+        switch (filterModel.OrderBy)
+        {
+            case OrderBy.Date:
+                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.StartDate) : tours.OrderByDescending(t => t.StartDate);
+                break;
+            case OrderBy.Price:
+                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.Price) : tours.OrderByDescending(t => t.Price);
+                break;
+        }
+
+        return await tours.ToListAsync();
+
     }
 
     public async Task<List<TourModel>> GetActiveTours()
     {
-        return await _tourRepository.GetActiveTours();
+        return await _tourRepository.GetActiveTours().ToListAsync();
     }
 
     public async Task SaveTourImages(List<IFormFile> images, TourModel tour)
@@ -85,7 +101,7 @@ public class TourService
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _tourRepository.GetTour(id);
+        return await _tourRepository.GetTour(id).FirstOrDefaultAsync();
     }
 
     public async Task<List<string>> SaveImages(List<IFormFile> images, string folder)
@@ -160,7 +176,7 @@ public class TourService
         {
             try
             {
-                var tour = await _tourRepository.GetTour(id);
+                var tour = await _tourRepository.GetTour(id).FirstOrDefaultAsync();
 
                 if (tour != null)
                 {

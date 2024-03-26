@@ -10,8 +10,11 @@ public class UserRepository : Repository<UserModel>, IUserRepository
     {
     }
 
-    public async Task<UserModel?> GetByUsername(string username)
+    public IQueryable<UserModel> GetByUsername(string username)
     {
-        return await _dbContext.Users.Include(u => u.Contact).Include(u => u.Address).Include(u => u.Preferences).FirstOrDefaultAsync(x => x.Username == username);
+        return _dbContext.Users
+                .Include(u => u.Contact)
+                .Include(u => u.Address)
+                .Include(u => u.Preferences);
     }
 }

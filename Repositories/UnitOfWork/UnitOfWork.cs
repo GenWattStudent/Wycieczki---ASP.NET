@@ -1,13 +1,13 @@
 namespace Book.App.Repositories.UnitOfWork;
 
-public class ReservationUnitOfWork
+public class UnitOfWork
 {
     public readonly IReservationRepository reservationRepository;
     public readonly ITourRepository tourRepository;
     public readonly IUserRepository userRepository;
     private readonly ApplicationDbContext _dbContext;
 
-    public ReservationUnitOfWork(IReservationRepository reservationRepository, ITourRepository tourRepository, IUserRepository userRepository, ApplicationDbContext dbContext)
+    public UnitOfWork(IReservationRepository reservationRepository, ITourRepository tourRepository, IUserRepository userRepository, ApplicationDbContext dbContext)
     {
         this.reservationRepository = reservationRepository;
         this.tourRepository = tourRepository;

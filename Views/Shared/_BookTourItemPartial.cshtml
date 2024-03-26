@@ -29,12 +29,15 @@
                     Details
                 </button>
             </a>
-            <form asp-action="Delete" asp-controller="Book" method="post">
-                <input type="hidden" name="id" value="@Model.TourModel.Id" />
-                <button class="btn btn-danger">
-                    Cancel this trip
-                </button>
-            </form>
+            @if (Model.TourModel.StartDate > DateTime.Now)
+            {
+                <form asp-action="Delete" asp-controller="Book" method="post">
+                    <input type="hidden" name="id" value="@Model.TourModel.Id" />
+                    <button class="btn btn-danger">
+                        Cancel this trip
+                    </button>
+                </form>
+            }
         </div>
     </div>
 </li>

@@ -8,10 +8,10 @@ namespace Book.App.Services;
 
 public class BookService
 {
-    private readonly ReservationUnitOfWork _reservationUnitOfWork;
+    private readonly UnitOfWork _reservationUnitOfWork;
     private readonly GeoService _geoService;
 
-    public BookService(ReservationUnitOfWork reservationUnitOfWork, GeoService geoService)
+    public BookService(UnitOfWork reservationUnitOfWork, GeoService geoService)
     {
         _reservationUnitOfWork = reservationUnitOfWork;
         _geoService = geoService;
@@ -19,24 +19,28 @@ public class BookService
 
     public async Task<List<ReservationModel>> GetUserActiveAndFutureReservations(int userId)
     {
-        return await _reservationUnitOfWork.reservationRepository.GetUserActiveAndFutureReservations(userId);
+        return await _reservationUnitOfWork.reservationRepository.GetUserActiveAndFutureReservations(userId).ToListAsync();
     }
 
     public async Task<List<ReservationModel>> GetReservationsHistoryByUserId(int userId)
     {
-        return await _reservationUnitOfWork.reservationRepository.GetReservationsHistoryByUserId(userId);
+        return await _reservationUnitOfWork.reservationRepository.GetReservationsHistoryByUserId(userId).ToListAsync();
     }
 
     public async Task<ReservationModel?> GetClosestReservation(int userId)
     {
-        return await _reservationUnitOfWork.reservationRepository.GetClosestReservation(userId);
+        return await _reservationUnitOfWork.reservationRepository.GetUserReservationsQueryable(userId)
+                        .OrderBy(r => r.Tour.StartDate)
+                        .ThenBy(r => r.Tour.EndDate)
+                        .Where(r => r.Tour.StartDate >= DateTime.Now || r.Tour.EndDate >= DateTime.Now)
+                        .FirstOrDefaultAsync(); ;
     }
 
     public async Task AddTourToUser(int userId, int tourId)
     {
         var user = await _reservationUnitOfWork.userRepository.GetById(userId);
-        var reservations = await _reservationUnitOfWork.reservationRepository.GetAllReservations(userId);
-        var tour = await _reservationUnitOfWork.tourRepository.GetTour(tourId);
+        var reservations = await _reservationUnitOfWork.reservationRepository.GetAllReservations(userId).ToListAsync();
+        var tour = await _reservationUnitOfWork.tourRepository.GetTour(tourId).FirstOrDefaultAsync();
 
         if (user == null || tour == null)
         {
@@ -79,7 +83,7 @@ public class BookService
 
     public async Task DeleteCancelTour(int userId, int tourId)
     {
-        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationByTourAndUserId(tourId, userId);
+        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationByTourAndUserId().FirstOrDefaultAsync(r => r.User.Id == userId && r.Tour.Id == tourId);
 
         if (reservation == null)
         {
@@ -97,7 +101,7 @@ public class BookService
 
     public async Task<TourModel?> GetTourById(int userId, int tourId)
     {
-        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationWithAllJoinsByTourAndUserId(tourId, userId);
+        var reservation = await _reservationUnitOfWork.reservationRepository.GetUserReservationsQueryable(userId).FirstOrDefaultAsync(r => r.Tour.Id == tourId);
 
         return reservation != null ? reservation.Tour : null;
     }
@@ -127,7 +131,7 @@ public class BookService
 
     public async Task DeleteReservation(int userId, int tourId)
     {
-        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationByTourAndUserId(tourId, userId);
+        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationByTourAndUserId().FirstOrDefaultAsync(r => r.User.Id == userId && r.Tour.Id == tourId);
 
         if (reservation != null)
         {

@@ -4,5 +4,5 @@ namespace Book.App.Repositories;
 
 public interface IUserRepository : IRepository<UserModel>
 {
-    Task<UserModel?> GetByUsername(string username);
+    IQueryable<UserModel> GetByUsername(string username);
 }

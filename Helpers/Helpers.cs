@@ -36,7 +36,7 @@ public static class Helpers
         services.AddTransient<IReservationRepository, ReservationRepository>();
         services.AddTransient<ITourRepository, TourRepository>();
         services.AddTransient<IImageRepository, ImageRepository>();
-        services.AddTransient<ReservationUnitOfWork>();
+        services.AddTransient<UnitOfWork>();
 
         // Services
         services.AddTransient<ImageService>();
