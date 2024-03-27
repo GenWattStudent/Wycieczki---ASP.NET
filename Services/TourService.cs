@@ -51,35 +51,12 @@ public class TourService
         }
     }
 
-    public async Task AddTour(TourModel tour, AddTourModel addTourModel)
+    public async Task<TourModel> AddTour(TourModel tour)
     {
-        foreach (var waypoint in addTourModel.Waypoints)
-        {
-            List<string> waypointImageUrls = new();
-
-            if (waypoint.Images != null)
-            {
-                waypointImageUrls = await SaveImages(waypoint.Images, _waypointFolder);
-            }
-
-            tour.Waypoints.Add(new WaypointModel(waypoint));
-
-            foreach (var imageUrl in waypointImageUrls)
-            {
-                tour.Waypoints.Last().Images.Add(new ImageModel
-                {
-                    ImageUrl = imageUrl
-                });
-            }
-        }
-
-        if (addTourModel.Images != null && addTourModel.Images.Count > 0)
-        {
-            await SaveTourImages(addTourModel.Images, tour);
-        }
-
         _tourRepository.Add(tour);
         await _tourRepository.SaveAsync();
+
+        return tour;
     }
 
     public async Task<TourModel?> GetTour(int id)

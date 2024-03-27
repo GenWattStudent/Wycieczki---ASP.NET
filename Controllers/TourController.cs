@@ -36,7 +36,7 @@ public class TourController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> AddTour([FromForm] AddTourModel addTourModel)
+    public async Task<IActionResult> AddTour(AddTourModel addTourModel)
     {
         var tour = new TourModel(addTourModel);
 
@@ -46,9 +46,9 @@ public class TourController : Controller
             return Json(new { error = errorMessage });
         }
 
-        await _tourService.AddTour(tour, addTourModel);
+        await _tourService.AddTour(tour);
 
-        return RedirectToAction("Tours");
+        return RedirectToAction("EditTour", new { id = tour.Id });
     }
 
     [HttpPost]

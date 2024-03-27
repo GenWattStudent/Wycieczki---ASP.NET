@@ -24,7 +24,7 @@ public class HomeController : Controller
     {
         var reservation = await _bookService.GetClosestReservation(int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
         var homeViewModel = new HomeViewModel();
-        
+
         if (reservation != null)
         {
             homeViewModel.Tour = reservation.Tour;

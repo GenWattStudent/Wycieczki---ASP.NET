@@ -22,6 +22,4 @@ public class AddTourModel
     public DateTime StartDate { get; set; }
     [DateGreaterThan("StartDate", ErrorMessage = "End date must be greater than start date.")]
     public DateTime EndDate { get; set; }
-    public List<AddTourWaypointsModel> Waypoints { get; set; } = new();
-    public List<IFormFile> Images { get; set; } = new();
 }

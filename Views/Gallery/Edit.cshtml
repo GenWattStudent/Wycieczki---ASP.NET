@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Gallery - Edit";
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h1>Gallery</h1>
+    <small>Choose your best pictures!</small>
+</header>
+
+<div class="glassmorphism p-3 mt-3 rounded">
+    @* <partial name="_TourNavigation" /> *@
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <input type="file" class="form-control" id="files" name="files" required accept="">
+        </div>
+    </form>
+</div>

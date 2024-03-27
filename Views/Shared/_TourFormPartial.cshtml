@@ -37,10 +37,10 @@
     @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
 </div>
 
-<label for="image">Image</label>
+@* <label for="image">Image</label>
 <div class="input-group mt-1">
     <input class="form-control" type="file" multiple="false" onchange="ImgPre(this)" accept="image/*">
-</div>
+</div> *@
 
 @section Scripts {
     <script src="~/js/resize-textarea.js"></script>

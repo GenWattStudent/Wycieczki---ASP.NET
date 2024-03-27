@@ -8,6 +8,10 @@
     <h2>Edit - <span class="text-primary">@Model.Name</span></h2>
 </header>
 
+<div class="glassmorphism p-3 mt-3 rounded">
+    <partial name="_TourNavigation" />
+</div>
+
 <div>
     @using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
