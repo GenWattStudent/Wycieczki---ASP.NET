@@ -1,6 +1,7 @@
 using Book.App.Models;
 using Book.App.Repositories;
 using Book.App.Repositories.UnitOfWork;
+using Book.App.Specifications;
 using Book.App.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,39 +9,41 @@ namespace Book.App.Services;
 
 public class BookService
 {
-    private readonly UnitOfWork _reservationUnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly GeoService _geoService;
 
-    public BookService(UnitOfWork reservationUnitOfWork, GeoService geoService)
+    public BookService(IUnitOfWork reservationUnitOfWork, GeoService geoService)
     {
-        _reservationUnitOfWork = reservationUnitOfWork;
+        _unitOfWork = reservationUnitOfWork;
         _geoService = geoService;
     }
 
     public async Task<List<ReservationModel>> GetUserActiveAndFutureReservations(int userId)
     {
-        return await _reservationUnitOfWork.reservationRepository.GetUserActiveAndFutureReservations(userId).ToListAsync();
+        var reservationSpec = new ReservationSpecification(userId);
+        reservationSpec.ActiveAndFutureReservations();
+        return await _unitOfWork.reservationRepository.GetBySpec(reservationSpec);
     }
 
     public async Task<List<ReservationModel>> GetReservationsHistoryByUserId(int userId)
     {
-        return await _reservationUnitOfWork.reservationRepository.GetReservationsHistoryByUserId(userId).ToListAsync();
+        var reservationSpec = new ReservationSpecification(userId);
+        reservationSpec.HistoryReservations();
+        return await _unitOfWork.reservationRepository.GetBySpec(reservationSpec);
     }
 
     public async Task<ReservationModel?> GetClosestReservation(int userId)
     {
-        return await _reservationUnitOfWork.reservationRepository.GetUserReservationsQueryable(userId)
-                        .OrderBy(r => r.Tour.StartDate)
-                        .ThenBy(r => r.Tour.EndDate)
-                        .Where(r => r.Tour.StartDate >= DateTime.Now || r.Tour.EndDate >= DateTime.Now)
-                        .FirstOrDefaultAsync(); ;
+        var reservationSpec = new ReservationSpecification(userId);
+        reservationSpec.ClosestReservation();
+        return await _unitOfWork.reservationRepository.GetSingleBySpec(reservationSpec);
     }
 
     public async Task AddTourToUser(int userId, int tourId)
     {
-        var user = await _reservationUnitOfWork.userRepository.GetById(userId);
-        var reservations = await _reservationUnitOfWork.reservationRepository.GetAllReservations(userId).ToListAsync();
-        var tour = await _reservationUnitOfWork.tourRepository.GetTour(tourId).FirstOrDefaultAsync();
+        var user = await _unitOfWork.userRepository.GetById(userId);
+        var reservations = await _unitOfWork.reservationRepository.GetBySpec(new ReservationSpecification(userId));
+        var tour = await _unitOfWork.tourRepository.GetSingleBySpec(new TourSpecification(tourId));
 
         if (user == null || tour == null)
         {
@@ -64,9 +67,9 @@ public class BookService
 
         if (user.Tours.Any(t =>
             t.StartDate <= tour.StartDate && t.EndDate >= tour.EndDate
-        || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate
-        || t.StartDate <= tour.StartDate && t.EndDate >= tour.StartDate
-        || t.StartDate <= tour.EndDate && t.EndDate >= tour.EndDate))
+            || t.StartDate >= tour.StartDate && t.EndDate <= tour.EndDate
+            || t.StartDate <= tour.StartDate && t.EndDate >= tour.StartDate
+            || t.StartDate <= tour.EndDate && t.EndDate >= tour.EndDate))
         {
             throw new Exception("User already booked a tour in this time");
         }
@@ -78,12 +81,14 @@ public class BookService
         };
 
         user.Reservations.Add(reservation);
-        await _reservationUnitOfWork.SaveAsync();
+        await _unitOfWork.SaveAsync();
     }
 
     public async Task DeleteCancelTour(int userId, int tourId)
     {
-        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationByTourAndUserId().FirstOrDefaultAsync(r => r.User.Id == userId && r.Tour.Id == tourId);
+        var reservationSpec = new ReservationSpecification(userId);
+        reservationSpec.FilterByTour(tourId);
+        var reservation = await _unitOfWork.reservationRepository.GetSingleBySpec(reservationSpec);
 
         if (reservation == null)
         {
@@ -95,13 +100,15 @@ public class BookService
             throw new Exception("Tour already started");
         }
 
-        await _reservationUnitOfWork.reservationRepository.Delete(reservation.Id);
-        await _reservationUnitOfWork.SaveAsync();
+        await _unitOfWork.reservationRepository.Remove(reservation.Id);
+        await _unitOfWork.SaveAsync();
     }
 
     public async Task<TourModel?> GetTourById(int userId, int tourId)
     {
-        var reservation = await _reservationUnitOfWork.reservationRepository.GetUserReservationsQueryable(userId).FirstOrDefaultAsync(r => r.Tour.Id == tourId);
+        var reservationSpec = new ReservationSpecification(userId);
+        reservationSpec.FilterByTour(tourId);
+        var reservation = await _unitOfWork.reservationRepository.GetSingleBySpec(reservationSpec);
 
         return reservation != null ? reservation.Tour : null;
     }
@@ -131,12 +138,14 @@ public class BookService
 
     public async Task DeleteReservation(int userId, int tourId)
     {
-        var reservation = await _reservationUnitOfWork.reservationRepository.GetReservationByTourAndUserId().FirstOrDefaultAsync(r => r.User.Id == userId && r.Tour.Id == tourId);
+        var reservationSpec = new ReservationSpecification(userId);
+        reservationSpec.FilterByTour(tourId);
+        var reservation = await _unitOfWork.reservationRepository.GetSingleBySpec(reservationSpec);
 
         if (reservation != null)
         {
-            await _reservationUnitOfWork.reservationRepository.Delete(reservation.Id);
-            await _reservationUnitOfWork.SaveAsync();
+            await _unitOfWork.reservationRepository.Remove(reservation.Id);
+            await _unitOfWork.SaveAsync();
         }
         else
         {

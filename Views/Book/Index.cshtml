@@ -20,12 +20,14 @@
 
 @if (Model.Books.Count() == 0)
 {
-    <p>You have no trips yet.</p>
-    <a asp-action="Tours" asp-controller="Tour">
-        <button class="btn btn-primary">
-            Book a trip
-        </button>
-    </a>
+    <div class="glassmorphism p-3 rounded mt-3">
+        <p>You have no trips yet.</p>
+        <a asp-action="Tours" asp-controller="Tour">
+            <button class="btn btn-primary">
+                Book a trip
+            </button>
+        </a>
+    </div>
 }
 else
 {

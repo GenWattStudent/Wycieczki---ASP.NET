@@ -1,18 +1,24 @@
 namespace Book.App.Repositories.UnitOfWork;
 
-public class UnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
-    public readonly IReservationRepository reservationRepository;
-    public readonly ITourRepository tourRepository;
-    public readonly IUserRepository userRepository;
     private readonly ApplicationDbContext _dbContext;
+    public IUserRepository userRepository => new UserRepository(_dbContext);
+    public ITourRepository tourRepository => new TourRepository(_dbContext);
+    public IReservationRepository reservationRepository => new ReservationRepository(_dbContext);
 
-    public UnitOfWork(IReservationRepository reservationRepository, ITourRepository tourRepository, IUserRepository userRepository, ApplicationDbContext dbContext)
+    public UnitOfWork(ApplicationDbContext dbContext)
     {
-        this.reservationRepository = reservationRepository;
-        this.tourRepository = tourRepository;
-        this.userRepository = userRepository;
         _dbContext = dbContext;
+    }
+
+    public UnitOfWork()
+    {
+    }
+
+    public void Dispose()
+    {
+        _dbContext.Dispose();
     }
 
     public async Task SaveAsync()

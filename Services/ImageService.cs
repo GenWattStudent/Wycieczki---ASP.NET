@@ -19,7 +19,7 @@ public class ImageService
 
         if (image != null)
         {
-            await _imageRepository.Delete(image.Id);
+            await _imageRepository.Remove(image.Id);
             await _fileService.DeleteFile(image.ImageUrl);
             await _imageRepository.SaveAsync();
         }

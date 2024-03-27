@@ -4,36 +4,18 @@ document.querySelector('form').addEventListener('submit', function (e) {
   e.preventDefault()
   const formData = new FormData()
   formData.append('Name', document.querySelector('input[name="Name"]').value)
-  formData.append(
-    'Description',
-    document.querySelector('textarea[name="Description"]').value
-  )
+  formData.append('Description', document.querySelector('textarea[name="Description"]').value)
   formData.append('Price', document.querySelector('input[name="Price"]').value)
-  formData.append(
-    'MaxUsers',
-    document.querySelector('input[name="MaxUsers"]').value
-  )
-  formData.append(
-    'StartDate',
-    document.querySelector('input[name="StartDate"]').value
-  )
-  formData.append(
-    'EndDate',
-    document.querySelector('input[name="EndDate"]').value
-  )
+  formData.append('MaxUsers', document.querySelector('input[name="MaxUsers"]').value)
+  formData.append('StartDate', document.querySelector('input[name="StartDate"]').value)
+  formData.append('EndDate', document.querySelector('input[name="EndDate"]').value)
   formData.append('Id', document.querySelector('input[name="Id"]').value)
 
-  const data = adminMap.waypoints
-    .map((waypoint) => waypoint.getSubmitData())
-    .filter((w) => !w.fromDb)
+  const data = adminMap.waypoints.map((waypoint) => waypoint.getSubmitData()).filter((w) => !w.fromDb)
   console.log(data)
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data[i].images.length; j++) {
-      formData.append(
-        `Waypoints[${i}].Images`,
-        data[i].images[j],
-        'image-name.jpg'
-      )
+      formData.append(`Waypoints[${i}].Images`, data[i].images[j], 'image-name.jpg')
     }
 
     formData.append(`Waypoints[${i}][name]`, data[i].name)
@@ -54,11 +36,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
     method: 'POST',
     body: formData,
   })
-    .then(
-      () =>
-        (window.location.href =
-          '/Tour/EditTour/' + document.querySelector('input[name="Id"]').value)
-    )
+    .then(() => (window.location.href = '/Tour/EditTour/' + document.querySelector('input[name="Id"]').value))
     .catch((error) => {
       console.error('Error:', error)
     })

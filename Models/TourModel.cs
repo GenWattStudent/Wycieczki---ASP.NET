@@ -3,10 +3,8 @@ using Book.App.Validators;
 
 namespace Book.App.Models;
 
-public class TourModel
+public class TourModel : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
     [Required]
     [StringLength(100)]
     [MinLength(3)]

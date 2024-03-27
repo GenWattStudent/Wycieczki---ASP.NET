@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Book.App.Models;
 
 public enum WaypointType
@@ -10,10 +8,8 @@ public enum WaypointType
     Road
 }
 
-public class WaypointModel
+public class WaypointModel : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<ImageModel> Images { get; set; } = new List<ImageModel>();

@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Book.App.Models;
 
-public class AddressModel
+public class AddressModel : BaseEntity
 {
-    public int Id { get; set; }
     [Required]
     public string Street { get; set; } = string.Empty;
     [Required]

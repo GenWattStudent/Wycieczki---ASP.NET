@@ -96,7 +96,7 @@ public class UserService
             return;
         }
 
-        await _userRepository.Delete(user.Id);
+        await _userRepository.Remove(user.Id);
         if (user.ImagePath != null) await _fileService.DeleteFile(user.ImagePath);
         await _userRepository.SaveAsync();
     }

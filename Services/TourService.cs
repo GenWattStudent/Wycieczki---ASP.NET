@@ -1,6 +1,8 @@
+using System.Linq.Expressions;
 using Book.App.Filters;
 using Book.App.Models;
 using Book.App.Repositories;
+using Book.App.Specifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
@@ -21,35 +23,16 @@ public class TourService
         _dbContext = dbContext;
     }
 
-    public async Task<List<TourModel>> GetTours()
-    {
-        return await _tourRepository.GetTours().ToListAsync();
-    }
-
     public async Task<List<TourModel>> GetTours(FilterModel filterModel)
     {
-        var tours = _tourRepository.GetTours();
-        var filters = new List<IFilter> { new SearchFilter(filterModel.SearchString), new PriceFilter(filterModel.MinPrice, filterModel.MaxPrice) };
-
-        tours = filters.Aggregate(tours, (current, filter) => filter.Process(current));
-
-        switch (filterModel.OrderBy)
-        {
-            case OrderBy.Date:
-                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.StartDate) : tours.OrderByDescending(t => t.StartDate);
-                break;
-            case OrderBy.Price:
-                tours = filterModel.OrderDirection == OrderDirection.Asc ? tours.OrderBy(t => t.Price) : tours.OrderByDescending(t => t.Price);
-                break;
-        }
-
-        return await tours.ToListAsync();
-
+        List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now };
+        var tours = await _tourRepository.GetBySpec(new TourFilterSpecification(filterModel, criterias));
+        return tours;
     }
 
     public async Task<List<TourModel>> GetActiveTours()
     {
-        return await _tourRepository.GetActiveTours().ToListAsync();
+        return await _tourRepository.GetBySpec(new ActiveToursSpecification());
     }
 
     public async Task SaveTourImages(List<IFormFile> images, TourModel tour)
@@ -101,7 +84,7 @@ public class TourService
 
     public async Task<TourModel?> GetTour(int id)
     {
-        return await _tourRepository.GetTour(id).FirstOrDefaultAsync();
+        return await _tourRepository.GetSingleBySpec(new TourSpecification(id));
     }
 
     public async Task<List<string>> SaveImages(List<IFormFile> images, string folder)
@@ -126,8 +109,9 @@ public class TourService
 
                 if (dbTour != null)
                 {
+                    Console.WriteLine("EditTour: " + tour.Description);
                     dbTour.EditTour(tour);
-
+                    Console.WriteLine("EditTour2 " + dbTour.Description);
                     // Add new waypoints
                     foreach (var waypoint in editTourModel.Waypoints.Where(wm => wm.Id == 0))
                     {
@@ -165,6 +149,7 @@ public class TourService
             }
             catch (Exception)
             {
+                Console.WriteLine("EditTour: Error");
                 transaction.Rollback();
             }
         }
@@ -176,7 +161,7 @@ public class TourService
         {
             try
             {
-                var tour = await _tourRepository.GetTour(id).FirstOrDefaultAsync();
+                var tour = await GetTour(id);
 
                 if (tour != null)
                 {
@@ -189,7 +174,7 @@ public class TourService
                     _dbContext.Images.RemoveRange(tour.Images);
 
                     await _tourRepository.SaveAsync();
-                    await _tourRepository.Delete(tour.Id);
+                    await _tourRepository.Remove(tour.Id);
                     // Delete all waypoints images
                     foreach (var waypoint in tour.Waypoints)
                     {

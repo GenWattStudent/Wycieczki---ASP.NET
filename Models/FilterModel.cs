@@ -14,9 +14,9 @@ public enum OrderBy
 
 public class FilterModel
 {
-    public string SearchString { get; set; }
-    public decimal MinPrice { get; set; }
-    public decimal MaxPrice { get; set; }
+    public string? SearchString { get; set; }
+    public decimal? MinPrice { get; set; }
+    public decimal? MaxPrice { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public OrderBy OrderBy { get; set; } = OrderBy.Date;

@@ -8,10 +8,8 @@ public enum Role
     User
 }
 
-public class UserModel
+public class UserModel : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
     [Required]
     [StringLength(50, MinimumLength = 3)]
     public string Username { get; set; } = string.Empty;
