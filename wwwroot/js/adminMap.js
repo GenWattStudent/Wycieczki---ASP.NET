@@ -15,10 +15,7 @@ class MapAdmin extends Map {
     return {
       isRoad: marker ? false : true,
       ...data,
-      id: (typeof waypointData.id === 'string'
-        ? 0
-        : waypointData.id
-      ).toString(),
+      id: (typeof waypointData.id === 'string' ? 0 : waypointData.id).toString(),
     }
   }
 
@@ -50,8 +47,7 @@ class MapAdmin extends Map {
       }
 
       waypoint.marker.bindPopup(popup).openPopup()
-      if (!edit)
-        waypoint.addRemoveListener(() => this.removeWayPoint(waypoint.id))
+      if (!edit) waypoint.addRemoveListener(() => this.removeWayPoint(waypoint.id))
       console.log(this.waypoints)
     }
   }
@@ -62,19 +58,13 @@ class MapAdmin extends Map {
     document.getElementById('waypoint-form').innerHTML = form
 
     if (!edit) {
-      document
-        .getElementById('create-marker-btn')
-        .addEventListener('click', () => this.updateWaypoint(waypointData.id))
+      document.getElementById('create-marker-btn').addEventListener('click', () => this.updateWaypoint(waypointData.id))
     } else {
-      document
-        .getElementById('edit-marker-btn')
-        .addEventListener('click', () => updateWaypointApi(waypointData.id))
+      document.getElementById('edit-marker-btn').addEventListener('click', () => updateWaypointApi(waypointData.id))
 
-      document
-        .getElementById('waypoint-image')
-        .addEventListener('change', (e) => {
-          addImages(waypointData.id, e)
-        })
+      document.getElementById('waypoint-image').addEventListener('change', (e) => {
+        addImages(waypointData.id, e)
+      })
     }
   }
 
@@ -86,17 +76,11 @@ class MapAdmin extends Map {
       return toastr.error('You have endpoint in your tour!')
     }
 
-    if (
-      this.toolSelector.currentTool === 'start' &&
-      this.waypoints.some((w) => w.type === 'start')
-    ) {
+    if (this.toolSelector.currentTool === 'start' && this.waypoints.some((w) => w.type === 'start')) {
       return toastr.error('Start point already exists!')
     }
 
-    if (
-      this.toolSelector.currentTool === 'end' &&
-      !this.waypoints.some((w) => w.type === 'start')
-    ) {
+    if (this.toolSelector.currentTool === 'end' && !this.waypoints.some((w) => w.type === 'start')) {
       return toastr.error('Start point must be added first!')
     }
 
@@ -104,13 +88,7 @@ class MapAdmin extends Map {
   }
 
   addWaypoint(waypoint, currentTool, edit = false) {
-    const marker = this.createMarker(
-      waypoint,
-      edit,
-      true,
-      false,
-      this.getIcon(currentTool)
-    )
+    const marker = this.createMarker(waypoint, edit, true, false, this.getIcon(currentTool))
     waypoint.marker = marker
 
     if (currentTool === 'marker') {
@@ -121,6 +99,7 @@ class MapAdmin extends Map {
 
     this.waypoints.push(waypoint)
     this.connectWaypointsWithLine(this.waypoints)
+    document.dispatchEvent(new CustomEvent('waypointAdded', { detail: { waypoint } }))
   }
 
   createWaypointForm(waypointData, edit = false) {
@@ -128,31 +107,17 @@ class MapAdmin extends Map {
           <div>
               <label for="waypoint-title">Title</label>
               <div class="input-group mt-1">
-                  <input class="form-control w-100" type="text" id="waypoint-title" value="${
-                    waypointData.name
-                  }" />
+                  <input class="form-control w-100" type="text" id="waypoint-title" value="${waypointData.name}" />
               </div>
               <label for="waypoint-description">Description</label>
               <div class="input-group mt-1">
-                  <textarea class="form-control w-100" id="waypoint-description">${
-                    waypointData.description
-                  }</textarea>
+                  <textarea class="form-control w-100" id="waypoint-description">${waypointData.description}</textarea>
               </div>
               <label for="waypoint-image">Image</label>
+              ${!edit ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />` : ''}
+              ${edit ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />` : ''}
               ${
-                !edit
-                  ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />`
-                  : ''
-              }
-              ${
-                edit
-                  ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />`
-                  : ''
-              }
-              ${
-                !edit
-                  ? `<button id="create-marker-btn" type="button" class="btn btn-primary mt-2">Update</button>`
-                  : ''
+                !edit ? `<button id="create-marker-btn" type="button" class="btn btn-primary mt-2">Update</button>` : ''
               }
               ${
                 edit === true

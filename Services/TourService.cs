@@ -35,22 +35,6 @@ public class TourService
         return await _tourRepository.GetBySpec(new ActiveToursSpecification());
     }
 
-    public async Task SaveTourImages(List<IFormFile> images, TourModel tour)
-    {
-        var imageUrls = await SaveImages(images, _tourFolder);
-
-        foreach (var imageUrl in imageUrls)
-        {
-            if (!tour.Images.Any(i => i.ImageUrl == imageUrl))
-            {
-                tour.Images.Add(new ImageModel
-                {
-                    ImageUrl = imageUrl
-                });
-            }
-        }
-    }
-
     public async Task<TourModel> AddTour(TourModel tour)
     {
         _tourRepository.Add(tour);
@@ -112,11 +96,6 @@ public class TourService
                         var newWaypoint = new WaypointModel(waypoint);
                         newWaypoint.Images = imagesToAdd;
                         dbTour.Waypoints.Add(newWaypoint);
-                    }
-
-                    if (editTourModel.Images != null && editTourModel.Images.Count > 0)
-                    {
-                        await SaveTourImages(editTourModel.Images, dbTour);
                     }
 
                     await _tourRepository.SaveAsync();

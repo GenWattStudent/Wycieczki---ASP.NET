@@ -9,12 +9,14 @@ namespace Book.App.Controllers;
 public class WaypointController : Controller
 {
     private readonly WaypointService _waypointService;
+    private readonly TourService _tourService;
     private readonly WeatherService _weatherService;
 
-    public WaypointController(WaypointService waypointService, WeatherService weatherService)
+    public WaypointController(WaypointService waypointService, WeatherService weatherService, TourService tourService)
     {
         _waypointService = waypointService;
         _weatherService = weatherService;
+        _tourService = tourService;
     }
 
     [Authorize(Roles = "Admin")]
@@ -63,6 +65,13 @@ public class WaypointController : Controller
         return RedirectToAction("EditTour", "Tour", new { id = waypoint.TourId });
     }
 
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var tour = await _tourService.GetTour(id);
+        return View(tour);
+    }
+
     [Authorize]
     public async Task<IActionResult> Details(int id)
     {
@@ -86,5 +95,14 @@ public class WaypointController : Controller
             Weather = weather
         };
         return View(waypointViewModel);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
+    [HttpPost]
+    public async Task<IActionResult> Add(List<AddTourWaypointsModel> addTourWaypointsModel, int tourId)
+    {
+        await _waypointService.Add(addTourWaypointsModel, tourId);
+        return RedirectToAction("Edit", new { id = tourId });
     }
 }

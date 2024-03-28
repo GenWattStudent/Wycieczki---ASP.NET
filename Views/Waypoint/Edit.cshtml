@@ -1,0 +1,100 @@
+@model TourModel
+
+@{
+    ViewData["Title"] = "Draw your tour";
+}
+
+<header class="glassmorphism rounded p-3">
+    <h1>Draw a tour</h1>
+    <small>Create a new tour by adding waypoints to the map</small>
+</header>
+
+<div class="glassmorphism p-3 mt-3 rounded">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
+</div>
+
+<form id="waypointsForm" asp-controller="Waypoint" asp-action="Add" asp-route-tourId="@Model.Id" method="post"
+    enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <div class="glassmorphism p-3 rounded mt-3">
+        <partial name="_MapTools" />
+
+        <div id="map" class="mt-2"></div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Save tour</button>
+</form>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
+    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
+
+    <script src="~/js/adminMap.js" type="module"></script>
+
+    <script type="module">
+        import { Waypoint } from '/js/waypoint.js';
+        import { adminMap } from '/js/adminMap.js';
+
+        function getTypeFromEnum(type) {
+            switch (type) {
+                case 0:
+                    return 'start'
+                case 1:
+                    return 'marker'
+                case 2:
+                    return 'end'
+                case 4:
+                    return 'indicator'
+                default:
+                    return 'road'
+            }
+        }
+        const model = @Html.Raw(Json.Serialize(Model));
+
+        model.waypoints.$values.forEach(waypoint => {
+            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
+            adminMap.addWaypoint(waypointObj, waypointObj.type, true);
+
+            const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
+            const bounds = L.latLngBounds(latLngs);
+            adminMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
+
+        });
+
+        function createInput(name, value, id, index) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = `addTourWaypointsModel[${index}].${name.charAt(0).toUpperCase() + name.slice(1)}`; // Convert the first character to uppercase
+            input.value = value;
+            input.id = id;
+            return input;
+        }
+        let waypointIndex = 0;
+        document.addEventListener('waypointAdded', function (e) {
+            const waypoint = e.detail.waypoint;
+
+            const inputId = createInput('id', waypoint.id, `waypointId${waypoint.id}`, waypointIndex);
+            const inputLat = createInput('lat', waypoint.lat, `waypointLat${waypoint.id}`, waypointIndex);
+            const inputLng = createInput('lng', waypoint.lng, `waypointLng${waypoint.id}`, waypointIndex);
+            const inputType = createInput('type', waypoint.type, `waypointType${waypoint.id}`, waypointIndex);
+
+            $('#waypointsForm').append(inputId);
+            $('#waypointsForm').append(inputLat);
+            $('#waypointsForm').append(inputLng);
+            $('#waypointsForm').append(inputType);
+            waypointIndex++;
+        });
+
+        document.addEventListener('waypointRemoved', function (e) {
+            const id = e.detail.id;
+
+            document.getElementById(`waypointId${id}`).remove();
+            document.getElementById(`waypointLat${id}`).remove();
+            document.getElementById(`waypointLng${id}`).remove();
+            document.getElementById(`waypointType${id}`).remove();
+            waypointIndex--;
+        });
+    </script>
+}

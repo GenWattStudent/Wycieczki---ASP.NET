@@ -20,6 +20,19 @@ public class FileService
         return $"/images/{folder}/{fileName}";
     }
 
+    public async Task<List<string>> SaveFiles(List<IFormFile> files, string folder)
+    {
+        var imageUrls = new List<string>();
+
+        foreach (var file in files)
+        {
+            var path = await SaveFile(file, folder);
+            imageUrls.Add(path);
+        }
+
+        return imageUrls;
+    }
+
     public async Task DeleteFile(string path)
     {
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", path.TrimStart('/'));

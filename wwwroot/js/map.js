@@ -107,6 +107,7 @@ export class Map {
     }
 
     this.connectWaypointsWithLine(this.waypoints)
+    document.dispatchEvent(new CustomEvent('waypointRemoved', { detail: { id } }))
   }
 
   connectWaypointsWithLine(waypoints) {

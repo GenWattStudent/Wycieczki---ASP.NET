@@ -7,5 +7,6 @@ public interface IUnitOfWork : IDisposable
     IReservationRepository reservationRepository { get; }
     ITourRepository tourRepository { get; }
     IUserRepository userRepository { get; }
+    IImageRepository imageRepository { get; }
     Task SaveAsync();
 }

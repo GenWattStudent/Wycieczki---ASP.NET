@@ -1,3 +1,5 @@
+@model TourModel
+
 @{
     ViewData["Title"] = "Gallery - Edit";
 }
@@ -8,13 +10,73 @@
 </header>
 
 <div class="glassmorphism p-3 mt-3 rounded">
-    @* <partial name="_TourNavigation" /> *@
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
 </div>
 
 <div class="glassmorphism p-3 rounded mt-3">
-    <form method="post" enctype="multipart/form-data">
+    <form id="addImageForm" asp-controller="Gallery" asp-action="Add" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
         <div class="form-group">
-            <input type="file" class="form-control" id="files" name="files" required accept="">
+            <input type="file" class="form-control" id="files" name="files" multiple accept="image/*">
         </div>
     </form>
+
+    <div class="d-flex flex-wrap gap-3">
+        @foreach (var image in Model.Images)
+        {
+            <div class="card mb-3">
+                <img src="@Url.Content(image.ImageUrl)" class="card-img-top" alt="...">
+                <div class="d-flex mt-2 gap-2">
+                <form asp-controller="Gallery" asp-action="Delete" asp-route-id="@image.Id" asp-route-tourId="@Model.Id">
+                    <button type="submit" class="btn btn-danger">Delete</button</form>
+
+                    <button type="button" class="btn btn-primary" data-image-btn data-toggle="modal"
+                        data-target="#GalleryDetailsModal" data-image-id="@image.Id">
+                        Preview
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="GalleryDetailsModal" tabindex="-1" role="dialog" aria-labelledby="GalleryDetailsModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-light">
+                <h5 class="modal-title" id="exampleModalLongTitle">Image preview</h5>
+                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+                <img src="" alt="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const dataImageBtns = $('[data-image-btn]');
+            dataImageBtns.on('click', function () {
+                const imageId = $(this).data('image-id');
+                const imageUrl = $(this).closest('.card').find('img').attr('src');
+
+                $('#GalleryDetailsModal img').attr('src', imageUrl);
+                $('#GalleryDetailsModal').modal('show');
+            });
+
+            const fileInput = $('#files');
+            fileInput.on('change', function () {
+                $('#addImageForm').submit();
+            });
+        })
+    </script>
+}

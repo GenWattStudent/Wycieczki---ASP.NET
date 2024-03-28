@@ -66,12 +66,14 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const model = @Json.Serialize(Model);
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const model = @Json.Serialize(Model);
 
-        document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
-            document.getElementById(`deleteForm-${model.id}`).submit();
+            document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
+                document.getElementById(`deleteForm-${model.id}`).submit();
+            });
         });
-    });
-</script>
+    </script>
+}

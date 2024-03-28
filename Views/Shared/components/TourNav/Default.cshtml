@@ -1,0 +1,28 @@
+@using Book.App.Helpers
+@model TourModel
+
+@if (Model != null)
+{
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Tour", "EditTour")" asp-controller="Tour" asp-action="EditTour"
+                asp-route-id="@Model.Id">Tour</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Gallery", "Edit")" asp-controller="Gallery" asp-action="Edit"
+                asp-route-id="@Model.Id">Gallery</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Waypoint", "Edit")" asp-controller="Waypoint" asp-action="Edit"
+                asp-route-id="@Model.Id">Map</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Meal", "Edit")" asp-controller="Meal" asp-action="Edit"
+                asp-route-id="@Model.Id">Meal</a>
+        </li>
+    </ul>
+}
+else
+{
+    <p>Couldn't load tour!</p>
+}

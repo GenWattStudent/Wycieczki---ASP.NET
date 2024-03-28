@@ -189,10 +189,10 @@ body * {
 }
 
 .background {
-  background-image: url(/images/bg.jpg);
+  /* background-image: url(/images/bg.jpg); */
   background-position: center;
   background-attachment: fixed;
-  animation: gradient 25s infinite;
+  /* animation: gradient 25s infinite; */
   background-repeat: no-repeat;
 }
 
