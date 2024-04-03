@@ -25,7 +25,7 @@
         @foreach (var image in Model.Images)
         {
             <div class="card mb-3">
-                <img src="@Url.Content(image.ImageUrl)" class="card-img-top" alt="...">
+                <img src="@Url.Content(image.ImageUrl)" class="card-img-top" style="max-height: 500px;" alt="...">
                 <div class="d-flex mt-2 gap-2">
                 <form asp-controller="Gallery" asp-action="Delete" asp-route-id="@image.Id" asp-route-tourId="@Model.Id">
                     <button type="submit" class="btn btn-danger">Delete</button</form>

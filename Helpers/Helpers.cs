@@ -39,14 +39,14 @@ public static class Helpers
         services.AddTransient<IUnitOfWork, UnitOfWork>();
 
         // Services
-        services.AddTransient<ImageService>();
-        services.AddTransient<TourService>();
-        services.AddTransient<UserService>();
-        services.AddTransient<TokenService>();
-        services.AddTransient<BookService>();
-        services.AddTransient<FileService>();
-        services.AddTransient<WaypointService>();
-        services.AddTransient<GeoService>();
-        services.AddTransient<WeatherService>();
+        services.AddTransient<IImageService, ImageService>();
+        services.AddTransient<ITourService, TourService>();
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<ITokenService, TokenService>();
+        services.AddTransient<IBookService, BookService>();
+        services.AddTransient<IFileService, FileService>();
+        services.AddTransient<IWaypointService, WaypointService>();
+        services.AddTransient<IGeoService, GeoService>();
+        services.AddTransient<IWeatherService, WeatherService>();
     }
 }

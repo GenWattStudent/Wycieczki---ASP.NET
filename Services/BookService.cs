@@ -1,18 +1,16 @@
 using Book.App.Models;
-using Book.App.Repositories;
 using Book.App.Repositories.UnitOfWork;
 using Book.App.Specifications;
 using Book.App.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
 
-public class BookService
+public class BookService : IBookService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly GeoService _geoService;
+    private readonly IGeoService _geoService;
 
-    public BookService(IUnitOfWork reservationUnitOfWork, GeoService geoService)
+    public BookService(IUnitOfWork reservationUnitOfWork, IGeoService geoService)
     {
         _unitOfWork = reservationUnitOfWork;
         _geoService = geoService;

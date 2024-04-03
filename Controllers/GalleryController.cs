@@ -6,10 +6,10 @@ namespace Book.App.Controllers;
 
 public class GalleryController : Controller
 {
-    private readonly TourService _tourService;
-    private readonly ImageService _imageService;
+    private readonly ITourService _tourService;
+    private readonly IImageService _imageService;
 
-    public GalleryController(TourService tourService, ImageService imageService)
+    public GalleryController(ITourService tourService, IImageService imageService)
     {
         _tourService = tourService;
         _imageService = imageService;

@@ -1,6 +1,6 @@
 namespace Book.App.Services;
 
-public class FileService
+public class FileService : IFileService
 {
     public async Task<string> SaveFile(IFormFile file, string folder)
     {

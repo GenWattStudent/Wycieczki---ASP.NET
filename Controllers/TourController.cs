@@ -11,9 +11,9 @@ namespace Book.App.Controllers;
 public class TourController : Controller
 {
     private readonly ILogger<TourController> _logger;
-    private readonly TourService _tourService;
+    private readonly ITourService _tourService;
 
-    public TourController(ILogger<TourController> logger, TourService tourService)
+    public TourController(ILogger<TourController> logger, ITourService tourService)
     {
         _logger = logger;
         _tourService = tourService;

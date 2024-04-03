@@ -8,11 +8,11 @@ namespace Book.App.Controllers;
 
 public class WaypointController : Controller
 {
-    private readonly WaypointService _waypointService;
-    private readonly TourService _tourService;
-    private readonly WeatherService _weatherService;
+    private readonly IWaypointService _waypointService;
+    private readonly ITourService _tourService;
+    private readonly IWeatherService _weatherService;
 
-    public WaypointController(WaypointService waypointService, WeatherService weatherService, TourService tourService)
+    public WaypointController(IWaypointService waypointService, IWeatherService weatherService, ITourService tourService)
     {
         _waypointService = waypointService;
         _weatherService = weatherService;

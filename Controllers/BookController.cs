@@ -9,9 +9,9 @@ namespace Book.App.Controllers;
 [Authorize]
 public class BookController : Controller
 {
-    private readonly BookService _bookService;
+    private readonly IBookService _bookService;
 
-    public BookController(BookService tourService)
+    public BookController(IBookService tourService)
     {
         _bookService = tourService;
     }

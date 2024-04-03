@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 public class UserController : Controller
 {
     private readonly ILogger<UserController> _logger;
-    private readonly UserService _userService;
-    private readonly TokenService _tokenService;
+    private readonly IUserService _userService;
+    private readonly ITokenService _tokenService;
 
-    public UserController(ILogger<UserController> logger, UserService userService, TokenService tokenService)
+    public UserController(ILogger<UserController> logger, IUserService userService, ITokenService tokenService)
     {
         _logger = logger;
         _userService = userService;

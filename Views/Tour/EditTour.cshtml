@@ -19,13 +19,6 @@
             <partial name="_TourFormPartial" model="Model" />
         </div>
 
-        <div class="glassmorphism p-3 rounded mt-3">
-            <h2>Gallery</h2>
-            <div id="preview" class="d-flex">
-                <partial name="_ImagesPartial" model="Model" />
-            </div>
-        </div>
-
         @Html.Hidden("Id", Model.Id, new { id = "Id" })
 
         <div class="d-flex flex-column">
@@ -37,42 +30,5 @@
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
-    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
-
     <script src="~/js/dateGreaterThan.js"></script>
-    <script src="~/js/imagePreview.js"></script>
-    <script src="~/js/adminMap.js" type="module"></script>
-    <script src="~/js/editTour.js" type="module"></script>
-
-    <script type="module">
-        import { Waypoint } from '/js/waypoint.js';
-        import { adminMap } from '/js/adminMap.js';
-
-        function getTypeFromEnum(type) {
-            switch (type) {
-                case 0:
-                    return 'start'
-                case 1:
-                    return 'marker'
-                case 2:
-                    return 'end'
-                case 4:
-                    return 'indicator'
-                default:
-                    return 'road'
-            }
-        }
-        const model = @Html.Raw(Json.Serialize(Model));
-
-        model.waypoints.$values.forEach(waypoint => {
-            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
-            console.log(waypointObj);
-            adminMap.addWaypoint(waypointObj, waypointObj.type, true);
-        });
-    </script>
 }

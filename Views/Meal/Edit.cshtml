@@ -1,0 +1,14 @@
+@model TourModel
+@{
+    ViewData["Title"] = "Edit Meal";
+    var mealModel = new MealModel();
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h1>Meals</h1>
+    <small>Select nom nom!</small>
+</header>
+
+<section class="glassmorphism p-3 rounded mt-3">
+    <partial name="_MealFormPartial" model="@mealModel" />
+</section>

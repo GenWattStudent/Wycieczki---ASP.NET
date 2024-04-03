@@ -1,17 +1,16 @@
 using Book.App.Models;
 using Book.App.Repositories;
-using Book.App.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly string _userImageFolder = "users";
-    private readonly FileService _fileService;
+    private readonly IFileService _fileService;
 
-    public UserService(IUserRepository userRepository, FileService fileService)
+    public UserService(IUserRepository userRepository, IFileService fileService)
     {
         _userRepository = userRepository;
         _fileService = fileService;

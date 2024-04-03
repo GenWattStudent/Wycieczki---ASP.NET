@@ -12,9 +12,9 @@ namespace Book.App.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly BookService _bookService;
+    private readonly IBookService _bookService;
 
-    public HomeController(ILogger<HomeController> logger, BookService bookService)
+    public HomeController(ILogger<HomeController> logger, IBookService bookService)
     {
         _bookService = bookService;
         _logger = logger;

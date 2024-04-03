@@ -6,10 +6,10 @@ namespace Book.App.Controllers;
 
 public class ImageController : Controller
 {
-    private readonly ImageService _imageService;
-    private readonly TourService _tourService;
+    private readonly IImageService _imageService;
+    private readonly ITourService _tourService;
 
-    public ImageController(ImageService imageService, TourService tourService)
+    public ImageController(IImageService imageService, ITourService tourService)
     {
         _imageService = imageService;
         _tourService = tourService;

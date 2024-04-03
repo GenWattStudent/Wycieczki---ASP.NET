@@ -1,11 +1,10 @@
-using System.Text.Json;
 using Book.App.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
 namespace Book.App.Services;
 
-public class WeatherService
+public class WeatherService : IWeatherService
 {
     private static string key = Environment.GetEnvironmentVariable("OPEN_WEATHER_API_KEY");
     private string url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";

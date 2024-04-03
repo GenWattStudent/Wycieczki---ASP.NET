@@ -1,16 +1,15 @@
 using Book.App.Models;
-using Book.App.Repositories;
 using Book.App.Repositories.UnitOfWork;
 
 namespace Book.App.Services;
 
-public class ImageService
+public class ImageService : IImageService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly FileService _fileService;
+    private readonly IFileService _fileService;
     private readonly string _tourFolder = "Tours";
 
-    public ImageService(IUnitOfWork unitOfWork, FileService fileService)
+    public ImageService(IUnitOfWork unitOfWork, IFileService fileService)
     {
         _unitOfWork = unitOfWork;
         _fileService = fileService;

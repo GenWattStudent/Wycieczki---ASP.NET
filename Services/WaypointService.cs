@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
 
-public class WaypointService
+public class WaypointService : IWaypointService
 {
     private readonly ApplicationDbContext _context;
-    private readonly FileService _fileService;
-    private readonly TourService _tourService;
+    private readonly IFileService _fileService;
+    private readonly ITourService _tourService;
 
-    public WaypointService(ApplicationDbContext context, FileService fileService, TourService tourService)
+    public WaypointService(ApplicationDbContext context, IFileService fileService, ITourService tourService)
     {
         _context = context;
         _fileService = fileService;

@@ -16,4 +16,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<ContactModel> Contacts { get; set; }
     public DbSet<AddressModel> Addresses { get; set; }
     public DbSet<ReservationModel> Reservations { get; set; }
+    public DbSet<MealModel> Meals { get; set; }
 }

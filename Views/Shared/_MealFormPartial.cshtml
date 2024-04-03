@@ -1,0 +1,67 @@
+@using Book.App.Models
+@model MealModel
+
+@{
+ List<SelectListItem> mealTypesFromEnum = new List<SelectListItem>();
+
+    foreach (var item in Enum.GetValues(typeof(MealType)))
+    {
+        mealTypesFromEnum.Add(new SelectListItem
+        {
+            Text = item.ToString(),
+            Value = ((int)item).ToString()
+        });
+    }
+}
+
+@using (Html.BeginForm("Add", "Meal", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h3>Add meal</h3>
+        <hr>
+
+        <label for="name">Name</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", @placeholder = "Meal Name" })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="Description">Description</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control w-100", @placeholder = "Meal Description" })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="Price">Price</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", @placeholder = "Meal Price", type = "number", min = "1", step = "0.01" })
+            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="type">Meal Type</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.DropDownListFor(model => model.MealType, mealTypesFromEnum, new { @class = "form-control w-100" })
+            @Html.ValidationMessageFor(model => model.MealType, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="start">Start Date</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.Start, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+            @Html.ValidationMessageFor(model => model.Start, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <label for="end">End Date</label>
+        <div class="input-group mt-1 d-flex flex-column">
+            @Html.TextBoxFor(model => model.End, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+            @Html.ValidationMessageFor(model => model.End, "", new { @class = "field-validation-error text-danger" })
+        </div>
+
+        <div class="input-group mt-2">
+            <div>
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}

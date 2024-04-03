@@ -29,6 +29,8 @@ public class TourModel : BaseEntity
     public DateTime EndDate { get; set; }
     public List<WaypointModel> Waypoints { get; set; } = new();
     public List<ReservationModel> Reservations { get; set; } = new();
+    public List<MealModel> Meals { get; set; } = new();
+    public bool IsVisible { get; set; } = false;
 
     public TourModel(AddTourModel addTourModel)
     {

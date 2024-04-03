@@ -6,7 +6,7 @@ namespace Book.App.Controllers;
 public class WeatherController : Controller
 {
     private readonly ILogger<WeatherController> _logger;
-    private readonly WeatherService _weatherService;
+    private readonly IWeatherService _weatherService;
 
     public WeatherController(ILogger<WeatherController> logger, WeatherService weatherService)
     {

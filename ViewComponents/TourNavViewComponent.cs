@@ -6,9 +6,9 @@ namespace Book.App.ViewComponents;
 
 public class TourNavViewComponent : ViewComponent
 {
-    private readonly TourService _tourService;
+    private readonly ITourService _tourService;
 
-    public TourNavViewComponent(TourService tourService)
+    public TourNavViewComponent(ITourService tourService)
     {
         _tourService = tourService;
     }
