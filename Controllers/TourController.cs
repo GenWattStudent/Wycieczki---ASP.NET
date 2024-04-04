@@ -10,12 +10,10 @@ namespace Book.App.Controllers;
 [Authorize]
 public class TourController : Controller
 {
-    private readonly ILogger<TourController> _logger;
     private readonly ITourService _tourService;
 
-    public TourController(ILogger<TourController> logger, ITourService tourService)
+    public TourController(ITourService tourService)
     {
-        _logger = logger;
         _tourService = tourService;
     }
 
@@ -23,8 +21,7 @@ public class TourController : Controller
     [Authorize]
     public async Task<IActionResult> Tours(FilterModel filterModel)
     {
-        _logger.LogInformation("Getting all tours");
-        var tours = await _tourService.GetTours(filterModel);
+        var tours = await _tourService.Get(filterModel);
         return View(tours);
     }
 
@@ -36,40 +33,40 @@ public class TourController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> AddTour(AddTourModel addTourModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddTour(AddTourViewModel addTourModel)
     {
-        var tour = new TourModel(addTourModel);
-
         if (!ModelState.IsValid)
         {
             var errorMessage = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
             return Json(new { error = errorMessage });
         }
 
-        await _tourService.AddTour(tour);
+        var tour = new TourModel(addTourModel);
+        await _tourService.Add(tour);
 
         return RedirectToAction("EditTour", new { id = tour.Id });
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> EditTour(EditTourModel editTourModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditTour(EditTourViewModel editTourModel)
     {
         var tour = new TourModel(editTourModel);
-
-        if (ModelState.IsValid == false)
+        if (!ModelState.IsValid)
         {
             return View(tour);
         }
 
-        await _tourService.EditTour(tour, editTourModel);
+        await _tourService.Edit(tour, editTourModel);
 
         return RedirectToAction("Tours");
     }
 
     public async Task<IActionResult> TourDetails(int id)
     {
-        var tour = await _tourService.GetTour(id);
+        var tour = await _tourService.GetById(id);
         if (tour == null)
         {
             return RedirectToAction("Tours");
@@ -80,20 +77,21 @@ public class TourController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteTour(int id)
     {
-        var tour = await _tourService.GetTour(id);
+        var tour = await _tourService.GetById(id);
         if (tour == null)
         {
             return NotFound();
         }
 
-        await _tourService.DeleteTour(id);
+        await _tourService.Delete(id);
         return Redirect("/Tour/Tours");
     }
 
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditTour(int id)
     {
-        var tour = await _tourService.GetTour(id);
+        var tour = await _tourService.GetById(id);
+
         if (tour == null)
         {
             return RedirectToAction("AddTour");

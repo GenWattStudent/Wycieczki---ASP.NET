@@ -22,6 +22,8 @@
         <h3>Add meal</h3>
         <hr>
 
+        @Html.HiddenFor(model => model.TourId)
+
         <label for="name">Name</label>
         <div class="input-group mt-1 d-flex flex-column">
             @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", @placeholder = "Meal Name" })

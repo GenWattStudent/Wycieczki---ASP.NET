@@ -18,8 +18,8 @@ public class ImageController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteImage(int id, int tourId)
     {
-        await _imageService.DeleteImage(id);
-        var tour = await _tourService.GetTour(tourId);
+        await _imageService.Delete(id);
+        var tour = await _tourService.GetById(tourId);
         return RedirectToAction("EditTour", "Tour", tour);
     }
 

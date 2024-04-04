@@ -31,7 +31,7 @@ public class WeatherService : IWeatherService
     }
 
 
-    public async Task<WeatherModel?> GetWeather(double lat, double lon)
+    public async Task<WeatherModel?> Get(double lat, double lon)
     {
         if (string.IsNullOrEmpty(_cache.GetString($"{lat},{lon}")))
         {

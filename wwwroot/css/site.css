@@ -227,27 +227,35 @@ body * {
 }
 /* Time line styles */
 .checkpoint {
-  display: flex;
-  flex-direction: column;
+  /* display: flex;
+  flex-direction: column; */
+  position: relative;
+  width: calc(50% - 1rem);
 }
 
 .checkpoint:nth-child(odd) {
-  align-items: flex-start;
+  left: calc(50% + 1rem);
 }
 
 .checkpoint:nth-child(even) {
-  align-items: flex-end;
+  text-align: right;
+  margin-right: -1rem;
 }
 
-.line {
+.line,
+.current-progress {
   position: absolute;
   left: 50%;
   width: 3px;
-  height: 100%;
   top: 0;
 }
 
-.line-dot {
+.line {
+  height: 100%;
+}
+
+.line-dot,
+.current-progress-indicator {
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -256,10 +264,12 @@ body * {
   transform: translateX(-20%);
 }
 
-.line .line-dot:nth-last-of-type(1) {
-  top: 15px;
+.checkpoint:nth-child(even) .timeline-actions {
+  top: 0.5rem;
+  left: 0.5rem;
 }
 
-.line .line-dot:nth-last-of-type(2) {
-  top: 65%;
+.checkpoint:nth-child(odd) .timeline-actions {
+  top: 0.5rem;
+  right: 0.5rem;
 }

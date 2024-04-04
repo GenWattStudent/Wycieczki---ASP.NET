@@ -58,7 +58,7 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(LoginModel loginModel)
+    public async Task<IActionResult> Login(LoginViewModel loginModel)
     {
         try
         {
@@ -70,7 +70,7 @@ public class UserController : Controller
                 return View(loginModel);
             }
 
-            var token = _tokenService.GenerateToken(user.Username, user.Role, user.Id, user.ImagePath, user.Contact?.Email);
+            var token = _tokenService.Generate(user.Username, user.Role, user.Id, user.ImagePath, user.Contact?.Email);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {

@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Book.App.Validators;
 
-namespace Book.App.Models;
+namespace Book.App.ViewModels;
 
-public class AddTourModel
+public class AddTourViewModel
 {
     [Required]
     [StringLength(100)]

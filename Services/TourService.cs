@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Book.App.Models;
 using Book.App.Repositories.UnitOfWork;
 using Book.App.Specifications;
+using Book.App.ViewModels;
 
 namespace Book.App.Services;
 
@@ -18,7 +19,7 @@ public class TourService : ITourService
         _dbContext = dbContext;
     }
 
-    public async Task<List<TourModel>> GetTours(FilterModel filterModel)
+    public async Task<List<TourModel>> Get(FilterModel filterModel)
     {
         List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now };
         var tours = await _unitOfWork.tourRepository.GetBySpec(new TourFilterSpecification(filterModel, criterias));
@@ -30,7 +31,7 @@ public class TourService : ITourService
         return await _unitOfWork.tourRepository.GetBySpec(new ActiveToursSpecification());
     }
 
-    public async Task<TourModel> AddTour(TourModel tour)
+    public async Task<TourModel> Add(TourModel tour)
     {
         _unitOfWork.tourRepository.Add(tour);
         await _unitOfWork.SaveAsync();
@@ -38,7 +39,7 @@ public class TourService : ITourService
         return tour;
     }
 
-    public async Task<TourModel?> GetTour(int id)
+    public async Task<TourModel?> GetById(int id)
     {
         return await _unitOfWork.tourRepository.GetSingleBySpec(new TourSpecification(id));
     }
@@ -55,11 +56,11 @@ public class TourService : ITourService
 
         return imageUrls;
     }
-    public async Task EditTour(TourModel tour, EditTourModel editTourModel)
+    public async Task Edit(TourModel tour, EditTourViewModel editTourModel)
     {
         try
         {
-            var dbTour = await GetTour(tour.Id);
+            var dbTour = await GetById(tour.Id);
 
             if (dbTour != null)
             {
@@ -73,13 +74,13 @@ public class TourService : ITourService
         }
     }
 
-    public async Task DeleteTour(int id)
+    public async Task Delete(int id)
     {
         using (var transaction = _dbContext.Database.BeginTransaction())
         {
             try
             {
-                var tour = await GetTour(id);
+                var tour = await GetById(id);
 
                 if (tour != null)
                 {

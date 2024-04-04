@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Book.App.Validators;
+using Book.App.ViewModels;
 
 namespace Book.App.Models;
 
@@ -32,7 +33,7 @@ public class TourModel : BaseEntity
     public List<MealModel> Meals { get; set; } = new();
     public bool IsVisible { get; set; } = false;
 
-    public TourModel(AddTourModel addTourModel)
+    public TourModel(AddTourViewModel addTourModel)
     {
         Name = addTourModel.Name;
         Description = addTourModel.Description;
@@ -42,7 +43,7 @@ public class TourModel : BaseEntity
         MaxUsers = addTourModel.MaxUsers;
     }
 
-    public TourModel(EditTourModel editTourModel)
+    public TourModel(EditTourViewModel editTourModel)
     {
         Id = editTourModel.Id;
         Name = editTourModel.Name;

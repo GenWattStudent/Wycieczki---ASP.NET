@@ -17,7 +17,7 @@ public class TourNavViewComponent : ViewComponent
     {
         // var model = new FilterModel();
         Console.WriteLine("TourNavViewComponent: " + tourId);
-        var tour = await _tourService.GetTour(tourId);
+        var tour = await _tourService.GetById(tourId);
         return View(tour);
     }
 }

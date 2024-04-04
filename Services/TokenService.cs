@@ -15,7 +15,7 @@ public class TokenService : ITokenService
         _configuration = configuration;
     }
 
-    public string GenerateToken(string username, Role role, int id, string? imagePath, string? email)
+    public string Generate(string username, Role role, int id, string? imagePath, string? email)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")));

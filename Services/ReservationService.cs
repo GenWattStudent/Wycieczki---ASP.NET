@@ -5,12 +5,12 @@ using Book.App.ViewModels;
 
 namespace Book.App.Services;
 
-public class BookService : IBookService
+public class ReservationService : IReservationService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGeoService _geoService;
 
-    public BookService(IUnitOfWork reservationUnitOfWork, IGeoService geoService)
+    public ReservationService(IUnitOfWork reservationUnitOfWork, IGeoService geoService)
     {
         _unitOfWork = reservationUnitOfWork;
         _geoService = geoService;
@@ -82,7 +82,7 @@ public class BookService : IBookService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task DeleteCancelTour(int userId, int tourId)
+    public async Task Cancel(int userId, int tourId)
     {
         var reservationSpec = new ReservationSpecification(userId);
         reservationSpec.FilterByTour(tourId);
@@ -134,7 +134,7 @@ public class BookService : IBookService
         return bookViewModel;
     }
 
-    public async Task DeleteReservation(int userId, int tourId)
+    public async Task Delete(int userId, int tourId)
     {
         var reservationSpec = new ReservationSpecification(userId);
         reservationSpec.FilterByTour(tourId);

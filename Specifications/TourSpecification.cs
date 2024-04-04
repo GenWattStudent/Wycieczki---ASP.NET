@@ -10,6 +10,7 @@ public class TourSpecification : BaseSpecification<TourModel>
         Includes.Add(t => t.Reservations);
         Includes.Add(t => t.Waypoints);
         Includes.Add(t => t.Users);
+        Includes.Add(t => t.Meals);
         IncludeStrings.Add("Reservations.User");
         IncludeStrings.Add("Waypoints.Images");
         ApplyCriteria(t => t.Id == id);

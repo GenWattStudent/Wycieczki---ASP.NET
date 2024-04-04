@@ -15,7 +15,7 @@ public class ImageService : IImageService
         _fileService = fileService;
     }
 
-    public async Task DeleteImage(int id)
+    public async Task Delete(int id)
     {
         var image = await _unitOfWork.imageRepository.GetById(id);
 

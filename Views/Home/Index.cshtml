@@ -9,7 +9,7 @@
 <div>
     @if (Model.Tour != null && Model.Book != null)
     {
-        var sliderData = new ImageSliderModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
+        var sliderData = new ImageSliderViewModel { Images = Model.Tour.Images, SliderId = Model.Tour.Id };
 
         <div class="alert alert-primary glassmorphism" role="alert" id="tour-info">
             <a class="mt-2 d-block" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Tour.Id">

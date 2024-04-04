@@ -19,7 +19,7 @@ public class GalleryController : Controller
     // GET: Gallery{tourId}
     public async Task<IActionResult> Edit(int id)
     {
-        var tour = await _tourService.GetTour(id);
+        var tour = await _tourService.GetById(id);
         return View(tour);
     }
 
@@ -37,7 +37,7 @@ public class GalleryController : Controller
     // POST: Gallery/Delete{imageId}
     public async Task<IActionResult> Delete(int id, int tourId)
     {
-        await _imageService.DeleteImage(id);
+        await _imageService.Delete(id);
         return RedirectToAction("Edit", new { id = tourId });
     }
 }

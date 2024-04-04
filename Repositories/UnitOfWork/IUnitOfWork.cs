@@ -1,5 +1,3 @@
-using Book.App.Models;
-
 namespace Book.App.Repositories.UnitOfWork;
 
 public interface IUnitOfWork : IDisposable
@@ -8,5 +6,6 @@ public interface IUnitOfWork : IDisposable
     ITourRepository tourRepository { get; }
     IUserRepository userRepository { get; }
     IImageRepository imageRepository { get; }
+    IMealRepository mealRepository { get; }
     Task SaveAsync();
 }

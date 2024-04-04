@@ -1,5 +1,6 @@
 using Book.App.Models;
 using Book.App.Repositories;
+using Book.App.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
@@ -70,7 +71,7 @@ public class UserService : IUserService
         return await _userRepository.GetByUsername(username).FirstOrDefaultAsync(x => x.Username == username);
     }
 
-    public async Task<UserModel?> Login(LoginModel loginModel)
+    public async Task<UserModel?> Login(LoginViewModel loginModel)
     {
         var user = await _userRepository.GetByUsername(loginModel.Username).FirstOrDefaultAsync(x => x.Username == loginModel.Username);
 

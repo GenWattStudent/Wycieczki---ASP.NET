@@ -8,7 +8,7 @@
 @{
     var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
     var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-    var sliderData = new ImageSliderModel
+    var sliderData = new ImageSliderViewModel
             {
                 Images = Model.Images,
                 SliderId = Model.Id,

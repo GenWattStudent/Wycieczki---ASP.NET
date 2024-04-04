@@ -1,3 +1,5 @@
+using Book.App.ViewModels;
+
 namespace Book.App.Models;
 
 public enum WaypointType
@@ -24,7 +26,7 @@ public class WaypointModel : BaseEntity
     {
     }
 
-    public WaypointModel(AddTourWaypointsModel waypoint)
+    public WaypointModel(AddTourWaypointsViewModel waypoint)
     {
         Name = waypoint.Name;
         Description = waypoint.Description;

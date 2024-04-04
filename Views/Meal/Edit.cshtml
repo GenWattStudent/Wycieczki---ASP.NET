@@ -1,14 +1,49 @@
-@model TourModel
+@using Book.App.ViewModels
+@model MealViewModel
 @{
     ViewData["Title"] = "Edit Meal";
-    var mealModel = new MealModel();
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+    var timelineViewModel = new TimelineViewModel
+            {
+                isEditMode = role == "Admin",
+                Meals = Model.TourModel.Meals,
+            };
 }
 
-<header class="glassmorphism p-3 rounded">
-    <h1>Meals</h1>
-    <small>Select nom nom!</small>
-</header>
+@if (Model.TourModel != null)
+{
+    <header class="glassmorphism p-3 rounded">
+        <h1>Meals</h1>
+        <small>Select nom nom!</small>
+    </header>
 
-<section class="glassmorphism p-3 rounded mt-3">
-    <partial name="_MealFormPartial" model="@mealModel" />
-</section>
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id })
+    </div>
+
+    <section class="glassmorphism p-3 rounded mt-3">
+        <partial name="_MealFormPartial" model="@Model.MealModel" />
+    </section>
+
+    <section>
+        <partial name="_MealTimeline" model="@timelineViewModel" />
+    </section>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Oh snap!</strong> Tour not found.
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/timeline/timeline.js"></script>
+    <script>
+        $(document).ready(() => {
+            const mealsModel = @Html.Raw(Json.Serialize(Model.TourModel.Meals));
+            const timeline = new Timeline(mealsModel);
+            timeline.init();
+        })
+    </script>
+}

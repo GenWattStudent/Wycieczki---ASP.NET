@@ -16,7 +16,7 @@ public class WeatherController : Controller
 
     public async Task<IActionResult> Index(int lat, int lon)
     {
-        var weather = await _weatherService.GetWeather(lat, lon);
+        var weather = await _weatherService.Get(lat, lon);
         return View(weather);
     }
 }

@@ -2,7 +2,7 @@
 @model TourModel
 @{
     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-    var sliderData = new ImageSliderModel
+    var sliderData = new ImageSliderViewModel
             {
                 Images = Model.Images,
                 SliderId = Model.Id

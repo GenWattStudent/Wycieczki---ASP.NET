@@ -22,7 +22,7 @@ public class WaypointController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
-        var waypoint = await _waypointService.GetWaypoint(id);
+        var waypoint = await _waypointService.Get(id);
 
         if (waypoint == null)
         {
@@ -35,9 +35,9 @@ public class WaypointController : Controller
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<IActionResult> Edit(AddTourWaypointsModel addTourWaypointsModel)
+    public async Task<IActionResult> Edit(AddTourWaypointsViewModel addTourWaypointsModel)
     {
-        var waypoint = await _waypointService.GetWaypoint(addTourWaypointsModel.Id);
+        var waypoint = await _waypointService.Get(addTourWaypointsModel.Id);
         if (waypoint == null)
         {
             return NotFound();
@@ -51,7 +51,7 @@ public class WaypointController : Controller
     [HttpPost]
     public async Task<IActionResult> AddImages(List<IFormFile> images, int id)
     {
-        var waypoint = await _waypointService.GetWaypoint(id);
+        var waypoint = await _waypointService.Get(id);
         Console.WriteLine(id);
         if (waypoint == null)
         {
@@ -68,14 +68,14 @@ public class WaypointController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id)
     {
-        var tour = await _tourService.GetTour(id);
+        var tour = await _tourService.GetById(id);
         return View(tour);
     }
 
     [Authorize]
     public async Task<IActionResult> Details(int id)
     {
-        var waypoint = await _waypointService.GetWaypoint(id);
+        var waypoint = await _waypointService.Get(id);
         if (waypoint == null)
         {
             TempData["ErrorMessage"] = "Waypoint not found";
@@ -88,7 +88,7 @@ public class WaypointController : Controller
             return Redirect(referrer);
         }
 
-        var weather = await _weatherService.GetWeather(waypoint.Latitude, waypoint.Longitude);
+        var weather = await _weatherService.Get(waypoint.Latitude, waypoint.Longitude);
         var waypointViewModel = new WaypointViewModel
         {
             Waypoint = waypoint,
@@ -100,7 +100,7 @@ public class WaypointController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     [HttpPost]
-    public async Task<IActionResult> Add(List<AddTourWaypointsModel> addTourWaypointsModel, int tourId)
+    public async Task<IActionResult> Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId)
     {
         await _waypointService.Add(addTourWaypointsModel, tourId);
         return RedirectToAction("Edit", new { id = tourId });

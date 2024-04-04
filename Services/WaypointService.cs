@@ -1,4 +1,5 @@
 using Book.App.Models;
+using Book.App.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
@@ -16,12 +17,12 @@ public class WaypointService : IWaypointService
         _tourService = tourService;
     }
 
-    public async Task<WaypointModel?> GetWaypoint(int id)
+    public async Task<WaypointModel?> Get(int id)
     {
         return await _context.Waypoints.Include(w => w.Images).Include(w => w.Tour).FirstOrDefaultAsync(w => w.Id == id);
     }
 
-    public async Task RemoveWaypointImages(WaypointModel waypointModel)
+    public async Task RemoveImages(WaypointModel waypointModel)
     {
         foreach (var image in waypointModel.Images)
         {
@@ -33,32 +34,18 @@ public class WaypointService : IWaypointService
             }
         }
     }
-
-    public async Task AddImagesToWaypoint(List<IFormFile> formFiles, WaypointModel waypointModel)
-    {
-        foreach (var formFile in formFiles)
-        {
-            var imageUrl = await _fileService.SaveFile(formFile, "waypoints");
-            var image = new ImageModel
-            {
-                ImageUrl = imageUrl,
-            };
-            waypointModel.Images.Add(image);
-        }
-    }
-
     public async Task Delete(int id)
     {
         var waypoint = await _context.Waypoints.Include(w => w.Images).FirstOrDefaultAsync(w => w.Id == id);
         if (waypoint != null)
         {
             _context.Waypoints.Remove(waypoint);
-            await RemoveWaypointImages(waypoint);
+            await RemoveImages(waypoint);
             await _context.SaveChangesAsync();
         }
     }
 
-    public async Task Edit(AddTourWaypointsModel editTourWaypointsModel)
+    public async Task Edit(AddTourWaypointsViewModel editTourWaypointsModel)
     {
         var waypointToEdit = await _context.Waypoints.FindAsync(editTourWaypointsModel.Id);
 
@@ -70,20 +57,29 @@ public class WaypointService : IWaypointService
             waypointToEdit.Longitude = editTourWaypointsModel.Lng;
             waypointToEdit.IsRoad = editTourWaypointsModel.IsRoad;
 
-            await AddImagesToWaypoint(editTourWaypointsModel.Images, waypointToEdit);
+            await AddImages(editTourWaypointsModel.Images, waypointToEdit);
             await _context.SaveChangesAsync();
         }
     }
 
     public async Task AddImages(List<IFormFile> formFiles, WaypointModel waypointModel)
     {
-        await AddImagesToWaypoint(formFiles, waypointModel);
+        foreach (var formFile in formFiles)
+        {
+            var imageUrl = await _fileService.SaveFile(formFile, "waypoints");
+            var image = new ImageModel
+            {
+                ImageUrl = imageUrl,
+            };
+            waypointModel.Images.Add(image);
+        }
+
         await _context.SaveChangesAsync();
     }
 
-    public async Task Add(List<AddTourWaypointsModel> addTourWaypointsModel, int tourId)
+    public async Task Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId)
     {
-        var tour = await _tourService.GetTour(tourId);
+        var tour = await _tourService.GetById(tourId);
         Console.WriteLine("AddWaypoints: " + tourId);
         if (tour != null)
         {

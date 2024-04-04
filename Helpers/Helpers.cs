@@ -43,10 +43,11 @@ public static class Helpers
         services.AddTransient<ITourService, TourService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ITokenService, TokenService>();
-        services.AddTransient<IBookService, BookService>();
+        services.AddTransient<IReservationService, ReservationService>();
         services.AddTransient<IFileService, FileService>();
         services.AddTransient<IWaypointService, WaypointService>();
         services.AddTransient<IGeoService, GeoService>();
         services.AddTransient<IWeatherService, WeatherService>();
+        services.AddTransient<IMealService, MealService>();
     }
 }
