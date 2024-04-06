@@ -4,6 +4,6 @@ namespace Book.App.ViewModels;
 
 public class MealViewModel
 {
-    public MealModel MealModel;
-    public TourModel TourModel;
+    public MealModel? MealModel;
+    public TourModel? TourModel;
 }

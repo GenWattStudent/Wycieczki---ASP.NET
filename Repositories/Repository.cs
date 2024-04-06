@@ -31,7 +31,8 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
 
     public void Update(T entity)
     {
-        _dbContext.Set<T>().Update(entity);
+        // _dbContext.Set<T>().Update(entity);
+        _dbContext.Entry(entity).State = EntityState.Modified;
     }
 
     public async Task Remove(int id)

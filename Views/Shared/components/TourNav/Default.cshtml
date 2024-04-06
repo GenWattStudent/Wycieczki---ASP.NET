@@ -17,8 +17,8 @@
                 asp-route-id="@Model.Id">Map</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @Html.IsActive("Meal", "Edit")" asp-controller="Meal" asp-action="Edit"
-                asp-route-id="@Model.Id">Meal</a>
+            <a class="nav-link @Html.IsActive("Meal", "Add") @Html.IsActive("Meal", "Edit")" asp-controller="Meal"
+                asp-action="Add" asp-route-tourId="@Model.Id">Meal</a>
         </li>
     </ul>
 }

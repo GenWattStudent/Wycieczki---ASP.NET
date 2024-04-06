@@ -9,7 +9,7 @@ class Timeline {
     this.progress = 0
   }
 
-  init(meals) {
+  init() {
     this.timelineItem.each((index, element) => {
       const itemTop = element.offsetTop + element.offsetHeight / 2
       const lineDotIndicator = document.createElement('div')
@@ -20,64 +20,50 @@ class Timeline {
       this.timeLineProgress.append(lineDotIndicator)
     })
 
-    const { currentMeal, progress } = this.getCurrentMealAndProgress(this.mealsModel.$values)
-    this.currentMeal = currentMeal
-    this.progress = progress
+    const nextMeal = this.getNextMeal(this.mealsModel.$values)
+    this.progress = this.getTimelineProgress(nextMeal)
 
     this.updateTimelineProgress()
   }
 
-  getTimelineProgress(meals) {
-    const biggestDate = new Date(
-      Math.max.apply(
-        null,
-        meals.map((meal) => new Date(meal.end))
-      )
-    )
-    const smallestDate = new Date(
-      Math.min.apply(
-        null,
-        meals.map((meal) => new Date(meal.start))
-      )
-    )
-    const currentDate = new Date()
+  getTimelineProgress(meal) {
+    console.log(meal)
+    if (!meal) {
+      return 0
+    }
 
-    const secondsPassed = (currentDate - smallestDate) / 1000
-    const totalSeconds = (biggestDate - smallestDate) / 1000
-
-    return (secondsPassed / totalSeconds) * 100
+    const mealIndex = this.mealsModel.$values.indexOf(meal)
+    const now = new Date()
+    const mealTime = new Date(meal.start)
+    const diff = mealTime - now
+    const mealPercent = ((mealIndex + 2) / this.mealsModel.$values.length) * 100
+    console.log(mealIndex, this.mealsModel.$values.length)
+    const nextMealProgress = (diff / mealTime) * 100
+    console.log(nextMealProgress, mealPercent)
+    const progress = mealPercent - nextMealProgress
+    console.log(progress)
+    return progress
   }
 
-  getCurrentMealAndProgress(meals) {
-    const currentDate = new Date()
-    let currentMeal = null
-    let progress = 0
+  getCurrentMeal(meals) {}
+
+  getNextMeal(meals) {
+    let nextMeal = null
+    const now = new Date()
 
     for (let i = 0; i < meals.length; i++) {
-      const mealStart = new Date(meals[i].start)
-      const mealEnd = new Date(meals[i].end)
-
-      if (currentDate >= mealStart && currentDate <= mealEnd) {
-        currentMeal = meals[i]
-        const secondsPassed = (currentDate - mealStart) / 1000
-        const totalSeconds = (mealEnd - mealStart) / 1000
-        progress = (secondsPassed / totalSeconds) * 100
+      const mealTime = new Date(meals[i].start)
+      if (mealTime > now) {
+        nextMeal = meals[i]
         break
       }
     }
 
-    return { currentMeal, progress }
+    return nextMeal
   }
 
   updateTimelineProgress() {
-    if (!this.currentMeal) {
-      return
-    }
-
-    const currentMealIndex = this.mealsModel.$values.findIndex((meal) => meal.id === this.currentMeal.id)
-    for (let i = 0; i < currentMealIndex; i++) {
-      this.progress += 100 / this.mealsModel.$values.length
-    }
+    console.log(this.progress)
     this.currentTimelineProgress.css('height', `${this.progress}%`)
     this.currentTimelineProgressIndicator.css('top', `${this.progress}%`)
   }

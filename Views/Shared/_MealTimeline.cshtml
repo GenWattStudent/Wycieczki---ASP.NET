@@ -12,30 +12,48 @@
 @if (Model.Meals != null && Model.Meals.Count > 0)
 {
     <div id="timeline" class="glassmorphism p-3 mt-3 rounded gap-2">
+        @{
+            int day = -1;
+        }
         @foreach (var meal in Model.Meals.OrderBy(m => m.Start))
         {
-            <div class="checkpoint card">
-                <div class="timeline-item-content card-body">
-                    <small class="font-weight-bold">@meal.Start</small>
-                    <h5 class="text-primary">@meal.Name</h5>
-                    <p class="text-muted">@meal.Description</p>
-                    <span class="badge badge-secondary p-1">
-                        @meal.MealType
-                    </span>
+            <div class="checkpoint">
+                @if (day != meal.Start.Day)
+                {
+                    <h6 class="text-primary">
+                        @(DateTime.Now.Day == meal.Start.Day ? $"Today {meal.Start.ToString("hh:mm tt")}" :
+                            meal.Start.ToString("d ddd hh:mm tt"))
+                    </h6>
+                    day = meal.Start.Day;
+                }
+                <div class="card">
+                    <div class="timeline-item-content card-body">
+                        <h5 class="text-primary">@meal.Name</h5>
+                        <p class="text-muted">@meal.Description</p>
+                        <span class="badge badge-secondary p-1">
+                            @meal.MealType
+                        </span>
 
-                    @if (Model.isEditMode)
-                    {
-                        <div class="position-absolute timeline-actions">
-                            @using (Html.BeginForm("Delete", "Meal", new { id = meal.Id }, FormMethod.Post))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button data-toggle="tooltip" data-placement="top" title="Delete @meal.Name meal" type="submit"
-                                    class="btn p-0">
-                                    <ion-icon name="trash-outline"></ion-icon>
-                                </button>
-                            }
-                        </div>
-                    }
+                        @if (Model.isEditMode)
+                        {
+                            <div class="position-absolute timeline-actions d-flex gap-2">
+                                <a asp-action="Edit" asp-controller="Meal" asp-route-mealId="@meal.Id"
+                                    asp-route-tourIdd="@Model.TourId" data-toggle="tooltip" data-placement="top"
+                                    title="Delete @meal.Name meal" type="submit" class="btn p-0">
+                                    <ion-icon name="pencil"></ion-icon>
+                                </a>
+
+                                @using (Html.BeginForm("Delete", "Meal", new { id = meal.Id }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button data-toggle="tooltip" data-placement="top" title="Delete @meal.Name meal" type="submit"
+                                        class="btn p-0">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         }

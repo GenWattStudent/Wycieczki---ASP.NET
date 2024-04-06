@@ -1,24 +1,18 @@
 @using Book.App.ViewModels
 @model MealViewModel
 @{
-    ViewData["Title"] = "Edit Meal";
+    ViewData["Title"] = "Add Meals";
     var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 }
 
-@if (Model.MealModel is null)
-{
-    <div class="alert alert-danger">
-        <strong>Error!</strong> Meal not found.
-    </div>
-}
-else
+@if (Model.TourModel != null)
 {
     var timelineViewModel = new TimelineViewModel
                 {
                     isEditMode = role == "Admin",
                     Meals = Model.TourModel.Meals,
+                    TourId = Model.TourModel.Id
                 };
-
     <header class="glassmorphism p-3 rounded">
         <h1>Meals</h1>
         <small>Select nom nom!</small>
@@ -29,21 +23,21 @@ else
     </div>
 
     <section class="glassmorphism p-3 rounded mt-3">
-        @using (Html.BeginForm("Edit", "Meal", FormMethod.Post))
+
+        @using (Html.BeginForm("Add", "Meal", FormMethod.Post))
         {
             @Html.AntiForgeryToken()
 
             <div class="form-horizontal">
-                <h3>Edit meal <strong class="text-primary">@Model.MealModel.Name</strong></h3>
+                <h3>Add meal</h3>
                 <hr>
                 <partial name="_MealFormPartial" model="@Model.MealModel" />
 
                 <div class="input-group mt-2">
                     <div>
-                        <input type="submit" value="Update" class="btn btn-primary" />
+                        <input type="submit" value="Create" class="btn btn-primary" />
                     </div>
                 </div>
-
             </div>
         }
     </section>
@@ -52,19 +46,22 @@ else
         <partial name="_MealTimeline" model="@timelineViewModel" />
     </section>
 }
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Oh snap!</strong> Tour not found.
+    </div>
+}
 
 @section Scripts {
-    @if (Model.TourModel is not null)
+    @if (Model.TourModel != null)
     {
         <script src="~/js/timeline/timeline.js"></script>
         <script>
             $(document).ready(() => {
                 const mealsModel = @Html.Raw(Json.Serialize(Model.TourModel.Meals));
                 const timeline = new Timeline(mealsModel);
-
-                setInterval(() => {
-                    timeline.init();
-                }, 1000);
+                timeline.init();
             })
         </script>
     }

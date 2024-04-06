@@ -18,13 +18,14 @@ public class MealController : Controller
         _tourService = tourService;
     }
 
-    public async Task<IActionResult> Edit(int id)
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Add(int tourId)
     {
-        var tour = await _tourService.GetById(id);
+        var tour = await _tourService.GetById(tourId);
         var mealViewModel = new MealViewModel
         {
             TourModel = tour,
-            MealModel = new MealModel { TourId = id }
+            MealModel = new MealModel { TourId = tourId }
         };
 
         return View(mealViewModel);
@@ -33,20 +34,67 @@ public class MealController : Controller
     [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(int tourId, MealModel mealModel)
+    public async Task<IActionResult> Add(MealModel mealModel)
     {
-        var tour = await _tourService.GetById(tourId);
+        var tour = await _tourService.GetById(mealModel.TourId);
+        Console.WriteLine($"Adding meal {mealModel.TourId} {mealModel.Id}");
+        if (tour == null)
+        {
+            ViewData["Error"] = "Tour not found";
+            return RedirectToAction("Tours", "Tour");
+        }
+
+        await _mealService.Add(mealModel);
+
+        return RedirectToAction("Add", new { tourId = mealModel.TourId });
+    }
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Edit(int tourIdd, int mealId)
+    {
+        var tour = await _tourService.GetById(tourIdd);
 
         if (tour == null)
         {
             ViewData["Error"] = "Tour not found";
-            return RedirectToAction("Edit", new { id = tourId });
+            return RedirectToAction("Tours", "Tour");
         }
 
-        mealModel.TourId = tourId;
-        await _mealService.Add(mealModel);
+        var mealViewModel = new MealViewModel
+        {
+            TourModel = tour,
+            MealModel = tour.Meals.FirstOrDefault(m => m.Id == mealId)
+        };
 
-        return RedirectToAction("Edit", new { id = tourId });
+        return View(mealViewModel);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(MealModel model)
+    {
+        var tour = await _tourService.GetById(model.TourId);
+
+        if (tour == null)
+        {
+            ViewData["Error"] = "Tour not found";
+            return RedirectToAction("Tours", "Tour");
+        }
+
+        var mealToUpdate = tour.Meals.FirstOrDefault(m => m.Id == model.Id);
+
+        if (mealToUpdate == null)
+        {
+            ViewData["Error"] = "Meal not found";
+            return RedirectToAction("Add", new { tourId = model.TourId });
+        }
+
+        mealToUpdate.Update(model);
+
+        await _mealService.Update(mealToUpdate);
+
+        return RedirectToAction("Add", new { tourId = model.TourId });
     }
 
     [Authorize(Roles = "Admin")]
@@ -55,6 +103,6 @@ public class MealController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var meal = await _mealService.Delete(id);
-        return RedirectToAction("Edit", new { id = meal.TourId });
+        return RedirectToAction("Add", new { tourId = meal.TourId });
     }
 }

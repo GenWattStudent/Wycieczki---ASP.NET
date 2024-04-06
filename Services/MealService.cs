@@ -15,6 +15,7 @@ public class MealService : IMealService
 
     public async Task<MealModel> Add(MealModel mealModel)
     {
+        Console.WriteLine($"Adding meal {mealModel.Id} {mealModel.TourId}");
         _unitOfWork.mealRepository.Add(mealModel);
         await _unitOfWork.SaveAsync();
         return mealModel;
@@ -39,5 +40,19 @@ public class MealService : IMealService
         _unitOfWork.mealRepository.Remove(meal);
         await _unitOfWork.SaveAsync();
         return meal;
+    }
+
+    public async Task Update(MealModel mealModel)
+    {
+        Console.WriteLine($"Updating meal {mealModel.Id} {mealModel.TourId}");
+
+        //Consloe write all the properties of mealModel
+        foreach (var prop in mealModel.GetType().GetProperties())
+        {
+            Console.WriteLine($"{prop.Name} = {prop.GetValue(mealModel, null)}");
+        }
+
+        _unitOfWork.mealRepository.Update(mealModel);
+        await _unitOfWork.SaveAsync();
     }
 }
