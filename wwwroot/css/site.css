@@ -227,8 +227,6 @@ body * {
 }
 /* Time line styles */
 .checkpoint {
-  /* display: flex;
-  flex-direction: column; */
   position: relative;
   width: calc(50% - 1rem);
 }
@@ -264,6 +262,11 @@ body * {
   transform: translateX(-20%);
 }
 
+.current-progress-indicator {
+  z-index: 1;
+  animation: timeline-pulse 1s infinite;
+}
+
 .checkpoint:nth-child(even) .timeline-actions {
   top: 0.5rem;
   left: 0.5rem;
@@ -272,4 +275,35 @@ body * {
 .checkpoint:nth-child(odd) .timeline-actions {
   top: 0.5rem;
   right: 0.5rem;
+}
+
+.timeline-starts-in.left::before,
+.timeline-starts-in.right::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  rotate: 45deg;
+  background-color: inherit;
+  z-index: -1;
+}
+
+.timeline-starts-in.left::before {
+  right: 0;
+}
+
+.timeline-starts-in.right::before {
+  left: 0;
+}
+
+@keyframes timeline-pulse {
+  0% {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfba6;
+  }
+  50% {
+    box-shadow: 0 0 0 0.1rem rgb(215, 64, 64), 0 0 0 0.5rem #258cfb8a;
+  }
+  100% {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb7d;
+  }
 }

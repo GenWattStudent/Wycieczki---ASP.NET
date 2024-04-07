@@ -17,6 +17,7 @@ public class ReservationSpecification : BaseSpecification<ReservationModel>
         IncludeStrings.Add("Tour.Images");
         IncludeStrings.Add("Tour.Waypoints");
         IncludeStrings.Add("Tour.Waypoints.Images");
+        IncludeStrings.Add("Tour.Meals");
     }
 
     public void FilterByTour(int tourId)

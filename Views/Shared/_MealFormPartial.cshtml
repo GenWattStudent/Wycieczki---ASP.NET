@@ -72,7 +72,7 @@
             @class = "form-control w-100",
             type =
             "datetime-local",
-            min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm")
+            @* min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") *@
         })
     @Html.ValidationMessageFor(model => model.End, "", new { @class = "field-validation-error text-danger" })
 </div>

@@ -48,7 +48,7 @@ else
         }
     </section>
 
-    <section>
+    <section id="edit-timeline">
         <partial name="_MealTimeline" model="@timelineViewModel" />
     </section>
 }
@@ -56,14 +56,15 @@ else
 @section Scripts {
     @if (Model.TourModel is not null)
     {
-        <script src="~/js/timeline/timeline.js"></script>
-        <script>
+        <script type="module">
+            import Timeline from "/js/timeline/timeline.js";
             $(document).ready(() => {
                 const mealsModel = @Html.Raw(Json.Serialize(Model.TourModel.Meals));
-                const timeline = new Timeline(mealsModel);
+                const timeline = new Timeline(mealsModel, "#edit-timeline");
+                timeline.init()
 
                 setInterval(() => {
-                    timeline.init();
+                    timeline.update();
                 }, 1000);
             })
         </script>

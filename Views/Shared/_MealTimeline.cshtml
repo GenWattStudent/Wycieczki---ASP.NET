@@ -1,9 +1,10 @@
 @using Book.App.ViewModels
+@using Book.App.Helpers;
 @model TimelineViewModel
 
 @if ((Model.Meals == null || Model.Meals.Count == 0) && !Model.isEditMode)
 {
-    <div class="alert alert-info mt-3">
+    <div class="alert alert-info mt-3 d-flex align-items-center gap-2">
         <ion-icon name="information-circle-outline"></ion-icon>
         <span>No meals found</span>
     </div>
@@ -21,15 +22,19 @@
                 @if (day != meal.Start.Day)
                 {
                     <h6 class="text-primary">
-                        @(DateTime.Now.Day == meal.Start.Day ? $"Today {meal.Start.ToString("hh:mm tt")}" :
-                            meal.Start.ToString("d ddd hh:mm tt"))
+                        @(DateTime.Now.Day == meal.Start.Day ? "Today" :
+                            meal.Start.ToString("d ddd"))
                     </h6>
+
                     day = meal.Start.Day;
                 }
+                <h6 class="text-muted">
+                    @meal.Start.ToString("hh:mm tt") - @meal.End.ToString("hh:mm tt")
+                </h6>
                 <div class="card">
                     <div class="timeline-item-content card-body">
-                        <h5 class="text-primary">@meal.Name</h5>
-                        <p class="text-muted">@meal.Description</p>
+                        <h5 class="text-primary">@meal.Name.Truncate(35)</h5>
+                        <p class="text-muted">@meal.Description.Truncate(70)</p>
                         <span class="badge badge-secondary p-1">
                             @meal.MealType
                         </span>
@@ -39,7 +44,7 @@
                             <div class="position-absolute timeline-actions d-flex gap-2">
                                 <a asp-action="Edit" asp-controller="Meal" asp-route-mealId="@meal.Id"
                                     asp-route-tourIdd="@Model.TourId" data-toggle="tooltip" data-placement="top"
-                                    title="Delete @meal.Name meal" type="submit" class="btn p-0">
+                                    title="Edit @meal.Name meal" type="submit" class="btn p-0">
                                     <ion-icon name="pencil"></ion-icon>
                                 </a>
 
@@ -61,6 +66,11 @@
             <div class="line-progress"></div>
             <div id="current-timeline-progress" class="current-progress bg-success"></div>
             <div id="current-timeline-progress-indicator" class="current-progress-indicator bg-danger"></div>
+            <div id="timeline-starts-in"
+                class="bg-danger align-items-center justify-content-center position-absolute rounded d-none timeline-starts-in"
+                style="width: 120px; height: 35px;">
+                <p class="text-light m-0"></p>
+            </div>
         </div>
     </div>
 }
