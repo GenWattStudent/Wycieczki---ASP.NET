@@ -34,32 +34,28 @@ public class WaypointService : IWaypointService
             }
         }
     }
-    public async Task Delete(int id)
+    public async Task Delete(WaypointModel waypoint)
     {
-        var waypoint = await _context.Waypoints.Include(w => w.Images).FirstOrDefaultAsync(w => w.Id == id);
-        if (waypoint != null)
-        {
-            _context.Waypoints.Remove(waypoint);
-            await RemoveImages(waypoint);
-            await _context.SaveChangesAsync();
-        }
+        _context.Waypoints.Remove(waypoint);
+        await RemoveImages(waypoint);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task Edit(AddTourWaypointsViewModel editTourWaypointsModel)
+    public async Task<WaypointModel?> Edit(WaypointModel waypoint)
     {
-        var waypointToEdit = await _context.Waypoints.FindAsync(editTourWaypointsModel.Id);
+        var waypointDb = await Get(waypoint.Id);
 
-        if (waypointToEdit != null)
+        if (waypointDb == null)
         {
-            waypointToEdit.Name = editTourWaypointsModel.Name;
-            waypointToEdit.Description = editTourWaypointsModel.Description;
-            waypointToEdit.Latitude = editTourWaypointsModel.Lat;
-            waypointToEdit.Longitude = editTourWaypointsModel.Lng;
-            waypointToEdit.IsRoad = editTourWaypointsModel.IsRoad;
-
-            await AddImages(editTourWaypointsModel.Images, waypointToEdit);
-            await _context.SaveChangesAsync();
+            return null;
         }
+
+        waypointDb.Edit(waypoint);
+
+        _context.Waypoints.Update(waypointDb);
+        await _context.SaveChangesAsync();
+
+        return waypointDb;
     }
 
     public async Task AddImages(List<IFormFile> formFiles, WaypointModel waypointModel)
@@ -80,14 +76,25 @@ public class WaypointService : IWaypointService
     public async Task Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId)
     {
         var tour = await _tourService.GetById(tourId);
-        Console.WriteLine("AddWaypoints: " + tourId);
+
         if (tour != null)
         {
-            Console.WriteLine("AddWaypoints: " + addTourWaypointsModel.Count);
             foreach (var waypointModel in addTourWaypointsModel)
             {
-                var waypoint = new WaypointModel(waypointModel);
-                tour.Waypoints.Add(waypoint);
+                var waypoint = tour.Waypoints.FirstOrDefault(w => w.Id == waypointModel.Id && w.Id != 0);
+
+                if (waypoint != null)
+                {
+                    waypoint.Edit(waypointModel);
+                    _context.Waypoints.Update(waypoint);
+                }
+                else
+                {
+                    waypointModel.Name = "Waypoint " + (tour.Waypoints.Count + 1);
+                    var newWaypoint = new WaypointModel(waypointModel);
+                    Console.WriteLine(newWaypoint.Name);
+                    tour.Waypoints.Add(newWaypoint);
+                }
             }
 
             await _context.SaveChangesAsync();

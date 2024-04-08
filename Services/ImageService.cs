@@ -54,4 +54,27 @@ public class ImageService : IImageService
             await _unitOfWork.imageRepository.SaveAsync();
         }
     }
+
+    public async Task AddImagesToWaypoint(List<IFormFile> files, int waypointId)
+    {
+        var waypoint = await _unitOfWork.waypointRepository.GetById(waypointId);
+
+        if (waypoint != null)
+        {
+            var imageUrls = await _fileService.SaveFiles(files, _tourFolder);
+
+            foreach (var imageUrl in imageUrls)
+            {
+                if (!waypoint.Images.Any(i => i.ImageUrl == imageUrl))
+                {
+                    waypoint.Images.Add(new ImageModel
+                    {
+                        ImageUrl = imageUrl
+                    });
+                }
+            }
+
+            await _unitOfWork.imageRepository.SaveAsync();
+        }
+    }
 }

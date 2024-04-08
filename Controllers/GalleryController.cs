@@ -34,6 +34,16 @@ public class GalleryController : Controller
     }
 
     [Authorize(Roles = "Admin")]
+    // POST: Gallery{waypointId}
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddImageToWaypoint(List<IFormFile> files, int id, int tourId)
+    {
+        await _imageService.AddImagesToWaypoint(files, id);
+        return RedirectToAction("EditWaypoints", "Waypoint", new { tourId, waypointId = id });
+    }
+
+    [Authorize(Roles = "Admin")]
     // POST: Gallery/Delete{imageId}
     public async Task<IActionResult> Delete(int id, int tourId)
     {

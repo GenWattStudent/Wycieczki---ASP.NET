@@ -35,4 +35,20 @@ public class WaypointModel : BaseEntity
         IsRoad = waypoint.IsRoad;
         Type = waypoint.Type;
     }
+
+    public void Edit(WaypointModel waypoint)
+    {
+        Name = waypoint.Name;
+        Description = waypoint.Description;
+    }
+
+    public void Edit(AddTourWaypointsViewModel waypoint)
+    {
+        Name = waypoint.Name;
+        Description = waypoint.Description;
+        Latitude = waypoint.Lat;
+        Longitude = waypoint.Lng;
+        IsRoad = waypoint.IsRoad;
+        Type = waypoint.Type;
+    }
 }

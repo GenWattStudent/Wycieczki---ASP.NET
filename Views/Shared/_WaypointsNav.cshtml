@@ -1,0 +1,14 @@
+@using Book.App.ViewModels
+@using Book.App.Helpers
+@model EditWaypointsViewModel
+
+<ul class="nav nav-pills">
+    @foreach (var waypoint in Model.Waypoints)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(Model.CurrentWaypoint != null && waypoint.Id == Model.CurrentWaypoint.Id ? "active" : "")"
+                asp-controller="Waypoint" asp-action="EditWaypoints" asp-route-tourId="@waypoint.Tour.Id"
+                asp-route-waypointId="@waypoint.Id">@waypoint.Name</a>
+        </li>
+    }
+</ul>

@@ -8,6 +8,7 @@ public class UnitOfWork : IUnitOfWork
     public IReservationRepository reservationRepository => new ReservationRepository(_dbContext);
     public IImageRepository imageRepository => new ImageRepository(_dbContext);
     public IMealRepository mealRepository => new MealRepository(_dbContext);
+    public IWaypointRepository waypointRepository => new WaypointRepository(_dbContext);
 
     public UnitOfWork(ApplicationDbContext dbContext)
     {

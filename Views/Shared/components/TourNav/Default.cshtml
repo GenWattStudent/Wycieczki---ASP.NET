@@ -1,6 +1,10 @@
 @using Book.App.Helpers
 @model TourModel
 
+@{
+    var waypoint = Model.Waypoints.FirstOrDefault();
+}
+
 @if (Model != null)
 {
     <ul class="nav nav-tabs">
@@ -20,6 +24,20 @@
             <a class="nav-link @Html.IsActive("Meal", "Add") @Html.IsActive("Meal", "Edit")" asp-controller="Meal"
                 asp-action="Add" asp-route-tourId="@Model.Id">Meal</a>
         </li>
+        @if (waypoint != null)
+        {
+            <li class="nav-item">
+                <a class="nav-link @Html.IsActive("Waypoint", "EditWaypoints")" asp-controller="Waypoint"
+                    asp-action="EditWaypoints" asp-route-tourId="@Model.Id" asp-route-waypointId="@waypoint.Id">Waypoints</a>
+            </li>
+        }
+        else
+        {
+            <li data-toggle="tooltip" data-placement="top" title="Add first waypoints in Map" class="nav-item">
+                <a class="nav-link disabled">Waypoints</a>
+            </li>
+        }
+
     </ul>
 }
 else

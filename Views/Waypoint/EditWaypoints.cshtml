@@ -1,0 +1,61 @@
+@using Book.App.ViewModels
+@model EditWaypointsViewModel
+
+@{
+    ViewData["Title"] = "Edit Waypoints";
+    var galleryViewModel = new GalleryViewModel
+            {
+                TourId = Model.TourId,
+                Images = Model.CurrentWaypoint != null ? Model.CurrentWaypoint.Images : new()
+            };
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h1>
+        You are editing
+        <strong class="text-primary">
+            @(Model.CurrentWaypoint == null ? "(Didn't found waypoint)" : Model.CurrentWaypoint.Name)
+        </strong>
+    </h1>
+    <small>Make them intresting!</small>
+</header>
+
+<div class="glassmorphism p-3 mt-3 rounded">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.TourId })
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    <partial name="_WaypointsNav" model="Model" />
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    <partial name="_WaypointForm" model="Model.CurrentWaypoint" />
+</div>
+
+@if (Model.CurrentWaypoint != null)
+{
+    <div class="glassmorphism p-3 rounded mt-3">
+        <h4>Waypoint Gallery</h4>
+        <form id="addImageForm" asp-controller="Gallery" asp-action="AddImageToWaypoint"
+            asp-route-id="@Model.CurrentWaypoint.Id" asp-route-tourId="@Model.TourId" method="post"
+            enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <input type="file" class="form-control" id="files" name="files" multiple accept="image/*">
+            </div>
+        </form>
+
+        <div class="d-flex flex-wrap gap-3">
+            <partial name="_Gallery" model="@galleryViewModel" />
+        </div>
+    </div>
+}
+
+<partial name="_PreviewModal" />
+
+<a asp-action="Delete" asp-controller="Waypoint" asp-route-id="@Model.CurrentWaypoint?.Id"
+    asp-route-tourId="@Model.TourId" class="btn btn-danger mt-3">Delete Waypoint</a>
+
+@section Scripts {
+    <script defer src="~/js/gallery/gallery.js"></script>
+}

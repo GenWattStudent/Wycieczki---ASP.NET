@@ -13,16 +13,38 @@
     @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
 </div>
 
+<div class="glassmorphism p-3 rounded mt-3">
+    <partial name="_MapTools" />
+
+    <div id="map" class="mt-2"></div>
+</div>
+
 <form id="waypointsForm" asp-controller="Waypoint" asp-action="Add" asp-route-tourId="@Model.Id" method="post"
     enctype="multipart/form-data">
     @Html.AntiForgeryToken()
-    <div class="glassmorphism p-3 rounded mt-3">
-        <partial name="_MapTools" />
+    @{
+        var index = 0;
+    }
 
-        <div id="map" class="mt-2"></div>
-    </div>
+    @foreach (var waypoint in Model.Waypoints)
+    {
+        <input id="@("waypointId" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Id"
+            value="@waypoint.Id" />
+        <input id="@("waypointLat" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Lat"
+            value="@waypoint.Latitude" />
+        <input id="@("waypointLng" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Lng"
+            value="@waypoint.Longitude" />
+        <input id="@("waypointType" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Type"
+            value="@waypoint.Type" />
+        <input id="@("waypointName" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Name"
+            value="@waypoint.Name" />
+        <input id="@("waypointDescription" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Description"
+            value="@("")" />
+        index++;
+    }
     <button type="submit" class="btn btn-primary mt-3">Save tour</button>
 </form>
+
 
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -54,13 +76,17 @@
         const model = @Html.Raw(Json.Serialize(Model));
 
         model.waypoints.$values.forEach(waypoint => {
+            console.log(waypoint);
             const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
             adminMap.addWaypoint(waypointObj, waypointObj.type, true);
 
-            const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
-            const bounds = L.latLngBounds(latLngs);
-            adminMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
-
+            if (model.waypoints.$values.length > 1) {
+                const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
+                const bounds = L.latLngBounds(latLngs);
+                adminMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
+            } else {
+                adminMap.map.setView([ waypoint.latitude, waypoint.longitude ], 13);
+            }
         });
 
         function createInput(name, value, id, index) {
@@ -71,7 +97,8 @@
             input.id = id;
             return input;
         }
-        let waypointIndex = 0;
+        let waypointIndex = model.waypoints.$values.length;
+        console.log(waypointIndex);
         document.addEventListener('waypointAdded', function (e) {
             const waypoint = e.detail.waypoint;
 
@@ -96,5 +123,12 @@
             document.getElementById(`waypointType${id}`).remove();
             waypointIndex--;
         });
+
+        document.addEventListener('waypointMoved', function (e) {
+            const waypoint = e.detail.waypoint;
+            console.log(waypoint);
+            document.getElementById(`waypointLat${waypoint.id}`).value = waypoint.lat;
+            document.getElementById(`waypointLng${waypoint.id}`).value = waypoint.lng;
+        })
     </script>
 }
