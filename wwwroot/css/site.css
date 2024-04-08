@@ -4,6 +4,10 @@ html {
   font-size: 14px;
 }
 
+:root {
+  --timeline-action-position: 0.5rem;
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -268,13 +272,13 @@ body * {
 }
 
 .checkpoint:nth-child(even) .timeline-actions {
-  top: 0.5rem;
-  left: 0.5rem;
+  bottom: var(--timeline-action-position);
+  left: var(--timeline-action-position);
 }
 
 .checkpoint:nth-child(odd) .timeline-actions {
-  top: 0.5rem;
-  right: 0.5rem;
+  bottom: var(--timeline-action-position);
+  right: var(--timeline-action-position);
 }
 
 .timeline-starts-in.left::before,

@@ -25,14 +25,15 @@ class BreakInfo {
         : `0${Math.floor((date % (1000 * 60)) / 1000)}`
 
     this.timelineStartsInP.text(`${days}d ${hours}h ${minutes}m ${seconds}s`)
-
+    console.log(date, this.timeline.parent)
     if (date <= 0) {
       this.timelineStartsInP.text('00d 00h 00m 00s')
       const timelineStartsIn = $(`${this.timeline.parent} #timeline-starts-in`)
+      console.log(timelineStartsIn)
       timelineStartsIn.removeClass('d-flex')
       timelineStartsIn.addClass('d-none')
       // create event breakend
-      document.dispatchEvent(new Event('breakend'))
+      document.dispatchEvent(new CustomEvent('breakend', { detail: { parent: this.timeline.parent } }))
     }
   }
 
@@ -81,10 +82,21 @@ class Timeline {
     this.progress = 0
     this.breakInfo = null
 
-    document.addEventListener('breakend', () => (this.breakInfo = null))
+    document.addEventListener('breakend', (e) => {
+      const { parent } = e.detail
+      if (parent === this.parent) {
+        this.breakInfo = null
+      }
+    })
+
+    window.addEventListener('resize', (e) => this.init())
   }
 
-  init() {
+  init = () => {
+    console.log('init')
+    // remove all dots
+    $(`${this.parent} .line-dot`).remove()
+
     this.timelineItem.each((index, element) => {
       const itemTop = element.offsetTop + element.offsetHeight / 2
       const lineDotIndicator = document.createElement('div')
@@ -107,14 +119,14 @@ class Timeline {
 
   getDatePercent(start, end) {
     const percent = (new Date() - start) / (end - start)
-    return percent > 1 ? 1 : percent < 0 ? 1 - percent : percent
+    return percent > 1 ? 1 : percent < 0 ? 1 + percent : percent
   }
 
   getHeightWhenNotPrevMeal(meal, index) {
     const checkpointHeight = this.dots[index].offsetTop
-    return (
-      this.getDatePercent(new Date(meal.start), new Date(meal.end)) * this.timeLineProgress.height() + checkpointHeight
-    )
+    const nextMealHeight = this.dots[index + 1].offsetTop
+    const percent = this.getDatePercent(new Date(meal.start), new Date(meal.end))
+    return percent * (nextMealHeight - checkpointHeight) + checkpointHeight
   }
 
   getHeightWhenNotNextMeal(meal, index) {
@@ -152,10 +164,12 @@ class Timeline {
         return checkpointHeight
       } else {
         const nextMeal = this.getNextMealFromNow(this.mealsModel)
+
         if (nextMeal) {
           const nextIndex = this.mealsModel.indexOf(nextMeal)
           const checkpointHeight = this.dots[nextIndex].offsetTop
           const percent = this.getDatePercent(new Date(nextMeal.start), new Date(nextMeal.end))
+          console.log(percent)
           return checkpointHeight * percent
         } else {
           return this.timeLineProgress.height()

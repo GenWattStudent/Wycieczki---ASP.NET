@@ -17,6 +17,7 @@ else
                 {
                     isEditMode = role == "Admin",
                     Meals = Model.TourModel.Meals,
+                    TourId = Model.TourModel.Id,
                 };
 
     <header class="glassmorphism p-3 rounded">
@@ -56,8 +57,7 @@ else
 @section Scripts {
     @if (Model.TourModel is not null)
     {
-        <script type="module">
-            import Timeline from "/js/timeline/timeline.js";
+        <script>
             $(document).ready(() => {
                 const mealsModel = @Html.Raw(Json.Serialize(Model.TourModel.Meals));
                 const timeline = new Timeline(mealsModel, "#edit-timeline");

@@ -28,14 +28,16 @@
 
                     day = meal.Start.Day;
                 }
-                <h6 class="text-muted">
+                <h6 class="text-muted" style="font-size: 0.7rem;">
                     @meal.Start.ToString("hh:mm tt") - @meal.End.ToString("hh:mm tt")
                 </h6>
                 <div class="card">
-                    <div class="timeline-item-content card-body">
-                        <h5 class="text-primary">@meal.Name.Truncate(35)</h5>
-                        <p class="text-muted">@meal.Description.Truncate(70)</p>
-                        <span class="badge badge-secondary p-1">
+                    <header class="card-header p-1">
+                        <h6 class="text-primary">@meal.Name.Truncate(35)</h6>
+                    </header>
+                    <div class="timeline-item-content card-body p-1">
+                        <p class="text-muted" style="font-size: 0.8rem;">@meal.Description.Truncate(70)</p>
+                        <span class="badge badge-secondary p-1" style="font-size: 0.6rem;">
                             @meal.MealType
                         </span>
 
