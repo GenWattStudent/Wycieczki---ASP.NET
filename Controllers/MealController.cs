@@ -69,6 +69,19 @@ public class MealController : Controller
         return View(mealViewModel);
     }
 
+    [Authorize]
+    public async Task<IActionResult> Details(int tourId)
+    {
+        var tour = await _tourService.GetById(tourId);
+        var mealViewModel = new MealViewModel
+        {
+            TourModel = tour,
+            MealModel = new MealModel { TourId = tourId }
+        };
+
+        return View(mealViewModel);
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]

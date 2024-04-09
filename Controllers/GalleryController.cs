@@ -33,6 +33,15 @@ public class GalleryController : Controller
         return RedirectToAction("Edit", new { id });
     }
 
+
+    [Authorize]
+    // GET Details
+    public async Task<IActionResult> Details(int id)
+    {
+        var tour = await _tourService.GetById(id);
+        return View(tour);
+    }
+
     [Authorize(Roles = "Admin")]
     // POST: Gallery{waypointId}
     [HttpPost]

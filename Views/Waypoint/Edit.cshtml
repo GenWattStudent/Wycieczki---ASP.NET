@@ -10,7 +10,7 @@
 </header>
 
 <div class="glassmorphism p-3 mt-3 rounded">
-    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id, isEdit = true })
 </div>
 
 <div class="glassmorphism p-3 rounded mt-3">
@@ -39,7 +39,7 @@
         <input id="@("waypointName" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Name"
             value="@waypoint.Name" />
         <input id="@("waypointDescription" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Description"
-            value="@("")" />
+            value="@(waypoint.Description)" />
         index++;
     }
     <button type="submit" class="btn btn-primary mt-3">Save tour</button>
@@ -55,7 +55,7 @@
 
     <script src="~/js/adminMap.js" type="module"></script>
 
-    <script type="module">
+    <script type="module" defer>
         import { Waypoint } from '/js/waypoint.js';
         import { adminMap } from '/js/adminMap.js';
 

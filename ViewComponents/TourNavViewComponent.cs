@@ -1,5 +1,5 @@
-using Book.App.Models;
 using Book.App.Services;
+using Book.App.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Book.App.ViewComponents;
@@ -13,11 +13,15 @@ public class TourNavViewComponent : ViewComponent
         _tourService = tourService;
     }
 
-    public async Task<IViewComponentResult> InvokeAsync(int tourId)
+    public async Task<IViewComponentResult> InvokeAsync(int tourId, bool isEdit = false)
     {
-        // var model = new FilterModel();
-        Console.WriteLine("TourNavViewComponent: " + tourId);
         var tour = await _tourService.GetById(tourId);
-        return View(tour);
+        var tourNavViewModel = new TourNavViewModel
+        {
+            TourModel = tour,
+            IsEdit = isEdit
+        };
+
+        return View(tourNavViewModel);
     }
 }

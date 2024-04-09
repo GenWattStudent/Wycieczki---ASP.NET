@@ -1,0 +1,56 @@
+@using Book.App.Models
+@using Book.App.ViewModels
+@model TourModel
+
+@{
+    ViewData["Title"] = "Waypoints";
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h2>Waypoints <strong class="text-primary">@Model.Name</strong></h2>
+    <small>Here you can see all the waypoints of the tour</small>
+</header>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    @foreach (var waypoint in Model.Waypoints.Where(w => w.Type != WaypointType.Road))
+    {
+        var imageSliderViewModel = new ImageSliderViewModel
+                {
+                    Images = waypoint.Images,
+                    SliderId = waypoint.Id
+                };
+
+        <div class="card-header">
+            <partial name="_ImageSliderPartial" model="imageSliderViewModel" />
+            <a class="text-decoration-none text-dark" asp-action="Details" asp-controller="Waypoint"
+                asp-route-id="@waypoint.Id" data-toggle="tooltip" title="See forecast">
+                <h5 class="card-title">@waypoint.Name</h5>
+            </a>
+        </div>
+        <a class="text-decoration-none text-dark" asp-action="Details" asp-controller="Waypoint" asp-route-id="@waypoint.Id"
+            data-toggle="tooltip" title="See forecast">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="card-text">@waypoint.Description</p>
+
+                    <div class="d-flex gap-2">
+                        <div class="badge bg-primary">
+                            <small>Latitude: @Math.Round(waypoint.Latitude, 5)</small>
+                        </div>
+                        <div class="badge bg-primary">
+                            <small>Longitude: @Math.Round(waypoint.Longitude, 5)</small>
+                        </div>
+
+                        <div class="badge bg-warning">
+                            @waypoint.Type
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    }
+</div>

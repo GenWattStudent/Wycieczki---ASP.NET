@@ -5,6 +5,11 @@
 <ul class="nav nav-pills">
     @foreach (var waypoint in Model.Waypoints)
     {
+        if (waypoint.Type == WaypointType.Road)
+        {
+            continue;
+        }
+
         <li class="nav-item">
             <a class="nav-link @(Model.CurrentWaypoint != null && waypoint.Id == Model.CurrentWaypoint.Id ? "active" : "")"
                 asp-controller="Waypoint" asp-action="EditWaypoints" asp-route-tourId="@waypoint.Tour.Id"

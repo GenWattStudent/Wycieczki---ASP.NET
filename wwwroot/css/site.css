@@ -233,15 +233,43 @@ body * {
 .checkpoint {
   position: relative;
   width: calc(50% - 1rem);
+  opacity: 0;
 }
 
 .checkpoint:nth-child(odd) {
   left: calc(50% + 1rem);
+  animation: transle-with-opacity-left 0.5s ease-in-out forwards;
+  animation-delay: var(--delay);
 }
 
 .checkpoint:nth-child(even) {
   text-align: right;
   margin-right: -1rem;
+  transform: translateX(-10px);
+  animation: transle-with-opacity-right 0.5s ease-in-out forwards;
+  animation-delay: var(--delay);
+}
+
+@keyframes transle-with-opacity-left {
+  0% {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes transle-with-opacity-right {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .line,
@@ -250,6 +278,8 @@ body * {
   left: 50%;
   width: 3px;
   top: 0;
+  height: 0;
+  transition: height 2s ease;
 }
 
 .line {
@@ -264,11 +294,13 @@ body * {
   position: absolute;
   left: -50%;
   transform: translateX(-20%);
+  top: 0;
 }
 
 .current-progress-indicator {
   z-index: 1;
   animation: timeline-pulse 1s infinite;
+  transition: top 2s ease;
 }
 
 .checkpoint:nth-child(even) .timeline-actions {
@@ -310,4 +342,32 @@ body * {
   100% {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb7d;
   }
+}
+
+.waypoint-arrow.active {
+  animation: right 1.5s infinite;
+  scale: 1.1;
+}
+
+@keyframes right {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.25rem);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  background-color: #a3bad2;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #258cfb;
+  border-radius: 10px;
 }

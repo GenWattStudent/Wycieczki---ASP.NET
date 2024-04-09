@@ -14,7 +14,7 @@ public class WaypointModel : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public List<ImageModel> Images { get; set; } = new List<ImageModel>();
+    public List<ImageModel> Images { get; set; } = new();
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public int TourId { get; set; }
@@ -28,12 +28,7 @@ public class WaypointModel : BaseEntity
 
     public WaypointModel(AddTourWaypointsViewModel waypoint)
     {
-        Name = waypoint.Name;
-        Description = waypoint.Description;
-        Latitude = waypoint.Lat;
-        Longitude = waypoint.Lng;
-        IsRoad = waypoint.IsRoad;
-        Type = waypoint.Type;
+        Edit(waypoint);
     }
 
     public void Edit(WaypointModel waypoint)

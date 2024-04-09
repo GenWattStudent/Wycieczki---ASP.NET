@@ -2,19 +2,28 @@
 @model List<WaypointModel>
 
 <div class="d-flex gap-2 mt-3 flex-wrap">
-    @foreach (var waypoint in Model)
+    @{
+        var index = 0;
+        var waypointsWithoutRoad = Model.Where(w => w.Type != WaypointType.Road).ToList();
+    }
+    @foreach (var waypoint in waypointsWithoutRoad)
     {
-        @if (waypoint.Type != WaypointType.Road)
-        {
-            <div class="d-flex align-items-center">
-                <a class="text-secondary" asp-action="Details" asp-controller="Waypoint" asp-route-id="@waypoint.Id">
-                    <strong class="d-block pe-2">@waypoint.Name</strong>
-                </a>
-                @if (@Model.Last() != waypoint)
+        <div class="d-flex align-items-center">
+            <a class="text-secondary" asp-action="Details" asp-controller="Waypoint" asp-route-id="@waypoint.Id">
+                <strong data-tour-waypoint id="waypoint-@waypoint.Id" class="d-block pe-2 waypoint">@waypoint.Name</strong>
+            </a>
+
+            @if (index < waypointsWithoutRoad.Count - 1)
+            {
+                var nextWaypoint = waypointsWithoutRoad[index + 1];
+
+                if (nextWaypoint != null)
                 {
-                    <ion-icon class="text-primary" name="arrow-forward"></ion-icon>
+                    <ion-icon data-tour-waypoint-arrow id="waypoint-arrow-@nextWaypoint.Id" class="text-primary waypoint-arrow"
+                        name="arrow-forward"></ion-icon>
                 }
-            </div>
-        }
+            }
+        </div>
+        index++;
     }
 </div>

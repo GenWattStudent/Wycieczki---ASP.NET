@@ -11,12 +11,14 @@ public class WaypointController : Controller
     private readonly IWaypointService _waypointService;
     private readonly ITourService _tourService;
     private readonly IWeatherService _weatherService;
+    private readonly IReservationService _reservationService;
 
-    public WaypointController(IWaypointService waypointService, IWeatherService weatherService, ITourService tourService)
+    public WaypointController(IWaypointService waypointService, IWeatherService weatherService, ITourService tourService, IReservationService reservationService)
     {
         _waypointService = waypointService;
         _weatherService = weatherService;
         _tourService = tourService;
+        _reservationService = reservationService;
     }
 
     [Authorize(Roles = "Admin")]
@@ -43,7 +45,7 @@ public class WaypointController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var waypoint = await _waypointService.Get(id);
-        Console.WriteLine(waypoint.Id);
+
         if (waypoint == null)
         {
             TempData["ErrorMessage"] = "Waypoint not found";
@@ -58,7 +60,6 @@ public class WaypointController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(WaypointModel waypoint)
     {
-        Console.WriteLine("EDIT HAHAHA");
         var waypointDb = await _waypointService.Edit(waypoint);
 
         if (waypointDb == null)
@@ -66,7 +67,7 @@ public class WaypointController : Controller
             TempData["ErrorMessage"] = "Waypoint not found";
             return RedirectToAction("EditTour", "Tour", new { id = waypoint.TourId });
         }
-        Console.WriteLine(waypointDb.Id + " " + waypointDb.TourId);
+
         return RedirectToAction("EditWaypoints", new { tourId = waypointDb.TourId, waypointId = waypointDb.Id });
     }
 
@@ -125,8 +126,29 @@ public class WaypointController : Controller
     [HttpPost]
     public async Task<IActionResult> Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId)
     {
-        Console.WriteLine("ADD WAYPOINT " + addTourWaypointsModel[0].Description == null);
         await _waypointService.Add(addTourWaypointsModel, tourId);
         return RedirectToAction("Edit", new { id = tourId });
+    }
+
+    [Authorize]
+    public async Task<IActionResult> MapView(int id)
+    {
+        var tour = await _tourService.GetById(id);
+
+        if (tour == null)
+        {
+            TempData["ErrorMessage"] = "Tour not found";
+            return RedirectToAction("Tours", "Tour");
+        }
+
+        var bookViewModel = _reservationService.GetBookViewModel(tour);
+        return View(bookViewModel);
+    }
+
+    [Authorize]
+    public async Task<IActionResult> WaypointsDetails(int tourId)
+    {
+        var tour = await _tourService.GetById(tourId);
+        return View(tour);
     }
 }

@@ -16,7 +16,7 @@
 </header>
 
 <div class="glassmorphism p-3 mt-3 rounded">
-    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id, isEdit = true })
 </div>
 
 <div class="glassmorphism p-3 rounded mt-3">

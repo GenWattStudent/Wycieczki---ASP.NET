@@ -93,7 +93,6 @@ class Timeline {
   }
 
   init = () => {
-    console.log('init')
     // remove all dots
     $(`${this.parent} .line-dot`).remove()
 
@@ -108,6 +107,15 @@ class Timeline {
     })
     this.dots = $(`${this.parent} .line-dot`)
     this.update()
+    // transition end event
+    this.currentTimelineProgressIndicator.on('transitionend', () => {
+      $(this.parent).animate(
+        {
+          scrollTop: this.currentTimelineProgressIndicator.offset().top - $(this.parent).offset().top - 100,
+        },
+        1000
+      )
+    })
   }
 
   update() {

@@ -12,13 +12,14 @@
 
 @if (Model.Meals != null && Model.Meals.Count > 0)
 {
-    <div id="timeline" class="glassmorphism p-3 mt-3 rounded gap-2">
+    <div id="timeline" class="gap-2 position-relative">
         @{
             int day = -1;
+            var index = 0;
         }
         @foreach (var meal in Model.Meals.OrderBy(m => m.Start))
         {
-            <div class="checkpoint">
+            <div class="checkpoint" style="--delay: @(index / 2)s">
                 @if (day != meal.Start.Day)
                 {
                     <h6 class="text-primary">
@@ -63,6 +64,7 @@
                     </div>
                 </div>
             </div>
+            index++;
         }
         <div id="timeline-progress" class="line position-absolute bg-primary">
             <div class="line-progress"></div>

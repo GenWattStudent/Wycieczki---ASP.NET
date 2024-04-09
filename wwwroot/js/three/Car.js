@@ -5,6 +5,6 @@ export default class Car {
     this.assets = assets
     this.scene.add(this.assets.carMesh.scene)
     this.car = this.assets.carMesh.scene
-    this.car.scale.set(0.25, 0.25, 0.25)
+    this.car.scale.set(0.1, 0.1, 0.1)
   }
 }
