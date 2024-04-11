@@ -17,6 +17,15 @@
                             <span></span>
                         </a>
                     </li>
+
+
+                    <li class="nav-item pe-2">
+                        <a class="nav-link text-light @Html.IsActive("Agency", "Requests")" asp-area=""
+                            asp-controller="Agency" asp-action="Requests">
+                            Agency Requests
+                            <span></span>
+                        </a>
+                    </li>
                 }
                 <li class="nav-item pe-2">
                     <a class="nav-link text-light @Html.IsActive("Tour", "Tours")" asp-area="" asp-controller="Tour"

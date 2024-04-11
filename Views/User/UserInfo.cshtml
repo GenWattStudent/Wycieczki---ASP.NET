@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = $"Welcome {Model.RegisterModel.Username}";
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 }
 
 <section>
@@ -22,7 +23,26 @@
             }
         </div>
     </header>
-    <div class="glassmorphism p-3 rounded">
+
+    @if (Model.TravelAgency != null)
+    {
+        <div class="glassmorphism p-3 rounded">
+            <h3>Your Agency <strong class="text-primary">@Model.TravelAgency.Name</strong></h3>
+            <div class="d-flex gap-3 mt-3">
+                <button class="btn btn-primary d-flex gap-2 align-items-center">
+                    <ion-icon name="eye"></ion-icon>
+                    See agency
+                </button>
+                <a asp-action="Leave" asp-controller="Agency" asp-route-userId="@userId"
+                    class="btn btn-danger d-flex gap-2 align-items-center">
+                    <ion-icon name="clipboard"></ion-icon>
+                    Leave agency
+                </a>
+            </div>
+        </div>
+    }
+
+    <div class="glassmorphism p-3 rounded mt-3">
         <form asp-action="EditUserInfo" asp-controller="User" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <h3>Contact</h3>
@@ -78,8 +98,21 @@
     <div class="mt-3 glassmorphism p-3 rounded">
         <h4>Actions</h4>
         <div class="d-flex gap-3 mt-3">
-            <a asp-action="Logout" asp-controller="User"><button class="btn btn-primary">Logout</button></a>
-            <a asp-action="Delete" asp-controller="User"><button class="btn btn-danger">Delete account</button></a>
+            <a asp-action="Create" asp-controller="Agency">
+                <button class="btn btn-primary d-flex gap-2 align-items-center">
+                    <ion-icon name="add"></ion-icon>Create Agnecy
+                </button>
+            </a>
+            <a asp-action="Logout" asp-controller="User">
+                <button class="btn btn-primary d-flex gap-2 align-items-center">
+                    <ion-icon name="log-out"></ion-icon>Logout
+                </button>
+            </a>
+            <a asp-action="Delete" asp-controller="User">
+                <button class="btn btn-danger d-flex gap-2 align-items-center">
+                    <ion-icon name="trash"></ion-icon>Delete account
+                </button>
+            </a>
         </div>
     </div>
 </section>

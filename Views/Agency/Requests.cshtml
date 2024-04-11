@@ -1,0 +1,48 @@
+@using Book.App.ViewModels
+@model TravelAgencyListViewModel
+
+@{
+    ViewData["Title"] = "Agency Requests";
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h2>Agency Requests</h2>
+</header>
+
+<div class="glassmorphism p-3 mt-3 rounded d-flex gap-2 flex-wrap justify-content-center">
+    @if (Model.TravelAgencies.Count == 0)
+    {
+        <p>No agency requests</p>
+    }
+
+    @foreach (var agency in Model.TravelAgencies)
+    {
+        <div class="card w-100">
+            <header class="card-header">
+                <h4>@agency.Name</h4>
+            </header>
+            <div class="card-body">
+                <p class="alert alert-info">@agency.Description</p>
+                <div>
+                    <h5>Agency Address</h5>
+                    <small class="d-block">Street: <span class="font-weight-bold">@agency.Address.Street</span></small>
+                    <small class="d-block">City: <span class="font-weight-bold">@agency.Address.City </span></small>
+                    <small class="d-block">Country: <span class="font-weight-bold">@agency.Address.Country </span></small>
+                </div>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="reason">Reason:</label>
+                        <input type="text" id="reason" name="reason" class="form-control" />
+                    </div>
+                    <button type="submit" formaction="@Url.Action("Accept", "Agency", new { id = agency.Id })"
+                        class="btn btn-success">Accept</button>
+                    <button type="submit" formaction="@Url.Action("Reject", "Agency", new { id = agency.Id })"
+                        class="btn btn-danger">Reject</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>

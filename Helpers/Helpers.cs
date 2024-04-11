@@ -1,6 +1,9 @@
+using Book.App.Models;
 using Book.App.Repositories;
 using Book.App.Repositories.UnitOfWork;
 using Book.App.Services;
+using Book.App.Validators;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Book.App.Helpers;
@@ -49,5 +52,9 @@ public static class Helpers
         services.AddTransient<IGeoService, GeoService>();
         services.AddTransient<IWeatherService, WeatherService>();
         services.AddTransient<IMealService, MealService>();
+        services.AddTransient<IAgencyService, AgencyService>();
+
+        // validators
+        services.AddTransient<IValidator<TravelAgencyModel>, TravelAgencyValidator>();
     }
 }

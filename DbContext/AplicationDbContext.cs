@@ -22,9 +22,6 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Other model configurations...
-        // Introducing FOREIGN KEY constraint 'FK_Reservations_TravelAgencies_TravelAgencyId' on table 'Reservations' may cause cycles or multiple cascade paths. Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints.
-
         modelBuilder.Entity<ReservationModel>()
             .HasOne(r => r.TravelAgency)
             .WithMany(t => t.Reservations)
@@ -34,7 +31,6 @@ public class ApplicationDbContext : DbContext
             .HasOne(t => t.TravelAgency)
             .WithMany(ta => ta.Tours)
             .HasForeignKey(t => t.TravelAgencyId)
-            .OnDelete(DeleteBehavior.NoAction); // or DeleteBehavior.Restrictor DeleteBehavior.Restrict
-
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

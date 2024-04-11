@@ -5,7 +5,10 @@ namespace Book.App.Models;
 public enum Role
 {
     Admin,
-    User
+    User,
+    AgencyAdmin,
+    AgencyUser,
+    AgencyManager
 }
 
 public class UserModel : BaseEntity
@@ -25,6 +28,8 @@ public class UserModel : BaseEntity
     public PreferencesModel Preferences { get; set; }
     public AddressModel? Address { get; set; }
     public string? ImagePath { get; set; }
+
+    public int? TravelAgencyId { get; set; }
     public TravelAgencyModel? TravelAgency { get; set; }
 
     public UserModel(RegisterModel registerModel)

@@ -8,5 +8,6 @@ public interface IUnitOfWork : IDisposable
     IImageRepository imageRepository { get; }
     IMealRepository mealRepository { get; }
     IWaypointRepository waypointRepository { get; }
+    IAgencyRepository agencyRepository { get; }
     Task SaveAsync();
 }

@@ -1,0 +1,69 @@
+@using Book.App.ViewModels
+@model TravelAgencyViewModel
+
+@{
+    ViewData["Title"] = "Create Agency";
+}
+
+
+<header class="glassmorphism p-3 rounded">
+    <h2>Create Agency</h2>
+    <small>Fill in the form to create a new agency</small>
+</header>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    @if (Model.TravelAgency != null)
+    {
+        @using (Html.BeginForm("Create", "Agency", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <h3>General information</h3>
+
+            <div class="form-group">
+                <label asp-for="TravelAgency.Name"></label>
+                <input asp-for="TravelAgency.Name" class="form-control" />
+                <span asp-validation-for="TravelAgency.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TravelAgency.Description"></label>
+                <textarea asp-for="TravelAgency.Description" class="form-control"></textarea>
+                <span asp-validation-for="TravelAgency.Description" class="text-danger"></span>
+            </div>
+
+            <h3>Address</h3>
+
+            <div class="form-group">
+                <label asp-for="TravelAgency.Address.Street"></label>
+                <input asp-for="TravelAgency.Address.Street" class="form-control" />
+                <span asp-validation-for="TravelAgency.Address.Street" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TravelAgency.Address.City"></label>
+                <input asp-for="TravelAgency.Address.City" class="form-control" />
+                <span asp-validation-for="TravelAgency.Address.City" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TravelAgency.Address.Country"></label>
+                <input asp-for="TravelAgency.Address.Country" class="form-control" />
+                <span asp-validation-for="TravelAgency.Address.Country" class="text-danger"></span>
+            </div>
+
+            <div>
+                <small>Wait for admin to accept your agency!</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Send application for agency</button>
+        }
+    }
+    else
+    {
+        <div>
+            <span class="text-danger">No agency found</span>
+        </div>
+    }
+</div>

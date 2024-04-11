@@ -22,7 +22,7 @@ public class UserService : IUserService
         var PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerModel.Password);
 
         registerModel.Password = PasswordHash;
-        Console.WriteLine(registerModel.Image + "asdasdd");
+
         var userModel = new UserModel(registerModel);
 
         if (registerModel.Image != null)
@@ -68,7 +68,7 @@ public class UserService : IUserService
 
     public async Task<UserModel?> GetByUsername(string username)
     {
-        return await _userRepository.GetByUsername(username).FirstOrDefaultAsync(x => x.Username == username);
+        return await _userRepository.GetByUsername(username).Include(u => u.TravelAgency).FirstOrDefaultAsync(x => x.Username == username);
     }
 
     public async Task<UserModel?> Login(LoginViewModel loginModel)

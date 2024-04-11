@@ -16,16 +16,20 @@ public class MealTimelineViewComponent : ViewComponent
 
     public IViewComponentResult Invoke()
     {
-        var userId = int.Parse(UserClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier));
-
-        if (userId == 0)
+        if (int.TryParse(UserClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier), out int userId))
         {
-            return View(new TimelineViewModel());
+            var tour = _reservationService.GetClosestReservation(userId).Result?.Tour;
+
+            if (tour == null)
+            {
+                return View(new TimelineViewModel());
+            }
+
+            var timelineViewModel = new TimelineViewModel() { Meals = tour.Meals, TourId = tour.Id };
+
+            return View(timelineViewModel);
         }
 
-        var tour = _reservationService.GetClosestReservation(userId).Result.Tour;
-        var timelineViewModel = new TimelineViewModel() { Meals = tour.Meals, TourId = tour.Id };
-
-        return View(timelineViewModel);
+        return View(new TimelineViewModel());
     }
 }
