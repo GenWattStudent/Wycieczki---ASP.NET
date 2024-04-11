@@ -19,6 +19,13 @@ public class TourService : ITourService
         _dbContext = dbContext;
     }
 
+    public async Task<List<TourModel>> GetVisible(FilterModel filterModel)
+    {
+        List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now, t => t.IsVisible };
+        var tours = await _unitOfWork.tourRepository.GetBySpec(new TourFilterSpecification(filterModel, criterias));
+        return tours;
+    }
+
     public async Task<List<TourModel>> Get(FilterModel filterModel)
     {
         List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now };

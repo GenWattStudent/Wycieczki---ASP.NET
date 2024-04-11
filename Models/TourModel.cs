@@ -33,6 +33,10 @@ public class TourModel : BaseEntity
     public List<MealModel> Meals { get; set; } = new();
     public bool IsVisible { get; set; } = false;
 
+    public int? TravelAgencyId { get; set; }
+    public TravelAgencyModel TravelAgency { get; set; }
+    public List<CommentModel> Comments { get; set; } = new();
+
     public TourModel(AddTourViewModel addTourModel)
     {
         Name = addTourModel.Name;
@@ -52,6 +56,7 @@ public class TourModel : BaseEntity
         StartDate = editTourModel.StartDate;
         EndDate = editTourModel.EndDate;
         MaxUsers = editTourModel.MaxUsers;
+        IsVisible = editTourModel.IsVisible;
     }
 
     public TourModel EditTour(TourModel tourModel)
@@ -62,6 +67,7 @@ public class TourModel : BaseEntity
         StartDate = tourModel.StartDate;
         EndDate = tourModel.EndDate;
         MaxUsers = tourModel.MaxUsers;
+        IsVisible = tourModel.IsVisible;
         return this;
     }
 

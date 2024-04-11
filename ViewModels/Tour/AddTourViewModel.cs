@@ -22,4 +22,5 @@ public class AddTourViewModel
     public DateTime StartDate { get; set; }
     [DateGreaterThan("StartDate", ErrorMessage = "End date must be greater than start date.")]
     public DateTime EndDate { get; set; }
+    public bool IsVisible { get; set; } = false;
 }

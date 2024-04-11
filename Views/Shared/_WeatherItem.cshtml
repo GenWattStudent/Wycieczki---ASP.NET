@@ -1,0 +1,50 @@
+@using Book.App.ViewModels
+@model WeatherItemViewModel
+
+@if (Model.Weather != null)
+{
+    <div class="card weather-card" id="@Model.Id">
+        <div class="card-body">
+            <div class="text-center ">
+                <h5 class="text-primary">
+                    @if (Model.Index == 0)
+                    {
+                        <strong>Today</strong>
+                    }
+                    else
+                    {
+                        <div class="d-flex gap-2 justify-content-center w-100">
+                            <span>@DateTime.Parse(Model.Weather.Datetime).ToString("yyyy/MM/dd")</span>
+                            <span>@DateTime.Parse(Model.Weather.Datetime).DayOfWeek.ToString().Substring(0, 3)</span>
+                        </div>
+                    }
+                </h5>
+                <h3>@Model.Weather.Temp&deg</h3>
+                <img src="~/icons/weather/@(Model.Weather.Icon).png" alt="@Model.Weather.Icon" />
+                <p class="text-info font-weight-bold">@Model.Weather.Description</p>
+            </div>
+            <span class="devider-x w-100 d-flex" style=""></span>
+            <div class="mt-2 d-flex flex-wrap justify-content-between">
+                <span>Pressure: @Model.Weather.Pressure hPa</span>
+                <span>Humidity: @Model.Weather.Humidity %</span>
+                <span>Wind: @Model.Weather.Windspeed m/s</span>
+                <span>Visibility: @Model.Weather.Visibility km</span>
+            </div>
+            <span class="devider-x w-100 d-flex mt-2" style=""></span>
+            <div class="mt-2 d-flex flex-wrap justify-content-between">
+                @if (Model.Weather.Sunrise != null)
+                {
+                    <span class="text-info font-weight-bold">
+                        Sunrise: @DateTime.Parse(Model.Weather.Sunrise).ToString("HH:mm")
+                    </span>
+                }
+                @if (Model.Weather.Sunset != null)
+                {
+                    <span class="text-info font-weight-bold">
+                        Sunset: @DateTime.Parse(Model.Weather.Sunset).ToString("HH:mm")
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+}

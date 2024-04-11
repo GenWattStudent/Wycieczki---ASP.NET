@@ -12,4 +12,5 @@ public interface ITourService
     Task<List<string>> SaveImages(List<IFormFile> images, string folder);
     Task Edit(TourModel tour, EditTourViewModel editTourModel);
     Task Delete(int id);
+    Task<List<TourModel>> GetVisible(FilterModel filterModel);
 }

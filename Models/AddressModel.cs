@@ -13,7 +13,9 @@ public class AddressModel : BaseEntity
     [Required]
     public string Country { get; set; } = string.Empty;
     public int UserId { get; set; }
-    public UserModel User { get; set; } = new();
+    public UserModel? User { get; set; } = new();
+
+    public TravelAgencyModel? TravelAgency { get; set; }
 
     public AddressModel(Address address)
     {

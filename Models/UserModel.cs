@@ -19,10 +19,13 @@ public class UserModel : BaseEntity
     public Role Role { get; set; } = Role.User;
     public List<TourModel> Tours { get; set; } = new();
     public List<ReservationModel> Reservations { get; set; } = new();
+
+    public int? ContactId { get; set; }
     public ContactModel? Contact { get; set; }
     public PreferencesModel Preferences { get; set; }
     public AddressModel? Address { get; set; }
     public string? ImagePath { get; set; }
+    public TravelAgencyModel? TravelAgency { get; set; }
 
     public UserModel(RegisterModel registerModel)
     {

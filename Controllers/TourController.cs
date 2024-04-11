@@ -21,7 +21,7 @@ public class TourController : Controller
     [Authorize]
     public async Task<IActionResult> Tours(FilterModel filterModel)
     {
-        var tours = await _tourService.Get(filterModel);
+        var tours = await _tourService.GetVisible(filterModel);
         return View(tours);
     }
 
@@ -54,6 +54,7 @@ public class TourController : Controller
     public async Task<IActionResult> EditTour(EditTourViewModel editTourModel)
     {
         var tour = new TourModel(editTourModel);
+
         if (!ModelState.IsValid)
         {
             return View(tour);
@@ -61,7 +62,7 @@ public class TourController : Controller
 
         await _tourService.Edit(tour, editTourModel);
 
-        return RedirectToAction("Tours");
+        return RedirectToAction("EditTour", new { id = tour.Id });
     }
 
     public async Task<IActionResult> TourDetails(int id)

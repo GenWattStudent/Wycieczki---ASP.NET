@@ -17,6 +17,22 @@
     {
         <div class="glassmorphism p-3 rounded mt-3">
             <partial name="_TourFormPartial" model="Model" />
+
+            <div class="form-check form-switch ml-4 mt-2 align-items-center d-flex">
+                @Html.CheckBoxFor(m => m.IsVisible, new
+                    {
+                        @class = "form-check-input",
+                        type = "checkbox",
+                        name = "isVisible",
+                        id = "isVisible"
+                    })
+                <label class="form-check-label d-flex aling-items-center" for="isVisible">Is visible
+                    <ion-icon class="bg-primary text-light p-1 rounded ml-2" data-toggle="tooltip"
+                        title="@(!Model.IsVisible ? "This trip won't be visible for users" : "This trip is visible for users")"
+                        name="help-outline"></ion-icon>
+                </label>
+            </div>
+
         </div>
 
         @Html.Hidden("Id", Model.Id, new { id = "Id" })

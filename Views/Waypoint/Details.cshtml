@@ -9,6 +9,7 @@
                 SliderId = Model.Waypoint.TourId
             };
     var index = 0;
+
 }
 <div class="glassmorphism p-3 rounded">
     <a class="text-dark" asp-action="Details" asp-controller="Book" asp-route-id="@Model.Waypoint.TourId">
@@ -38,42 +39,12 @@
     <div class="grid gap-2 flex-wrap mt-3">
         @foreach (var weather in Model.Weather.Days)
         {
-            <div class="card weather-card">
-                <div class="card-body">
-                    <div class="text-center ">
-                        <h5 class="text-primary">
-                            @if (index == 0)
-                            {
-                                <strong>Today</strong>
-                            }
-                            else
-                            {
-                                <div class="d-flex gap-2 justify-content-center w-100">
-                                    <span>@DateTime.Parse(weather.Datetime).ToString("yyyy/MM/dd")</span>
-                                    <span>@DateTime.Parse(weather.Datetime).DayOfWeek.ToString().Substring(0, 3)</span>
-                                </div>
-                            }
-                        </h5>
-                        <h3>@weather.Temp&deg</h3>
-                        <img src="~/icons/weather/@(weather.Icon).png" alt="@weather.Icon" />
-                        <p class="text-info font-weight-bold">@weather.Description</p>
-                    </div>
-                    <span class="devider-x w-100 d-flex" style=""></span>
-                    <div class="mt-2 d-flex flex-wrap justify-content-between">
-                        <span>Pressure: @weather.Pressure hPa</span>
-                        <span>Humidity: @weather.Humidity %</span>
-                        <span>Wind: @weather.Windspeed m/s</span>
-                        <span>Visibility: @weather.Visibility km</span>
-                    </div>
-                    <span class="devider-x w-100 d-flex mt-2" style=""></span>
-                    <div class="mt-2 d-flex flex-wrap justify-content-between">
-                        <span class="text-info font-weight-bold">
-                            Sunrise: @DateTime.Parse(weather.Sunrise).ToString("HH:mm")</span>
-                        <span class="text-info font-weight-bold">
-                            Sunset: @DateTime.Parse(weather.Sunset).ToString("HH:mm")</span>
-                    </div>
-                </div>
-            </div>
+            var weatherItemViewModel = new WeatherItemViewModel()
+                    {
+                        Weather = weather,
+                        Index = index
+                    };
+            <partial name="_WeatherItem" model="@weatherItemViewModel" />
             index++;
         }
     </div>

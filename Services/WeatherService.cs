@@ -24,28 +24,28 @@ public class WeatherService : IWeatherService
 
     public async Task<WeatherModel> GetWeatherFromApi(double lat, double lon)
     {
-        var response = await _client.GetAsync($"{url}{lat},{lon}?key={key}&include=days&unitGroup=metric");
-        var content = await response.Content.ReadAsStringAsync();
-        var weatherData = JsonConvert.DeserializeObject<WeatherModel>(content);
-        return weatherData;
+        if (string.IsNullOrEmpty(_cache.GetString($"{lat},{lon}")))
+        {
+            var response = await _client.GetAsync($"{url}{lat},{lon}?key={key}&include=days&unitGroup=metric");
+            var content = await response.Content.ReadAsStringAsync();
+            var weatherData = JsonConvert.DeserializeObject<WeatherModel>(content);
+            var cacheOptions = new DistributedCacheEntryOptions();
+            cacheOptions.SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
+            Console.WriteLine("Setting cache");
+            _cache.SetString($"{lat},{lon}", JsonConvert.SerializeObject(weatherData), cacheOptions);
+            return weatherData;
+        }
+        Console.WriteLine("Getting from cache");
+        var cachedData = _cache.GetString($"{lat},{lon}");
+        return JsonConvert.DeserializeObject<WeatherModel>(cachedData ?? "");
     }
 
 
     public async Task<WeatherModel?> Get(double lat, double lon)
     {
-        if (string.IsNullOrEmpty(_cache.GetString($"{lat},{lon}")))
-        {
-            var weatherData = await GetWeatherFromApi(lat, lon);
-            var cacheOptions = new DistributedCacheEntryOptions();
-            cacheOptions.SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
-            Console.WriteLine("Setting cache");
-            _cache.SetString($"{lat},{lon}", JsonConvert.SerializeObject(weatherData), cacheOptions);
-            return weatherData;
-        }
 
-        Console.WriteLine("Getting from cache");
-        var cachedData = _cache.GetString($"{lat},{lon}");
-        return JsonConvert.DeserializeObject<WeatherModel>(cachedData ?? "");
+        var weatherData = await GetWeatherFromApi(lat, lon);
+
 
         // var weatherData = new WeatherModel
         // {
@@ -122,7 +122,7 @@ public class WeatherService : IWeatherService
         // }
         // };
 
-        // return weatherData;
+        return weatherData;
     }
 
 }
