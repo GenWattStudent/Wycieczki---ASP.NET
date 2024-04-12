@@ -15,6 +15,7 @@ namespace Book.App.Controllers
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)
         {
+            Console.WriteLine(statusCode);
             switch (statusCode)
             {
                 case 404:
@@ -23,6 +24,10 @@ namespace Book.App.Controllers
 
                 case 401:
                     return RedirectToAction("Login", "User");
+
+                case 403:
+                    TempData["ErrorMessage"] = "Sorry, you don't have permission to access this resource";
+                    return View("Forbidden");
 
                 default:
                     TempData["ErrorMessage"] = "Sorry, something went wrong";

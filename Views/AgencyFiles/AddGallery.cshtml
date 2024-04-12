@@ -1,0 +1,49 @@
+@using Book.App.Models
+@using Book.App.ViewModels
+@model TravelAgencyModel
+
+@{
+    ViewData["Title"] = "Add Gallery";
+}
+
+@if (Model != null)
+{
+    var galleyViewModel = new GalleryViewModel
+                {
+                    TourId = Model.Id,
+                    Images = Model.Images
+                };
+
+    <header class="glassmorphism p-3 rounded">
+        <h1>Add Gallery</h1>
+        <small>Choose your best pictures!</small>
+    </header>
+
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @await Component.InvokeAsync("AgencyNav", new { agencyId = Model.Id })
+    </div>
+
+    <div class="glassmorphism p-3 rounded mt-3">
+        <form id="addImageForm" asp-controller="AgencyFiles" asp-action="AddGallery" asp-route-agencyId="@Model.Id"
+            method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <input type="file" class="form-control" id="files" name="files" multiple accept="image/*">
+            </div>
+        </form>
+
+        <div class="d-flex flex-wrap gap-3">
+            <partial name="_Gallery" model="@galleyViewModel" />
+        </div>
+    </div>
+
+    <partial name="_PreviewModal" />
+}
+else
+{
+    <p class="alert alert-error">Agency not found</p>
+}
+
+@section Scripts {
+    <script src="~/js/gallery/gallery.js"></script>
+}

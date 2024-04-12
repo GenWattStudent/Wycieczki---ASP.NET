@@ -1,0 +1,51 @@
+@using Book.App.ViewModels
+@model CreateAgencyViewModel
+
+<h3>General information</h3>
+
+@Html.AntiForgeryToken()
+@Html.HiddenFor(m => m.Id)
+
+<div class="form-group">
+    <label asp-for="@Model.Name"></label>
+    <input asp-for="@Model.Name" class="form-control" />
+    <span asp-validation-for="@Model.Name" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="@Model.Description"></label>
+    <textarea asp-for="@Model.Description" class="form-control"></textarea>
+    <span asp-validation-for="@Model.Description" class="text-danger"></span>
+</div>
+
+<h3>Address</h3>
+
+<div class="form-group">
+    <label asp-for="@Model.Address.Street"></label>
+    <input asp-for="@Model.Address.Street" class="form-control" />
+    <span asp-validation-for="@Model.Address.Street" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="@Model.Address.City"></label>
+    <input asp-for="@Model.Address.City" class="form-control" />
+    <span asp-validation-for="@Model.Address.City" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="@Model.Address.Country"></label>
+    <input asp-for="@Model.Address.Country" class="form-control" />
+    <span asp-validation-for="@Model.Address.Country" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="@Model.LogoFile"></label>
+    <input asp-for="@Model.LogoFile" class="form-control" />
+    <span asp-validation-for="@Model.LogoFile" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="@Model.VideoFile"></label>
+    <input asp-for="@Model.VideoFile" class="form-control" />
+    <span asp-validation-for="@Model.VideoFile" class="text-danger"></span>
+</div>

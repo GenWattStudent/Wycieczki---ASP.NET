@@ -1,12 +1,11 @@
 using Book.App.Models;
-using Book.App.ViewModels;
 
 namespace Book.App.Services;
 
 public interface IAgencyService
 {
-    Task<TravelAgencyModel> CreateAsync(TravelAgencyViewModel travelAgencyViewModel, int userId);
-    Task UpdateAsync(TravelAgencyViewModel travelAgencyModel);
+    Task<TravelAgencyModel> CreateAsync(TravelAgencyModel travelAgencyModel, int userId);
+    Task UpdateAsync(TravelAgencyModel travelAgencyModel);
 
     Task<List<TravelAgencyModel>> GetNotAcceptedAsync();
     Task<List<TravelAgencyModel>> GetAllByUserIdAsync(string userId);
@@ -15,7 +14,7 @@ public interface IAgencyService
 
     Task AcceptAsync(int id, string reason);
     Task RejectAsync(int id, string reason);
-    Task DeleteAsync(int id);
+    Task DeleteAsync(int id, int userId);
     Task LeaveAsync(int userId);
     Task PromoteAsync(int userId, int currentUserId, Role role);
 

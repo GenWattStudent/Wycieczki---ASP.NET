@@ -1,5 +1,9 @@
 @using Book.App.Helpers;
 
+@{
+    var isAdmin = Html.HasRole("Admin");
+}
+
 <div class="collapse justify-content-between container-fluid">
     <ul class="navbar-nav flex-row">
         <div class="d-none d-sm-block">
@@ -8,7 +12,8 @@
                     <a class="nav-link text-light pl-0 @Html.IsActive("Home", "Index")" asp-area=""
                         asp-controller="Home" asp-action="Index">Home <span></span></a>
                 </li>
-                @if (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value == "Admin")
+
+                @if (isAdmin)
                 {
                     <li class="nav-item pe-2">
                         <a class="nav-link text-light @Html.IsActive("Tour", "AddTour")" asp-area="" asp-controller="Tour"
@@ -17,7 +22,6 @@
                             <span></span>
                         </a>
                     </li>
-
 
                     <li class="nav-item pe-2">
                         <a class="nav-link text-light @Html.IsActive("Agency", "Requests")" asp-area=""

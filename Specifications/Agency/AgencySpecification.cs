@@ -8,11 +8,12 @@ public class AgencySpecification : BaseSpecification<TravelAgencyModel>
     {
         AddInclude(x => x.Address);
         AddInclude(x => x.Users);
+        AddInclude(x => x.Images);
     }
 
     public void SetNotAccepted()
     {
-        ApplyCriteria(x => !x.IsAccepted);
+        ApplyCriteria(x => !x.IsAccepted && string.IsNullOrEmpty(x.Reason));
     }
 
     public void HasAgency(int userId)
@@ -22,6 +23,13 @@ public class AgencySpecification : BaseSpecification<TravelAgencyModel>
 
     public void ByUserId(int userId)
     {
+        IncludeStrings.Add("Users.Roles");
         ApplyCriteria(x => x.Users.Any(u => u.Id == userId));
+    }
+
+    public void ById(int id)
+    {
+        IncludeStrings.Add("Users.Roles");
+        ApplyCriteria(x => x.Id == id);
     }
 }

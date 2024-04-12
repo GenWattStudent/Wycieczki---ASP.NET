@@ -19,6 +19,14 @@ public class TravelAgencyModel : BaseEntity
     public string Reason { get; set; } = string.Empty;
 
     public List<CommentModel> Comments { get; set; } = new();
+
+
+    public void Update(TravelAgencyModel travelAgencyModel)
+    {
+        Name = travelAgencyModel.Name;
+        Description = travelAgencyModel.Description;
+        Address = travelAgencyModel.Address;
+    }
 }
 
 

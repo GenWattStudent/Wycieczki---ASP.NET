@@ -1,0 +1,61 @@
+@using Book.App.ViewModels
+@using Book.App.Helpers
+@model TravelAgencyViewModel
+
+@{
+    ViewData["Title"] = "Agency Details";
+    var isAgencyAdmin = Html.HasRole("Admin");
+}
+
+@if (Model.TravelAgency != null)
+{
+    int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int userId);
+    var isBelongToAgency = Model.TravelAgency.Users.Any(u => u.Id == userId);
+
+    @if (!isBelongToAgency && !Model.TravelAgency.IsAccepted)
+    {
+        <div class="glassmorphism p-3 rounded">
+            <h2>Agency not found</h2>
+        </div>
+    }
+    else if (isBelongToAgency)
+    {
+        <header class="glassmorphism p-3 rounded">
+            <h2>Welcome to <strong class="text-primary">@Model.TravelAgency.Name</strong>
+                <partial name="_AgencyStatus" model="@Model.TravelAgency" />
+            </h2>
+        </header>
+
+        <div class="glassmorphism p-3 mt-3 rounded">
+            @await Component.InvokeAsync("AgencyNav", new { agencyId = Model.TravelAgency.Id })
+        </div>
+
+        <div class="glassmorphism p-3 mt-3 rounded">
+            @using (Html.BeginForm("Update", "Agency", FormMethod.Post))
+            {
+                <partial name="_AgencyForm" model="@Model.TravelAgency" />
+                <button type="submit" class="btn btn-primary">Update</button>
+            }
+
+            <a asp-action="Delete" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
+                class="btn btn-danger mt-2">Delete Agency</a>
+        </div>
+    }
+    else if (!isBelongToAgency && Model.TravelAgency.IsAccepted)
+    {
+        <header class="glassmorphism p-3 rounded">
+            <h2>
+                Welcome to <strong class="text-primary">@Model.TravelAgency.Name</strong>
+            </h2>
+        </header>
+    }
+}
+else
+{
+    <p class="alert alert-error">Agency not found</p>
+}
+
+
+@section Scripts {
+    <script src="~/js/resize-textarea.js"></script>
+}

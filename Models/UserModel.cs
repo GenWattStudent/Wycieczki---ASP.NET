@@ -7,8 +7,15 @@ public enum Role
     Admin,
     User,
     AgencyAdmin,
-    AgencyUser,
-    AgencyManager
+    AgencyManager,
+    AgencyUser
+}
+
+public class RoleModel : BaseEntity
+{
+    [Required]
+    public Role Role { get; set; }
+    public List<UserModel> Users { get; set; } = new();
 }
 
 public class UserModel : BaseEntity
@@ -18,19 +25,18 @@ public class UserModel : BaseEntity
     public string Username { get; set; } = string.Empty;
     [Required]
     public string Password { get; set; } = string.Empty;
-    [Required]
-    public Role Role { get; set; } = Role.User;
-    public List<TourModel> Tours { get; set; } = new();
-    public List<ReservationModel> Reservations { get; set; } = new();
-
     public int? ContactId { get; set; }
+    public string? ImagePath { get; set; }
+    public int? TravelAgencyId { get; set; }
+
     public ContactModel? Contact { get; set; }
     public PreferencesModel Preferences { get; set; }
     public AddressModel? Address { get; set; }
-    public string? ImagePath { get; set; }
-
-    public int? TravelAgencyId { get; set; }
     public TravelAgencyModel? TravelAgency { get; set; }
+
+    public List<TourModel> Tours { get; set; } = new();
+    public List<ReservationModel> Reservations { get; set; } = new();
+    public List<RoleModel> Roles { get; set; } = new();
 
     public UserModel(RegisterModel registerModel)
     {

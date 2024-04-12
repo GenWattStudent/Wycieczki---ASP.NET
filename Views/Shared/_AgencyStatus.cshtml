@@ -1,0 +1,18 @@
+@using Book.App.Models
+@model TravelAgencyModel
+
+@if (Model != null)
+{
+    @if (Model.IsAccepted)
+    {
+        <span class="badge bg-success">Accepted</span>
+    }
+    else if (!Model.IsAccepted && string.IsNullOrEmpty(Model.Reason))
+    {
+        <span class="badge bg-warning">Pending</span>
+    }
+    else
+    {
+        <span class="badge bg-danger">Rejected</span>
+    }
+}

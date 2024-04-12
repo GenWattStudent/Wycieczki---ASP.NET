@@ -10,11 +10,13 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly string _userImageFolder = "users";
     private readonly IFileService _fileService;
+    private readonly IAgencyService _agencyService;
 
-    public UserService(IUserRepository userRepository, IFileService fileService)
+    public UserService(IUserRepository userRepository, IFileService fileService, IAgencyService agencyService)
     {
         _userRepository = userRepository;
         _fileService = fileService;
+        _agencyService = agencyService;
     }
 
     public async Task Register(RegisterModel registerModel)
@@ -68,12 +70,12 @@ public class UserService : IUserService
 
     public async Task<UserModel?> GetByUsername(string username)
     {
-        return await _userRepository.GetByUsername(username).Include(u => u.TravelAgency).FirstOrDefaultAsync(x => x.Username == username);
+        return await _userRepository.GetByUsername(username).Include(u => u.TravelAgency).Include(u => u.Roles).FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
     }
 
     public async Task<UserModel?> Login(LoginViewModel loginModel)
     {
-        var user = await _userRepository.GetByUsername(loginModel.Username).FirstOrDefaultAsync(x => x.Username == loginModel.Username);
+        var user = await _userRepository.GetByUsername(loginModel.Username).Include(u => u.Roles).FirstOrDefaultAsync(x => x.Username == loginModel.Username);
 
         if (user == null)
         {
@@ -90,10 +92,15 @@ public class UserService : IUserService
 
     public async Task Delete(string username)
     {
-        var user = await _userRepository.GetByUsername(username).FirstOrDefaultAsync(x => x.Username == username);
+        var user = await _userRepository.GetByUsername(username).Include(u => u.TravelAgency).FirstOrDefaultAsync(x => x.Username == username);
         if (user == null)
         {
             return;
+        }
+
+        if (user.TravelAgency != null)
+        {
+            await _agencyService.LeaveAsync(user.Id);
         }
 
         await _userRepository.Remove(user.Id);

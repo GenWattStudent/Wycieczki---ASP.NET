@@ -27,16 +27,35 @@
     @if (Model.TravelAgency != null)
     {
         <div class="glassmorphism p-3 rounded">
-            <h3>Your Agency <strong class="text-primary">@Model.TravelAgency.Name</strong></h3>
+            <h3>
+                Your Agency
+                <strong class="text-primary">@Model.TravelAgency.Name</strong>
+                <partial name="_AgencyStatus" model="Model.TravelAgency" />
+            </h3>
+            @if (!string.IsNullOrEmpty(Model.TravelAgency.Reason))
+            {
+                <p class="alert alert-info">@Model.TravelAgency.Reason</p>
+            }
+
             <div class="d-flex gap-3 mt-3">
-                <button class="btn btn-primary d-flex gap-2 align-items-center">
+                <a asp-action="Details" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
+                    class="btn btn-primary d-flex gap-2 align-items-center">
                     <ion-icon name="eye"></ion-icon>
                     See agency
-                </button>
+                </a>
+
                 <a asp-action="Leave" asp-controller="Agency" asp-route-userId="@userId"
                     class="btn btn-danger d-flex gap-2 align-items-center">
-                    <ion-icon name="clipboard"></ion-icon>
-                    Leave agency
+                    @if (Model.TravelAgency.Users.Count != 1)
+                    {
+                        <ion-icon name="clipboard"></ion-icon>
+                        <span>Leave agency</span>
+                    }
+                    else
+                    {
+                        <ion-icon name="trash"></ion-icon>
+                        <span>Delete agency</span>
+                    }
                 </a>
             </div>
         </div>

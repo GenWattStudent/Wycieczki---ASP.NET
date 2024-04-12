@@ -1,12 +1,23 @@
+using System.Security.Claims;
+using AutoMapper;
 using Book.App.Models;
 using Book.App.Repositories;
 using Book.App.Repositories.UnitOfWork;
 using Book.App.Services;
 using Book.App.Validators;
+using Book.App.ViewModels;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Book.App.Helpers;
+
+class MappingProfile : Profile
+{
+    public MappingProfile()
+    {
+        CreateMap<CreateAgencyViewModel, TravelAgencyModel>();
+    }
+}
 
 public static class Helpers
 {
@@ -32,6 +43,12 @@ public static class Helpers
         return value.Substring(0, length) + "...";
     }
 
+    public static bool HasRole(this IHtmlHelper htmlHelper, string role)
+    {
+        var roles = htmlHelper.ViewContext.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value.Split(",");
+        return roles != null && roles.Contains(role);
+    }
+
     public static void AddMyServices(this IServiceCollection services)
     {
         // Repositories
@@ -53,8 +70,11 @@ public static class Helpers
         services.AddTransient<IWeatherService, WeatherService>();
         services.AddTransient<IMealService, MealService>();
         services.AddTransient<IAgencyService, AgencyService>();
+        services.AddTransient<IAgencyFilesService, AgencyFilesService>();
 
         // validators
-        services.AddTransient<IValidator<TravelAgencyModel>, TravelAgencyValidator>();
+        services.AddTransient<IValidator<CreateAgencyViewModel>, TravelAgencyValidator>();
+
+        services.AddAutoMapper(typeof(MappingProfile));
     }
 }

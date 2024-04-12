@@ -19,6 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<MealModel> Meals { get; set; }
     public DbSet<TravelAgencyModel> TravelAgencies { get; set; }
     public DbSet<CommentModel> Comments { get; set; }
+    public DbSet<RoleModel> Roles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -8,10 +8,12 @@ namespace Book.App.Services;
 public class AgencyService : IAgencyService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IFileService _fileService;
 
-    public AgencyService(IUnitOfWork unitOfWork)
+    public AgencyService(IUnitOfWork unitOfWork, IFileService fileService)
     {
         _unitOfWork = unitOfWork;
+        _fileService = fileService;
     }
 
     public async Task AcceptAsync(int id, string reason)
@@ -30,14 +32,22 @@ public class AgencyService : IAgencyService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task<TravelAgencyModel> CreateAsync(TravelAgencyViewModel travelAgencyViewModel, int userId)
+    public async Task<TravelAgencyModel> CreateAsync(TravelAgencyModel travelAgencyModel, int userId)
     {
-        if (travelAgencyViewModel.TravelAgency == null)
+        if (travelAgencyModel == null)
         {
             throw new Exception("Travel agency is null");
         }
 
+        var agencyByName = await _unitOfWork.agencyRepository.GetByName(travelAgencyModel.Name);
+
+        if (agencyByName != null)
+        {
+            throw new Exception("Agency with this name already exists");
+        }
+
         var user = await _unitOfWork.userRepository.GetById(userId);
+
         if (user == null)
         {
             throw new Exception("User not found");
@@ -48,21 +58,39 @@ public class AgencyService : IAgencyService
             throw new Exception("User already has an agency");
         }
 
-        user.Role = Role.AgencyAdmin;
-        travelAgencyViewModel.TravelAgency.Users.Add(user);
-        _unitOfWork.agencyRepository.Add(travelAgencyViewModel.TravelAgency);
+        user.Roles.Add(new RoleModel { Role = Role.AgencyAdmin });
+        travelAgencyModel.Users.Add(user);
+        _unitOfWork.agencyRepository.Add(travelAgencyModel);
         await _unitOfWork.SaveAsync();
 
-        return travelAgencyViewModel.TravelAgency;
+        return travelAgencyModel;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, int userId)
     {
-        var agency = await _unitOfWork.agencyRepository.GetById(id);
+        var agencySpecification = new AgencySpecification();
+        agencySpecification.ById(id);
+        var agency = await _unitOfWork.agencyRepository.GetSingleBySpec(agencySpecification);
 
         if (agency == null)
         {
             throw new Exception("Agency not found");
+        }
+
+        if (!agency.Users.Any(u => u.Id == userId))
+        {
+            throw new Exception("You are not allowed to delete this agency");
+        }
+
+        foreach (var user in agency.Users)
+        {
+            user.Roles.RemoveAll(r => r.Role == Role.AgencyAdmin || r.Role == Role.AgencyUser || r.Role == Role.AgencyManager);
+        }
+
+        foreach (var image in agency.Images)
+        {
+            await _fileService.DeleteFile(image.ImageUrl);
+            _unitOfWork.imageRepository.Remove(image);
         }
 
         _unitOfWork.agencyRepository.Remove(agency);
@@ -79,9 +107,18 @@ public class AgencyService : IAgencyService
         throw new NotImplementedException();
     }
 
-    public Task<TravelAgencyModel> GetByIdAsync(int id)
+    public async Task<TravelAgencyModel> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var agencySpecification = new AgencySpecification();
+        agencySpecification.ById(id);
+        var agency = await _unitOfWork.agencyRepository.GetSingleBySpec(agencySpecification);
+
+        if (agency == null)
+        {
+            throw new Exception("Agency not found");
+        }
+
+        return agency;
     }
 
     public async Task<List<TravelAgencyModel>> GetNotAcceptedAsync()
@@ -118,33 +155,37 @@ public class AgencyService : IAgencyService
 
         if (agency.Users.Count == 1)
         {
-            await DeleteAsync(agency.Id);
+            await DeleteAsync(agency.Id, userId);
             return;
         }
-        else if (user.Role == Role.AgencyAdmin && agency.Users.Count > 1)
+        else if (user.Roles.Any(r => r.Role == Role.AgencyAdmin) && agency.Users.Count > 1)
         {
             // promote another user to admin
             var newAdmin = agency.Users.FirstOrDefault(u => u.Id != userId);
             if (newAdmin != null)
             {
-                newAdmin.Role = Role.AgencyAdmin;
+                newAdmin.Roles.Add(new RoleModel { Role = Role.AgencyAdmin });
             }
+
+            user.Roles.RemoveAll(r => r.Role == Role.AgencyAdmin);
         }
 
         agency.Users.RemoveAll(u => u.Id == userId);
         await _unitOfWork.SaveAsync();
     }
 
+    private bool IsAgencyAdmin(UserModel? user) => user != null && user.TravelAgency != null && user.Roles.Any(r => r.Role == Role.AgencyAdmin);
+
     public async Task PromoteAsync(int userId, int currentUserId, Role agencyRole)
     {
         var currentUser = await _unitOfWork.userRepository.GetById(currentUserId);
 
-        if (currentUser != null && currentUser.TravelAgency != null && currentUser.Role == Role.AgencyAdmin)
+        if (IsAgencyAdmin(currentUser))
         {
             var user = await _unitOfWork.userRepository.GetById(userId);
-            if (user != null)
+            if (user != null && user.TravelAgencyId == currentUser.TravelAgencyId && user.Roles.All(r => r.Role != agencyRole))
             {
-                user.Role = agencyRole;
+                user.Roles.Add(new RoleModel { Role = agencyRole });
                 await _unitOfWork.SaveAsync();
             }
         }
@@ -166,8 +207,22 @@ public class AgencyService : IAgencyService
         await _unitOfWork.SaveAsync();
     }
 
-    public Task UpdateAsync(TravelAgencyViewModel travelAgencyModel)
+    public async Task UpdateAsync(TravelAgencyModel travelAgencyModel)
     {
-        throw new NotImplementedException();
+        if (travelAgencyModel == null)
+        {
+            throw new Exception("Travel agency is empty");
+        }
+
+        var agency = await _unitOfWork.agencyRepository.GetById(travelAgencyModel.Id);
+
+        if (agency == null)
+        {
+            throw new Exception("Agency not found");
+        }
+
+        agency.Update(travelAgencyModel);
+        _unitOfWork.agencyRepository.Update(agency);
+        await _unitOfWork.SaveAsync();
     }
 }

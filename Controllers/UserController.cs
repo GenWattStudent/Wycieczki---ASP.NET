@@ -70,7 +70,7 @@ public class UserController : Controller
                 return View(loginModel);
             }
 
-            var token = _tokenService.Generate(user.Username, user.Role, user.Id, user.ImagePath, user.Contact?.Email);
+            var token = _tokenService.Generate(user.Username, user.Roles, user.Id, user.ImagePath, user.Contact?.Email);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {
@@ -95,6 +95,7 @@ public class UserController : Controller
         return RedirectToAction("Login");
     }
 
+    [Authorize]
     async public Task<IActionResult> UserInfo()
     {
         var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
@@ -109,6 +110,7 @@ public class UserController : Controller
         return View(userViewModel);
     }
 
+    [Authorize]
     public async Task<IActionResult> EditUserInfo(UserViewModel userInfo)
     {
         Console.WriteLine("EditUserInfo " + userInfo.RegisterModel.Image);
@@ -166,7 +168,7 @@ public class UserController : Controller
             {
                 Username = username,
                 Password = password,
-                Role = Role.Admin
+                Roles = new List<RoleModel> { new RoleModel { Role = Role.Admin } }
             };
 
             await _userService.RegisterAdmin(user);
@@ -180,6 +182,7 @@ public class UserController : Controller
         }
     }
 
+    [Authorize]
     public async Task<IActionResult> DeleteImage()
     {
         await _userService.DeleteImage(User.FindFirst(ClaimTypes.Name)?.Value);

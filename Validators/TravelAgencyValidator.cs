@@ -1,10 +1,9 @@
-using Book.App.Models;
-using Book.App.Services;
+using Book.App.ViewModels;
 using FluentValidation;
 
 namespace Book.App.Validators;
 
-public class TravelAgencyValidator : AbstractValidator<TravelAgencyModel>
+public class TravelAgencyValidator : AbstractValidator<CreateAgencyViewModel>
 {
 
     public TravelAgencyValidator()
