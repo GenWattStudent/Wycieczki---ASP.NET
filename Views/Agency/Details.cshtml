@@ -4,7 +4,7 @@
 
 @{
     ViewData["Title"] = "Agency Details";
-    var isAgencyAdmin = Html.HasRole("Admin");
+    var isAgencyAdmin = Html.HasRole("AgencyAdmin");
 }
 
 @if (Model.TravelAgency != null)
@@ -20,26 +20,7 @@
     }
     else if (isBelongToAgency)
     {
-        <header class="glassmorphism p-3 rounded">
-            <h2>Welcome to <strong class="text-primary">@Model.TravelAgency.Name</strong>
-                <partial name="_AgencyStatus" model="@Model.TravelAgency" />
-            </h2>
-        </header>
-
-        <div class="glassmorphism p-3 mt-3 rounded">
-            @await Component.InvokeAsync("AgencyNav", new { agencyId = Model.TravelAgency.Id })
-        </div>
-
-        <div class="glassmorphism p-3 mt-3 rounded">
-            @using (Html.BeginForm("Update", "Agency", FormMethod.Post))
-            {
-                <partial name="_AgencyForm" model="@Model.TravelAgency" />
-                <button type="submit" class="btn btn-primary">Update</button>
-            }
-
-            <a asp-action="Delete" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
-                class="btn btn-danger mt-2">Delete Agency</a>
-        </div>
+        <partial name="_AgencyAdminPartial" model="@Model" />
     }
     else if (!isBelongToAgency && Model.TravelAgency.IsAccepted)
     {

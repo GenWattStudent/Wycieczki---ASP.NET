@@ -1,7 +1,5 @@
-
 using System.Security.Claims;
 using AutoMapper;
-using Book.App.Models;
 using Book.App.Services;
 using Book.App.ViewModels;
 using FluentValidation;
@@ -17,12 +15,14 @@ public class AgencyController : Controller
     private readonly IValidator<CreateAgencyViewModel> _validator;
     private readonly IAgencyService _agencyService;
     private readonly IMapper _mapper;
+    private readonly ITourService _tourService;
 
-    public AgencyController(IAgencyService agencyService, IValidator<CreateAgencyViewModel> validator, IMapper mapper)
+    public AgencyController(IAgencyService agencyService, IValidator<CreateAgencyViewModel> validator, IMapper mapper, ITourService tourService)
     {
         _agencyService = agencyService;
         _validator = validator;
         _mapper = mapper;
+        _tourService = tourService;
     }
 
     [Authorize]
@@ -48,7 +48,7 @@ public class AgencyController : Controller
         {
             try
             {
-                await _agencyService.CreateAsync(_mapper.Map<TravelAgencyModel>(createAgencyViewModel), userId);
+                await _agencyService.CreateAsync(createAgencyViewModel, userId);
                 return RedirectToAction("UserInfo", "User");
             }
             catch (Exception e)
@@ -108,7 +108,7 @@ public class AgencyController : Controller
         try
         {
             var travelAgency = await _agencyService.GetByIdAsync(agencyId);
-            return View(new TravelAgencyViewModel() { TravelAgency = travelAgency });
+            return View(new TravelAgencyViewModel() { TravelAgency = travelAgency, CreateAgencyViewModel = _mapper.Map<CreateAgencyViewModel>(travelAgency) });
         }
         catch (Exception e)
         {
@@ -122,23 +122,22 @@ public class AgencyController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(CreateAgencyViewModel createAgencyViewModel)
     {
-        ValidationResult result = await _validator.ValidateAsync(createAgencyViewModel);
-
-        if (!result.IsValid)
-        {
-            result.AddToModelState(ModelState, null);
-            return View(createAgencyViewModel);
-        }
-
         try
         {
-            await _agencyService.UpdateAsync(_mapper.Map<TravelAgencyModel>(createAgencyViewModel));
+            ValidationResult result = await _validator.ValidateAsync(createAgencyViewModel);
+
+            if (!result.IsValid)
+            {
+                result.AddToModelState(ModelState, null);
+                return View("Details", new TravelAgencyViewModel() { TravelAgency = await _agencyService.GetByIdAsync(createAgencyViewModel.Id), CreateAgencyViewModel = createAgencyViewModel });
+            }
+            await _agencyService.UpdateAsync(createAgencyViewModel);
             return RedirectToAction("Details", new { agencyId = createAgencyViewModel.Id });
         }
         catch (Exception e)
         {
             TempData["ErrorMessage"] = e.Message;
-            return View(createAgencyViewModel);
+            return RedirectToAction("Details", new { agencyId = createAgencyViewModel.Id });
         }
     }
 
@@ -160,5 +159,50 @@ public class AgencyController : Controller
         }
 
         return RedirectToAction("Login", "User");
+    }
+
+    [Authorize(Roles = "Admin,AgencyAdmin")]
+    public async Task<IActionResult> DeleteLogo(int agencyId)
+    {
+        try
+        {
+            await _agencyService.DeleteLogoAsync(agencyId);
+            return RedirectToAction("Details", new { agencyId });
+        }
+        catch (Exception e)
+        {
+            TempData["ErrorMessage"] = e.Message;
+            return RedirectToAction("Details", new { agencyId });
+        }
+    }
+
+    [Authorize(Roles = "Admin,AgencyAdmin")]
+    public async Task<IActionResult> DeleteVideo(int agencyId)
+    {
+        try
+        {
+            await _agencyService.DeleteVideoAsync(agencyId);
+            return RedirectToAction("Details", new { agencyId });
+        }
+        catch (Exception e)
+        {
+            TempData["ErrorMessage"] = e.Message;
+            return RedirectToAction("Details", new { agencyId });
+        }
+    }
+
+    [Authorize(Roles = "Admin,AgencyAdmin")]
+    public async Task<IActionResult> Tours(int agencyId)
+    {
+        try
+        {
+            var tours = await _tourService.GetByAgencyIdAsync(agencyId);
+            return View(new AgencyTourListViewModel() { Tours = tours, AgencyId = agencyId });
+        }
+        catch (Exception e)
+        {
+            TempData["ErrorMessage"] = e.Message;
+            return RedirectToAction("Details", new { agencyId });
+        }
     }
 }

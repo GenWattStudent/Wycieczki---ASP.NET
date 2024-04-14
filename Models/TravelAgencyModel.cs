@@ -23,6 +23,7 @@ public class TravelAgencyModel : BaseEntity
 
     public void Update(TravelAgencyModel travelAgencyModel)
     {
+        Console.WriteLine(travelAgencyModel.Address.UserId);
         Name = travelAgencyModel.Name;
         Description = travelAgencyModel.Description;
         Address = travelAgencyModel.Address;

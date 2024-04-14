@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Book.App.ViewModels;
 
 namespace Book.App.Models;
 
@@ -29,16 +30,16 @@ public class UserModel : BaseEntity
     public string? ImagePath { get; set; }
     public int? TravelAgencyId { get; set; }
 
-    public ContactModel? Contact { get; set; }
+    public ContactModel Contact { get; set; } = new();
     public PreferencesModel Preferences { get; set; }
-    public AddressModel? Address { get; set; }
+    public AddressModel Address { get; set; } = new();
     public TravelAgencyModel? TravelAgency { get; set; }
 
     public List<TourModel> Tours { get; set; } = new();
     public List<ReservationModel> Reservations { get; set; } = new();
     public List<RoleModel> Roles { get; set; } = new();
 
-    public UserModel(RegisterModel registerModel)
+    public UserModel(RegisterViewModel registerModel)
     {
         Username = registerModel.Username;
         Password = registerModel.Password;

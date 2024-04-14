@@ -2,20 +2,20 @@
 @model UserViewModel
 
 @{
-    ViewData["Title"] = $"Welcome {Model.RegisterModel.Username}";
+    ViewData["Title"] = $"Welcome {Model.Username}";
     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 }
 
 <section>
     <header class="d-flex flex-wrap justify-content-between glassmorphism p-3 mb-3 rounded">
-        <h1>Welcome <span class="text-primary">@Model.RegisterModel.Username</span></h1>
+        <h1>Welcome <span class="text-primary">@Model.Username</span></h1>
         <div>
             @if (Model.ImagePath != null)
             {
                 <a class="position-absolute btn btn-danger" asp-action="DeleteImage" asp-controller="User">
                     <ion-icon name="close-outline"></ion-icon>
                 </a>
-                <img class="rounded w-100" src="@Model.ImagePath" alt="user_image">
+                <img class="rounded" style="width: 200px; height: 200px;" src="@Model.ImagePath" alt="user_image">
             }
             else
             {
@@ -66,47 +66,47 @@
             @Html.AntiForgeryToken()
             <h3>Contact</h3>
             <div class="form-group">
-                <label asp-for="RegisterModel.Contact.Email"></label>
-                <input asp-for="RegisterModel.Contact.Email" class="form-control" />
-                <span asp-validation-for="RegisterModel.Contact.Email" class="text-danger"></span>
+                <label asp-for="EditUserViewModel.Contact.Email"></label>
+                <input asp-for="EditUserViewModel.Contact.Email" class="form-control" />
+                <span asp-validation-for="EditUserViewModel.Contact.Email" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="RegisterModel.Contact.Phone"></label>
-                <input asp-for="RegisterModel.Contact.Phone" class="form-control" />
-                <span asp-validation-for="RegisterModel.Contact.Phone" class="text-danger"></span>
+                <label asp-for="EditUserViewModel.Contact.Phone"></label>
+                <input asp-for="EditUserViewModel.Contact.Phone" class="form-control" />
+                <span asp-validation-for="EditUserViewModel.Contact.Phone" class="text-danger"></span>
             </div>
 
             <h3>Address</h3>
             <div class="form-group">
-                <label asp-for="RegisterModel.Address.Street"></label>
-                <input asp-for="RegisterModel.Address.Street" class="form-control" />
-                <span asp-validation-for="RegisterModel.Address.Street" class="text-danger"></span>
+                <label asp-for="EditUserViewModel.Address.Street"></label>
+                <input asp-for="EditUserViewModel.Address.Street" class="form-control" />
+                <span asp-validation-for="EditUserViewModel.Address.Street" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="RegisterModel.Address.City"></label>
-                <input asp-for="RegisterModel.Address.City" class="form-control" />
-                <span asp-validation-for="RegisterModel.Address.City" class="text-danger"></span>
+                <label asp-for="EditUserViewModel.Address.City"></label>
+                <input asp-for="EditUserViewModel.Address.City" class="form-control" />
+                <span asp-validation-for="EditUserViewModel.Address.City" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="RegisterModel.Address.Zip"></label>
-                <input asp-for="RegisterModel.Address.Zip" class="form-control" />
-                <span asp-validation-for="RegisterModel.Address.Zip" class="text-danger"></span>
+                <label asp-for="EditUserViewModel.Address.Zip"></label>
+                <input asp-for="EditUserViewModel.Address.Zip" class="form-control" />
+                <span asp-validation-for="EditUserViewModel.Address.Zip" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="RegisterModel.Address.Country"></label>
-                <input asp-for="RegisterModel.Address.Country" class="form-control" />
-                <span asp-validation-for="RegisterModel.Address.Country" class="text-danger"></span>
+                <label asp-for="EditUserViewModel.Address.Country"></label>
+                <input asp-for="EditUserViewModel.Address.Country" class="form-control" />
+                <span asp-validation-for="EditUserViewModel.Address.Country" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="RegisterModel.Image"></label>
-                <input asp-for="RegisterModel.Image" type="file" class="form-control" onchange="ImgPre(this)"
+                <label asp-for="EditUserViewModel.Image"></label>
+                <input asp-for="EditUserViewModel.Image" type="file" class="form-control" onchange="ImgPre(this)"
                     accept="image/*" />
-                <span asp-validation-for="RegisterModel.Image" class="text-danger"></span>
+                <span asp-validation-for="EditUserViewModel.Image" class="text-danger"></span>
             </div>
 
             <div id="preview" class="mb-2 d-flex justify-content-center"></div>

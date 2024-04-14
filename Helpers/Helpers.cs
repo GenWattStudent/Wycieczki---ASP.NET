@@ -8,6 +8,7 @@ using Book.App.Validators;
 using Book.App.ViewModels;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace Book.App.Helpers;
 
@@ -16,6 +17,10 @@ class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<CreateAgencyViewModel, TravelAgencyModel>();
+        CreateMap<TravelAgencyModel, CreateAgencyViewModel>();
+        CreateMap<RegisterViewModel, UserModel>();
+        CreateMap<EditUserViewModel, UserModel>();
+        CreateMap<EditAgencyViewModel, TravelAgencyModel>();
     }
 }
 
@@ -51,6 +56,7 @@ public static class Helpers
 
     public static void AddMyServices(this IServiceCollection services)
     {
+        const int MAX_BODY_SIZE = 104857600 / 2; // 50MB
         // Repositories
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IReservationRepository, ReservationRepository>();
@@ -74,7 +80,19 @@ public static class Helpers
 
         // validators
         services.AddTransient<IValidator<CreateAgencyViewModel>, TravelAgencyValidator>();
+        services.AddTransient<IValidator<AddressModel>, AddressValidator>();
+        services.AddTransient<IValidator<RegisterViewModel>, RegisterViewModelValidator>();
+        services.AddTransient<IValidator<ContactModel>, ContactValidator>();
+        services.AddTransient<IValidator<EditUserViewModel>, EditUserViewModelValidator>();
+        services.AddTransient<IValidator<LoginViewModel>, LoginViewModelValidator>();
+
+        services.AddHttpContextAccessor();
 
         services.AddAutoMapper(typeof(MappingProfile));
+
+        services.Configure<KestrelServerOptions>(options =>
+        {
+            options.Limits.MaxRequestBodySize = MAX_BODY_SIZE;
+        });
     }
 }

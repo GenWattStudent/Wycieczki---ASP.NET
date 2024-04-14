@@ -23,9 +23,13 @@ public class Contact
 
 public class Address
 {
+    [Required]
     public string Street { get; set; } = string.Empty;
+    [Required]
     public string City { get; set; } = string.Empty;
+    [Required]
     public string Zip { get; set; } = string.Empty;
+    [Required]
     public string Country { get; set; } = string.Empty;
 
     public Address()
@@ -41,33 +45,3 @@ public class Address
     }
 }
 
-public class RegisterModel
-{
-    [Required]
-    [StringLength(50, MinimumLength = 3)]
-    public string Username { get; set; } = string.Empty;
-    [Required]
-    [StringLength(50, MinimumLength = 3)]
-    public string Password { get; set; } = string.Empty;
-    [Required]
-    [StringLength(50, MinimumLength = 3)]
-    [Compare("Password")]
-    [Display(Name = "Confirm Password")]
-    public string ConfirmPassword { get; set; } = string.Empty;
-    [Required]
-    public Contact Contact { get; set; } = new();
-    public Address Address { get; set; } = new();
-    [Display(Name = "Profile Image")]
-    public IFormFile? Image { get; set; }
-
-    public RegisterModel()
-    {
-    }
-
-    public RegisterModel(UserModel userModel)
-    {
-        Username = userModel.Username;
-        Contact = userModel.Contact != null ? new Contact(userModel.Contact) : new();
-        Address = userModel.Address != null ? new Address(userModel.Address) : new();
-    }
-}

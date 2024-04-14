@@ -13,4 +13,5 @@ public interface ITourService
     Task Edit(TourModel tour, EditTourViewModel editTourModel);
     Task Delete(int id);
     Task<List<TourModel>> GetVisible(FilterModel filterModel);
+    Task<List<TourModel>> GetByAgencyIdAsync(int id);
 }

@@ -12,12 +12,12 @@ public class AddressModel : BaseEntity
     public string Zip { get; set; } = string.Empty;
     [Required]
     public string Country { get; set; } = string.Empty;
-    public int UserId { get; set; }
-    public UserModel? User { get; set; } = new();
+    public int? UserId { get; set; }
+    public UserModel? User { get; set; }
 
     public TravelAgencyModel? TravelAgency { get; set; }
 
-    public AddressModel(Address address)
+    public AddressModel(AddressModel address)
     {
         Street = address.Street;
         City = address.City;

@@ -1,11 +1,12 @@
 using Book.App.Models;
+using Book.App.ViewModels;
 
 namespace Book.App.Services;
 
 public interface IAgencyService
 {
-    Task<TravelAgencyModel> CreateAsync(TravelAgencyModel travelAgencyModel, int userId);
-    Task UpdateAsync(TravelAgencyModel travelAgencyModel);
+    Task<TravelAgencyModel> CreateAsync(CreateAgencyViewModel travelAgencyModel, int userId);
+    Task UpdateAsync(CreateAgencyViewModel travelAgencyModel);
 
     Task<List<TravelAgencyModel>> GetNotAcceptedAsync();
     Task<List<TravelAgencyModel>> GetAllByUserIdAsync(string userId);
@@ -19,4 +20,7 @@ public interface IAgencyService
     Task PromoteAsync(int userId, int currentUserId, Role role);
 
     Task<bool> HasUserAgencyAsync(int userId);
+
+    Task DeleteLogoAsync(int id);
+    Task DeleteVideoAsync(int id);
 }

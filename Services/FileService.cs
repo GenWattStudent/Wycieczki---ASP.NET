@@ -33,7 +33,7 @@ public class FileService : IFileService
         return imageUrls;
     }
 
-    public async Task DeleteFile(string path)
+    public void DeleteFile(string path)
     {
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", path.TrimStart('/'));
         if (File.Exists(filePath))

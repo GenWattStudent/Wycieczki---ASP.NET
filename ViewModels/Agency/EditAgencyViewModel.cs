@@ -3,8 +3,7 @@ using Book.App.Models;
 
 namespace Book.App.ViewModels;
 
-
-public class CreateAgencyViewModel
+public class EditAgencyViewModel
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -13,5 +12,5 @@ public class CreateAgencyViewModel
     public IFormFile? VideoFile { get; set; }
     [Display(Name = "Choose your logo")]
     public IFormFile? LogoFile { get; set; }
-    public AddressModel Address { get; set; } = new AddressModel();
+    public AddressModel Address { get; set; } = new();
 }

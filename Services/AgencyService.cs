@@ -1,3 +1,4 @@
+using AutoMapper;
 using Book.App.Models;
 using Book.App.Repositories.UnitOfWork;
 using Book.App.Specifications;
@@ -9,11 +10,15 @@ public class AgencyService : IAgencyService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileService _fileService;
+    private readonly IMapper _mapper;
+    public readonly string logosFolder = "logos";
+    public readonly string videosFolder = "videos";
 
-    public AgencyService(IUnitOfWork unitOfWork, IFileService fileService)
+    public AgencyService(IUnitOfWork unitOfWork, IFileService fileService, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _fileService = fileService;
+        _mapper = mapper;
     }
 
     public async Task AcceptAsync(int id, string reason)
@@ -32,20 +37,8 @@ public class AgencyService : IAgencyService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task<TravelAgencyModel> CreateAsync(TravelAgencyModel travelAgencyModel, int userId)
+    public async Task<TravelAgencyModel> CreateAsync(CreateAgencyViewModel createAgencyViewModel, int userId)
     {
-        if (travelAgencyModel == null)
-        {
-            throw new Exception("Travel agency is null");
-        }
-
-        var agencyByName = await _unitOfWork.agencyRepository.GetByName(travelAgencyModel.Name);
-
-        if (agencyByName != null)
-        {
-            throw new Exception("Agency with this name already exists");
-        }
-
         var user = await _unitOfWork.userRepository.GetById(userId);
 
         if (user == null)
@@ -53,9 +46,18 @@ public class AgencyService : IAgencyService
             throw new Exception("User not found");
         }
 
-        if (user.TravelAgencyId != null)
+        var travelAgencyModel = _mapper.Map<TravelAgencyModel>(createAgencyViewModel);
+
+        if (createAgencyViewModel.LogoFile != null)
         {
-            throw new Exception("User already has an agency");
+            var logoUrl = await _fileService.SaveFile(createAgencyViewModel.LogoFile, logosFolder);
+            travelAgencyModel.LogoPath = logoUrl;
+        }
+
+        if (createAgencyViewModel.VideoFile != null)
+        {
+            var videoUrl = await _fileService.SaveFile(createAgencyViewModel.VideoFile, videosFolder);
+            travelAgencyModel.VideoPath = videoUrl;
         }
 
         user.Roles.Add(new RoleModel { Role = Role.AgencyAdmin });
@@ -87,9 +89,13 @@ public class AgencyService : IAgencyService
             user.Roles.RemoveAll(r => r.Role == Role.AgencyAdmin || r.Role == Role.AgencyUser || r.Role == Role.AgencyManager);
         }
 
+        if (agency.LogoPath != null) _fileService.DeleteFile(agency.LogoPath);
+        if (agency.VideoPath != null) _fileService.DeleteFile(agency.VideoPath);
+
+
         foreach (var image in agency.Images)
         {
-            await _fileService.DeleteFile(image.ImageUrl);
+            _fileService.DeleteFile(image.ImageUrl);
             _unitOfWork.imageRepository.Remove(image);
         }
 
@@ -113,10 +119,7 @@ public class AgencyService : IAgencyService
         agencySpecification.ById(id);
         var agency = await _unitOfWork.agencyRepository.GetSingleBySpec(agencySpecification);
 
-        if (agency == null)
-        {
-            throw new Exception("Agency not found");
-        }
+        if (agency == null) throw new Exception("Agency not found");
 
         return agency;
     }
@@ -143,15 +146,8 @@ public class AgencyService : IAgencyService
         var agency = await _unitOfWork.agencyRepository.GetSingleBySpec(agencySpecification);
         var user = await _unitOfWork.userRepository.GetById(userId);
 
-        if (agency == null)
-        {
-            throw new Exception("Agency not found");
-        }
-
-        if (user == null)
-        {
-            throw new Exception("User not found");
-        }
+        if (agency == null) throw new Exception("Agency not found");
+        if (user == null) throw new Exception("User not found");
 
         if (agency.Users.Count == 1)
         {
@@ -183,7 +179,7 @@ public class AgencyService : IAgencyService
         if (IsAgencyAdmin(currentUser))
         {
             var user = await _unitOfWork.userRepository.GetById(userId);
-            if (user != null && user.TravelAgencyId == currentUser.TravelAgencyId && user.Roles.All(r => r.Role != agencyRole))
+            if (user != null && user.TravelAgencyId == currentUser?.TravelAgencyId && user.Roles.All(r => r.Role != agencyRole))
             {
                 user.Roles.Add(new RoleModel { Role = agencyRole });
                 await _unitOfWork.SaveAsync();
@@ -207,22 +203,67 @@ public class AgencyService : IAgencyService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task UpdateAsync(TravelAgencyModel travelAgencyModel)
+    public async Task UpdateAsync(CreateAgencyViewModel createAgencyViewModel)
     {
-        if (travelAgencyModel == null)
+        var agency = await _unitOfWork.agencyRepository.GetById(createAgencyViewModel.Id);
+
+        if (agency == null) throw new Exception("Agency not found");
+
+        if (createAgencyViewModel.LogoFile != null)
         {
-            throw new Exception("Travel agency is empty");
+            if (agency.LogoPath != null)
+            {
+                _fileService.DeleteFile(agency.LogoPath);
+            }
+
+            var logoUrl = await _fileService.SaveFile(createAgencyViewModel.LogoFile, logosFolder);
+            agency.LogoPath = logoUrl;
         }
 
-        var agency = await _unitOfWork.agencyRepository.GetById(travelAgencyModel.Id);
-
-        if (agency == null)
+        if (createAgencyViewModel.VideoFile != null)
         {
-            throw new Exception("Agency not found");
+            if (agency.VideoPath != null)
+            {
+                _fileService.DeleteFile(agency.VideoPath);
+            }
+
+            var videoUrl = await _fileService.SaveFile(createAgencyViewModel.VideoFile, videosFolder);
+            agency.VideoPath = videoUrl;
         }
 
-        agency.Update(travelAgencyModel);
+        agency = _mapper.Map(createAgencyViewModel, agency);
+
         _unitOfWork.agencyRepository.Update(agency);
         await _unitOfWork.SaveAsync();
+    }
+
+    public async Task DeleteLogoAsync(int id)
+    {
+        var agency = await _unitOfWork.agencyRepository.GetById(id);
+
+        if (agency == null) throw new Exception("Agency not found");
+
+        if (agency.LogoPath != null)
+        {
+            _fileService.DeleteFile(agency.LogoPath);
+            agency.LogoPath = null;
+            _unitOfWork.agencyRepository.Update(agency);
+            await _unitOfWork.SaveAsync();
+        }
+    }
+
+    public async Task DeleteVideoAsync(int id)
+    {
+        var agency = await _unitOfWork.agencyRepository.GetById(id);
+
+        if (agency == null) throw new Exception("Agency not found");
+
+        if (agency.VideoPath != null)
+        {
+            _fileService.DeleteFile(agency.VideoPath);
+            agency.VideoPath = null;
+            _unitOfWork.agencyRepository.Update(agency);
+            await _unitOfWork.SaveAsync();
+        }
     }
 }

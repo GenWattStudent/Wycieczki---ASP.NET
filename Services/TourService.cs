@@ -93,7 +93,7 @@ public class TourService : ITourService
                 {
                     foreach (var image in tour.Images)
                     {
-                        await _fileService.DeleteFile(image.ImageUrl);
+                        _fileService.DeleteFile(image.ImageUrl);
                     }
 
                     // remove images from db
@@ -106,7 +106,7 @@ public class TourService : ITourService
                     {
                         foreach (var image in waypoint.Images)
                         {
-                            await _fileService.DeleteFile(image.ImageUrl);
+                            _fileService.DeleteFile(image.ImageUrl);
                         }
                     }
 
@@ -120,5 +120,10 @@ public class TourService : ITourService
                 transaction.Rollback();
             }
         }
+    }
+
+    public async Task<List<TourModel>> GetByAgencyIdAsync(int id)
+    {
+        return await _unitOfWork.tourRepository.GetBySpec(new TourByAgencyIdSpecification(id));
     }
 }

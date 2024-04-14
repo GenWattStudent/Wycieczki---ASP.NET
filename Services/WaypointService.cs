@@ -29,7 +29,7 @@ public class WaypointService : IWaypointService
             var imageToDelete = await _context.Images.FindAsync(image.Id);
             if (imageToDelete != null)
             {
-                await _fileService.DeleteFile(imageToDelete.ImageUrl);
+                _fileService.DeleteFile(imageToDelete.ImageUrl);
                 _context.Images.Remove(imageToDelete);
             }
         }

@@ -22,7 +22,7 @@ public class ImageService : IImageService
         if (image != null)
         {
             await _unitOfWork.imageRepository.Remove(image.Id);
-            await _fileService.DeleteFile(image.ImageUrl);
+            _fileService.DeleteFile(image.ImageUrl);
             await _unitOfWork.imageRepository.SaveAsync();
         }
     }

@@ -1,0 +1,16 @@
+@using Book.App.ViewModels
+@model VideoViewModel
+
+@if (Model.Path != null)
+{
+    <div>
+        @if (Model.IsEdit)
+        {
+            <a asp-action="DeleteLogo" asp-area="Agency" asp-route-agencyId="@Model.Id"
+                class="btn-sm btn-danger mb-2 position-absolute">
+                <ion-icon name="trash"></ion-icon></a>
+        }
+
+        <img style="width: 80px; height: 80px; border-radius: 50%;" src="@Model.Path" class="img-fluid" alt="Agency Logo" />
+    </div>
+}

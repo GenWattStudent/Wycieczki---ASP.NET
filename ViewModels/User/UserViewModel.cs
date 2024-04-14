@@ -4,13 +4,15 @@ namespace Book.App.ViewModels
 {
     public class UserViewModel
     {
-        public RegisterModel RegisterModel { get; set; } = new();
+        public EditUserViewModel EditUserViewModel { get; set; } = new();
         public string? ImagePath { get; set; }
         public TravelAgencyModel? TravelAgency { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         public UserViewModel(UserModel userModel)
         {
-            RegisterModel = new(userModel);
+            Username = userModel.Username;
+            EditUserViewModel = new(userModel);
             ImagePath = userModel.ImagePath;
             TravelAgency = userModel.TravelAgency;
         }
