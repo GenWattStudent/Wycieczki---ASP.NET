@@ -1,0 +1,25 @@
+@using Book.App.ViewModels
+@model CreateAgencyViewModel
+
+@{
+    ViewData["Title"] = "Create Agency";
+}
+
+
+<header class="glassmorphism p-3 rounded">
+    <h2>Create Agency</h2>
+    <small>Fill in the form to create a new agency</small>
+</header>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    @using (Html.BeginForm("Create", "Agency", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <partial name="_AgencyForm" model="@Model" />
+
+        <div>
+            <small>Wait for admin to accept your agency!</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send application for agency</button>
+    }
+</div>

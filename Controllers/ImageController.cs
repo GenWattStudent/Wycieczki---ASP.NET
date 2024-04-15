@@ -6,10 +6,10 @@ namespace Book.App.Controllers;
 
 public class ImageController : Controller
 {
-    private readonly ImageService _imageService;
-    private readonly TourService _tourService;
+    private readonly IImageService _imageService;
+    private readonly ITourService _tourService;
 
-    public ImageController(ImageService imageService, TourService tourService)
+    public ImageController(IImageService imageService, ITourService tourService)
     {
         _imageService = imageService;
         _tourService = tourService;
@@ -18,8 +18,8 @@ public class ImageController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteImage(int id, int tourId)
     {
-        await _imageService.DeleteImage(id);
-        var tour = await _tourService.GetTour(tourId);
+        await _imageService.Delete(id);
+        var tour = await _tourService.GetById(tourId);
         return RedirectToAction("EditTour", "Tour", tour);
     }
 

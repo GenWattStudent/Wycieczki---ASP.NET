@@ -1,0 +1,18 @@
+@using Book.App.ViewModels
+@model GalleryViewModel
+
+@foreach (var image in Model.Images)
+{
+    <div class="card mb-3">
+        <img src="@Url.Content(image.ImageUrl)" class="card-img-top" style="max-height: 300px;" alt="...">
+        <div class="d-flex gap-2 p-2">
+            <form asp-controller="Gallery" asp-action="Delete" asp-route-id="@image.Id" asp-route-tourId="@Model.TourId">
+                <button type="submit" class="btn btn-danger">Delete</button </form>
+
+                <button type="button" class="btn btn-primary" data-image-btn data-toggle="modal"
+                    data-target="#GalleryDetailsModal" data-image-id="@image.Id">
+                    Preview
+                </button>
+        </div>
+    </div>
+}

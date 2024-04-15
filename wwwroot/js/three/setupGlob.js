@@ -1,6 +1,6 @@
-import { Assets } from './Assets.js'
 import EarthScene from './earth.js'
 import { latLongToVector3 } from './helpers.js'
+import { Assets } from './Assets.js'
 
 export class EarthOptions {
   constructor(width, height, zoom) {
@@ -12,11 +12,9 @@ export class EarthOptions {
 
 function setupGlob(waypointsObj, options) {
   const assets = new Assets()
-
   return new Promise((resolve, reject) => {
     assets.loadAssets().then(() => {
       const earthScene = new EarthScene(assets)
-
       earthScene.earth.setWaypoints(waypointsObj)
       earthScene.setHeight(options.height)
       earthScene.setWidth(options.width)
@@ -27,15 +25,9 @@ function setupGlob(waypointsObj, options) {
       earthScene.earth.isAnimate = false
       earthScene.earth.setZoom(options.zoom)
       earthScene.earth.updateCamera(
-        latLongToVector3(
-          waypointsObj[0].lat,
-          waypointsObj[0].lng,
-          earthScene.earth.earthRadius,
-          0.01
-        )
+        latLongToVector3(waypointsObj[0].lat, waypointsObj[0].lng, earthScene.earth.earthRadius, 0.01)
       )
       earthScene.animate()
-
       resolve(earthScene)
     })
   })

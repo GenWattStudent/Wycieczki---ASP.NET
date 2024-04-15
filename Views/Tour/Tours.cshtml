@@ -1,3 +1,4 @@
+@using Book.App.Helpers
 @{
     ViewData["Title"] = "Tours";
 }
@@ -5,16 +6,7 @@
 @using Book.App.Models
 @model List<TourModel>
 
-@{
-    var role = User.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
-}
-
 <div class="glassmorphism p-3 rounded mb-3">
-    @if (role == "Admin")
-    {
-        <a asp-action="Active" asp-controller="Tour">See Active Tours</a>
-    }
-
     @if (Model.Count == 0)
     {
         <h3 class="mt-2">No tours available</h3>

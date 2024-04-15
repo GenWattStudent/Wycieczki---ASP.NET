@@ -1,59 +1,57 @@
+using AutoMapper;
 using Book.App.Models;
-using Book.App.Repositories;
+using Book.App.Repositories.UnitOfWork;
+using Book.App.Specifications;
 using Book.App.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace Book.App.Services;
 
-public class UserService
+public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly string _userImageFolder = "users";
-    private readonly FileService _fileService;
+    private readonly IFileService _fileService;
+    private readonly IAgencyService _agencyService;
+    private readonly IMapper _mapper;
 
-    public UserService(IUserRepository userRepository, FileService fileService)
+    public UserService(IUnitOfWork unitOfWork, IFileService fileService, IAgencyService agencyService, IMapper mapper)
     {
-        _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
         _fileService = fileService;
+        _agencyService = agencyService;
+        _mapper = mapper;
     }
 
-    public async Task Register(RegisterModel registerModel)
+    public async Task Register(RegisterViewModel registerModel)
     {
         var PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerModel.Password);
 
         registerModel.Password = PasswordHash;
-        Console.WriteLine(registerModel.Image + "asdasdd");
-        var userModel = new UserModel(registerModel);
+
+        var userModel = _mapper.Map<UserModel>(registerModel);
 
         if (registerModel.Image != null)
         {
             userModel.ImagePath = await _fileService.SaveFile(registerModel.Image, _userImageFolder);
         }
 
-        _userRepository.Add(userModel);
-        await _userRepository.SaveAsync();
+        _unitOfWork.userRepository.Add(userModel);
+        await _unitOfWork.SaveAsync();
     }
 
-    public async Task EditUserInfo(RegisterModel userViewModel, UserModel userModel)
+    public async Task EditUserInfo(EditUserViewModel userViewModel, UserModel userModel)
     {
-        if (userModel == null)
-        {
-            return;
-        }
+        if (userModel == null) return;
 
-        if (userModel.Contact == null) userModel.Contact = new ContactModel();
-        if (userModel.Address == null) userModel.Address = new AddressModel();
-
-        userModel.Contact.SetContact(userViewModel.Contact);
-        userModel.Address.SetAddress(userViewModel.Address);
+        userModel = _mapper.Map(userViewModel, userModel);
 
         if (userViewModel.Image != null)
         {
-            if (userModel.ImagePath != null) await _fileService.DeleteFile(userModel.ImagePath);
+            if (userModel.ImagePath != null) _fileService.DeleteFile(userModel.ImagePath);
             userModel.ImagePath = await _fileService.SaveFile(userViewModel.Image, _userImageFolder);
         }
 
-        await _userRepository.SaveAsync();
+        await _unitOfWork.SaveAsync();
     }
 
     public async Task RegisterAdmin(UserModel userModel)
@@ -62,51 +60,35 @@ public class UserService
 
         userModel.Password = PasswordHash;
 
-        _userRepository.Add(userModel);
-        await _userRepository.SaveAsync();
+        _unitOfWork.userRepository.Add(userModel);
+        await _unitOfWork.SaveAsync();
     }
 
-    public async Task<UserModel?> GetByUsername(string username)
-    {
-        return await _userRepository.GetByUsername(username).FirstOrDefaultAsync(x => x.Username == username);
-    }
-
-    public async Task<UserModel?> Login(LoginModel loginModel)
-    {
-        var user = await _userRepository.GetByUsername(loginModel.Username).FirstOrDefaultAsync(x => x.Username == loginModel.Username);
-
-        if (user == null)
-        {
-            return null;
-        }
-
-        if (BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password))
-        {
-            return user;
-        }
-
-        return null;
-    }
+    public async Task<UserModel?> GetByUsername(string username) => await _unitOfWork.userRepository.GetSingleBySpec(new UserSpecification(username));
 
     public async Task Delete(string username)
     {
-        var user = await _userRepository.GetByUsername(username).FirstOrDefaultAsync(x => x.Username == username);
-        if (user == null)
+        var user = await GetByUsername(username);
+        if (user == null) return;
+
+
+        if (user.TravelAgency != null)
         {
-            return;
+            await _agencyService.LeaveAsync(user.Id);
         }
 
-        await _userRepository.Remove(user.Id);
-        if (user.ImagePath != null) await _fileService.DeleteFile(user.ImagePath);
-        await _userRepository.SaveAsync();
+        await _unitOfWork.userRepository.Remove(user.Id);
+        if (user.ImagePath != null) _fileService.DeleteFile(user.ImagePath);
+        await _unitOfWork.SaveAsync();
     }
 
     public async Task DeleteImage(string? username)
     {
-        var user = await _userRepository.GetByUsername(username ?? string.Empty).FirstOrDefaultAsync(x => x.Username == username);
+        var user = await GetByUsername(username ?? "");
         if (user == null) return;
-        if (user.ImagePath != null) await _fileService.DeleteFile(user.ImagePath);
+
+        if (user.ImagePath != null) _fileService.DeleteFile(user.ImagePath);
         user.ImagePath = null;
-        await _userRepository.SaveAsync();
+        await _unitOfWork.SaveAsync();
     }
 }

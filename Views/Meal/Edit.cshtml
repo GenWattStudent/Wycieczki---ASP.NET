@@ -1,0 +1,82 @@
+@using Book.App.ViewModels
+@model MealViewModel
+@{
+    ViewData["Title"] = "Edit Meal";
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+@if (Model.TourModel != null)
+{
+    <a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TourModel.TravelAgency.Id"
+        class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+        title="Go back to @Model.TourModel.TravelAgency.Name agency">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Back
+    </a>
+}
+
+@if (Model.MealModel is null)
+{
+    <div class="alert alert-danger">
+        <strong>Error!</strong> Meal not found.
+    </div>
+}
+else
+{
+    var timelineViewModel = new TimelineViewModel
+                {
+                    isEditMode = role == "Admin",
+                    Meals = Model.TourModel.Meals,
+                    TourId = Model.TourModel.Id,
+                };
+
+    <header class="glassmorphism p-3 rounded">
+        <h1>Meals</h1>
+        <small>Select nom nom!</small>
+    </header>
+
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id, isEdit = true })
+    </div>
+
+    <section class="glassmorphism p-3 rounded mt-3">
+        @using (Html.BeginForm("Edit", "Meal", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h3>Edit meal <strong class="text-primary">@Model.MealModel.Name</strong></h3>
+                <hr>
+                <partial name="_MealFormPartial" model="@Model.MealModel" />
+
+                <div class="input-group mt-2">
+                    <div>
+                        <input type="submit" value="Update" class="btn btn-primary" />
+                    </div>
+                </div>
+
+            </div>
+        }
+    </section>
+
+    <section id="edit-timeline">
+        <partial name="_MealTimeline" model="@timelineViewModel" />
+    </section>
+}
+
+@section Scripts {
+    @if (Model.TourModel is not null)
+    {
+        <script>
+            $(document).ready(() => {
+                const mealsModel = @Html.Raw(Json.Serialize(Model.TourModel.Meals));
+                const timeline = new Timeline(mealsModel, "#edit-timeline");
+                timeline.init()
+
+                setInterval(() => {
+                    timeline.update();
+                }, 1000);
+            })
+        </script>
+    }
+}

@@ -30,7 +30,7 @@ public class DateGreaterThanAttribute : ValidationAttribute, IClientModelValidat
     {
         DateTime dateTime = (DateTime)value;
         DateTime target = (DateTime)validationContext.ObjectType.GetProperty(comparisonProperty).GetValue(validationContext.ObjectInstance, null);
-        Console.WriteLine(dateTime + " dupa " + target);
+
         if (dateTime > target)
         {
             return ValidationResult.Success;

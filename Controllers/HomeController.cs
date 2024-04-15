@@ -12,9 +12,9 @@ namespace Book.App.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly BookService _bookService;
+    private readonly IReservationService _bookService;
 
-    public HomeController(ILogger<HomeController> logger, BookService bookService)
+    public HomeController(ILogger<HomeController> logger, IReservationService bookService)
     {
         _bookService = bookService;
         _logger = logger;
@@ -24,7 +24,7 @@ public class HomeController : Controller
     {
         var reservation = await _bookService.GetClosestReservation(int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
         var homeViewModel = new HomeViewModel();
-        
+
         if (reservation != null)
         {
             homeViewModel.Tour = reservation.Tour;
@@ -33,7 +33,6 @@ public class HomeController : Controller
 
         return View(homeViewModel);
     }
-
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

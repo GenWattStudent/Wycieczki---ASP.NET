@@ -1,6 +1,6 @@
 namespace Book.App.Services;
 
-public class FileService
+public class FileService : IFileService
 {
     public async Task<string> SaveFile(IFormFile file, string folder)
     {
@@ -20,7 +20,20 @@ public class FileService
         return $"/images/{folder}/{fileName}";
     }
 
-    public async Task DeleteFile(string path)
+    public async Task<List<string>> SaveFiles(List<IFormFile> files, string folder)
+    {
+        var imageUrls = new List<string>();
+
+        foreach (var file in files)
+        {
+            var path = await SaveFile(file, folder);
+            imageUrls.Add(path);
+        }
+
+        return imageUrls;
+    }
+
+    public void DeleteFile(string path)
     {
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", path.TrimStart('/'));
         if (File.Exists(filePath))

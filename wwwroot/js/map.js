@@ -70,7 +70,7 @@ export class Map {
     `
       )
       .join('')
-
+    console.log(waypointData.id)
     return `
       <div>
         <h4>${name}</h4>
@@ -107,6 +107,7 @@ export class Map {
     }
 
     this.connectWaypointsWithLine(this.waypoints)
+    document.dispatchEvent(new CustomEvent('waypointRemoved', { detail: { id } }))
   }
 
   connectWaypointsWithLine(waypoints) {
@@ -176,6 +177,7 @@ export class Map {
         waypointData.lat = e.target._latlng.lat
         waypointData.lng = e.target._latlng.lng
         this.connectWaypointsWithLine(this.waypoints)
+        document.dispatchEvent(new CustomEvent('waypointMoved', { detail: { waypoint: waypointData } }))
       })
       .on('popupopen', () => {
         if (!edit && !isUser)

@@ -1,0 +1,80 @@
+@using Book.App.ViewModels
+@using Book.App.Helpers;
+@model TimelineViewModel
+
+@if ((Model.Meals == null || Model.Meals.Count == 0) && !Model.isEditMode)
+{
+    <div class="alert alert-info mt-3 d-flex align-items-center gap-2">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <span>No meals found</span>
+    </div>
+}
+
+@if (Model.Meals != null && Model.Meals.Count > 0)
+{
+    <div id="timeline" class="gap-2 position-relative">
+        @{
+            int day = -1;
+            var index = 0;
+        }
+        @foreach (var meal in Model.Meals.OrderBy(m => m.Start))
+        {
+            <div class="checkpoint" style="--delay: @(index / 2)s">
+                @if (day != meal.Start.Day)
+                {
+                    <h6 class="text-primary">
+                        @(DateTime.Now.Day == meal.Start.Day ? "Today" :
+                            meal.Start.ToString("d ddd"))
+                    </h6>
+
+                    day = meal.Start.Day;
+                }
+                <h6 class="text-muted" style="font-size: 0.7rem;">
+                    @meal.Start.ToString("hh:mm tt") - @meal.End.ToString("hh:mm tt")
+                </h6>
+                <div class="card">
+                    <header class="card-header p-1">
+                        <h6 class="text-primary">@meal.Name.Truncate(35)</h6>
+                    </header>
+                    <div class="timeline-item-content card-body p-1">
+                        <p class="text-muted" style="font-size: 0.8rem;">@meal.Description.Truncate(70)</p>
+                        <span class="badge badge-secondary p-1" style="font-size: 0.6rem;">
+                            @meal.MealType
+                        </span>
+
+                        @if (Model.isEditMode)
+                        {
+                            <div class="position-absolute timeline-actions d-flex gap-2">
+                                <a asp-action="Edit" asp-controller="Meal" asp-route-mealId="@meal.Id"
+                                    asp-route-tourIdd="@Model.TourId" data-toggle="tooltip" data-placement="top"
+                                    title="Edit @meal.Name meal" type="submit" class="btn p-0">
+                                    <ion-icon name="pencil"></ion-icon>
+                                </a>
+
+                                @using (Html.BeginForm("Delete", "Meal", new { id = meal.Id }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button data-toggle="tooltip" data-placement="top" title="Delete @meal.Name meal" type="submit"
+                                        class="btn p-0">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            index++;
+        }
+        <div id="timeline-progress" class="line position-absolute bg-primary">
+            <div class="line-progress"></div>
+            <div id="current-timeline-progress" class="current-progress bg-success"></div>
+            <div id="current-timeline-progress-indicator" class="current-progress-indicator bg-danger"></div>
+            <div id="timeline-starts-in"
+                class="bg-danger align-items-center justify-content-center position-absolute rounded d-none timeline-starts-in"
+                style="width: 120px; height: 35px;">
+                <p class="text-light m-0"></p>
+            </div>
+        </div>
+    </div>
+}

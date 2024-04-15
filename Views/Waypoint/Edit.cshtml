@@ -1,0 +1,155 @@
+@model TourModel
+
+@{
+    ViewData["Title"] = "Draw your tour";
+}
+
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
+    class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+    title="Go back to @Model.TravelAgency.Name agency">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+    Back
+</a>
+
+<header class="glassmorphism rounded p-3">
+    <h1>Draw a tour</h1>
+    <small>Create a new tour by adding waypoints to the map</small>
+</header>
+
+<div class="glassmorphism p-3 mt-3 rounded">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id, isEdit = true })
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    <partial name="_MapTools" />
+    <div id="map-info" class="mt-2">
+        <strong id="distance">Distance: 0 km</strong>
+    </div>
+    <div id="map" class="mt-2"></div>
+</div>
+
+<form id="waypointsForm" asp-controller="Waypoint" asp-action="Add" asp-route-tourId="@Model.Id" method="post"
+    enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    @{
+        var index = 0;
+    }
+
+    @foreach (var waypoint in Model.Waypoints)
+    {
+        <input id="@("waypointId" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Id"
+            value="@waypoint.Id" />
+        <input id="@("waypointLat" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Lat"
+            value="@waypoint.Latitude" />
+        <input id="@("waypointLng" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Lng"
+            value="@waypoint.Longitude" />
+        <input id="@("waypointType" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Type"
+            value="@waypoint.Type" />
+        <input id="@("waypointName" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Name"
+            value="@waypoint.Name" />
+        <input id="@("waypointDescription" + waypoint.Id)" type="hidden" name="addTourWaypointsModel[@index].Description"
+            value="@(waypoint.Description)" />
+        index++;
+    }
+    <button type="submit" class="btn btn-primary mt-3">Save tour</button>
+</form>
+
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
+    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
+
+    <script src="~/js/adminMap.js" type="module"></script>
+
+    <script type="module" defer>
+        import { Waypoint } from '/js/waypoint.js';
+        import { adminMap } from '/js/adminMap.js';
+        import { TourData } from '/js/tourData.js';
+
+        function getTypeFromEnum(type) {
+            switch (type) {
+                case 0:
+                    return 'start'
+                case 1:
+                    return 'marker'
+                case 2:
+                    return 'end'
+                case 4:
+                    return 'indicator'
+                default:
+                    return 'road'
+            }
+        }
+        const model = @Html.Raw(Json.Serialize(Model));
+
+        model.waypoints.$values.forEach(waypoint => {
+            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
+            adminMap.addWaypoint(waypointObj, waypointObj.type, true);
+
+            if (model.waypoints.$values.length > 1) {
+                const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
+                const bounds = L.latLngBounds(latLngs);
+                adminMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
+            } else {
+                adminMap.map.setView([ waypoint.latitude, waypoint.longitude ], 13);
+            }
+        });
+
+        function updateMapInfo() {
+            const tourData = new TourData(adminMap.waypoints.map(w => ({ latitude: w.lat, longitude: w.lng })));
+            $('#map-info #distance').text(`Distance: ${tourData.calculateTotalDistance().toFixed(3)} km`);
+        }
+
+        updateMapInfo()
+
+        function createInput(name, value, id, index) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = `addTourWaypointsModel[${index}].${name.charAt(0).toUpperCase() + name.slice(1)}`; // Convert the first character to uppercase
+            input.value = value;
+            input.id = id;
+            return input;
+        }
+        let waypointIndex = model.waypoints.$values.length;
+
+        document.addEventListener('waypointAdded', function (e) {
+            const waypoint = e.detail.waypoint;
+
+            const inputId = createInput('id', waypoint.id, `waypointId${waypoint.id}`, waypointIndex);
+            const inputLat = createInput('lat', waypoint.lat, `waypointLat${waypoint.id}`, waypointIndex);
+            const inputLng = createInput('lng', waypoint.lng, `waypointLng${waypoint.id}`, waypointIndex);
+            const inputType = createInput('type', waypoint.type, `waypointType${waypoint.id}`, waypointIndex);
+
+            $('#waypointsForm').append(inputId);
+            $('#waypointsForm').append(inputLat);
+            $('#waypointsForm').append(inputLng);
+            $('#waypointsForm').append(inputType);
+            waypointIndex++;
+
+            updateMapInfo()
+        });
+
+        document.addEventListener('waypointRemoved', function (e) {
+            const id = e.detail.id;
+
+            document.getElementById(`waypointId${id}`).remove();
+            document.getElementById(`waypointLat${id}`).remove();
+            document.getElementById(`waypointLng${id}`).remove();
+            document.getElementById(`waypointType${id}`).remove();
+            waypointIndex--;
+
+            updateMapInfo()
+        });
+
+        document.addEventListener('waypointMoved', function (e) {
+            const waypoint = e.detail.waypoint;
+
+            document.getElementById(`waypointLat${waypoint.id}`).value = waypoint.lat;
+            document.getElementById(`waypointLng${waypoint.id}`).value = waypoint.lng;
+            updateMapInfo()
+        })
+    </script>
+}

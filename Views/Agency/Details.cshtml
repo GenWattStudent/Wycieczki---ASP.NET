@@ -1,0 +1,84 @@
+@using Book.App.ViewModels
+@using Book.App.Helpers
+@model TravelAgencyViewModel
+
+@{
+    ViewData["Title"] = "Agency Details";
+    var isAgencyAdmin = Html.HasRole("AgencyAdmin");
+}
+
+@if (Model.TravelAgency != null)
+{
+    int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int userId);
+    var isBelongToAgency = Model.TravelAgency.Users.Any(u => u.Id == userId);
+
+    @if (!isBelongToAgency && !Model.TravelAgency.IsAccepted)
+    {
+        <div class="glassmorphism p-3 rounded">
+            <h2>Agency not found</h2>
+        </div>
+    }
+    else if (isBelongToAgency)
+    {
+        <partial name="_AgencyAdminPartial" model="@Model" />
+    }
+    else if (!isBelongToAgency && Model.TravelAgency.IsAccepted)
+    {
+        <div>
+            <header class="glassmorphism p-3 rounded">
+                <h2>
+                    Welcome to <strong class="text-primary">@Model.TravelAgency.Name</strong>
+                </h2>
+            </header>
+
+            @if (Model.TravelAgency.VideoPath != null)
+            {
+                <div class="w-100 position-absolute" style="z-index: -1; left: 0; top: 0; bottom:0;right:0;">
+                    <div style="background-color: rgba(255, 255, 255, 0.288); position: absolute; left: 0; top:0;bottom:0;right:0;">
+                    </div>
+
+                    <video id="agency-video" autoplay muted loop class="w-100" style="min-height: 100%; object-fit: cover;">
+                        <source src="@Model.TravelAgency.VideoPath" type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            }
+
+            <div class="glassmorphism p-3 rounded mt-3">
+                <h4>About us</h4>
+                <p class="font-weight-bold">@Model.TravelAgency.Description</p>
+            </div>
+
+            <div class="glassmorphism p-3 rounded mt-3">
+                <h4>Our memories</h4>
+                @{
+                    var sliderData = new ImageSliderViewModel
+                    {
+                        Images = Model.TravelAgency.Images,
+                        SliderId = Model.TravelAgency.Id
+                    };
+                }
+                <partial name="_ImageSliderPartial" model="@sliderData" />
+            </div>
+
+            <div class="glassmorphism p-3 rounded mt-3">
+                <h4>Our tours</h4>
+                <ul class="grid-tour gap-3 p-0 justify-content-center">
+                    @foreach (var tour in Model.TravelAgency.Tours)
+                    {
+                        <partial name="_TourPartial" model="tour" />
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p class="alert alert-error">Agency not found</p>
+}
+
+
+@section Scripts {
+    <script src="~/js/resize-textarea.js"></script>
+}

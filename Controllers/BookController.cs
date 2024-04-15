@@ -9,9 +9,9 @@ namespace Book.App.Controllers;
 [Authorize]
 public class BookController : Controller
 {
-    private readonly BookService _bookService;
+    private readonly IReservationService _bookService;
 
-    public BookController(BookService tourService)
+    public BookController(IReservationService tourService)
     {
         _bookService = tourService;
     }
@@ -92,7 +92,7 @@ public class BookController : Controller
                 return RedirectToAction("Login", "Account");
             }
 
-            await _bookService.DeleteCancelTour(int.Parse(userId), id);
+            await _bookService.Cancel(int.Parse(userId), id);
 
             return RedirectToAction("Index");
         }
@@ -128,7 +128,7 @@ public class BookController : Controller
     {
         try
         {
-            await _bookService.DeleteReservation(id, tourId);
+            await _bookService.Delete(id, tourId);
 
             return RedirectToAction("TourDetails", "Tour", new { id = tourId });
         }

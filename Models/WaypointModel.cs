@@ -1,3 +1,5 @@
+using Book.App.ViewModels;
+
 namespace Book.App.Models;
 
 public enum WaypointType
@@ -11,8 +13,8 @@ public enum WaypointType
 public class WaypointModel : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public List<ImageModel> Images { get; set; } = new List<ImageModel>();
+    public string? Description { get; set; } = string.Empty;
+    public List<ImageModel> Images { get; set; } = new();
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public int TourId { get; set; }
@@ -24,7 +26,18 @@ public class WaypointModel : BaseEntity
     {
     }
 
-    public WaypointModel(AddTourWaypointsModel waypoint)
+    public WaypointModel(AddTourWaypointsViewModel waypoint)
+    {
+        Edit(waypoint);
+    }
+
+    public void Edit(WaypointModel waypoint)
+    {
+        Name = waypoint.Name;
+        Description = waypoint.Description;
+    }
+
+    public void Edit(AddTourWaypointsViewModel waypoint)
     {
         Name = waypoint.Name;
         Description = waypoint.Description;

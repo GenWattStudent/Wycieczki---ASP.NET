@@ -15,15 +15,11 @@ class MapAdmin extends Map {
     return {
       isRoad: marker ? false : true,
       ...data,
-      id: (typeof waypointData.id === 'string'
-        ? 0
-        : waypointData.id
-      ).toString(),
+      id: (typeof waypointData.id === 'string' ? 0 : waypointData.id).toString(),
     }
   }
 
   updateWaypoint(id, edit = false) {
-    console.log('update', id, this.waypoints)
     const waypoint = this.waypoints.find((w) => w.id == id)
 
     if (waypoint) {
@@ -50,32 +46,25 @@ class MapAdmin extends Map {
       }
 
       waypoint.marker.bindPopup(popup).openPopup()
-      if (!edit)
-        waypoint.addRemoveListener(() => this.removeWayPoint(waypoint.id))
+      if (!edit) waypoint.addRemoveListener(() => this.removeWayPoint(waypoint.id))
       console.log(this.waypoints)
     }
   }
 
   selectWaypoint(waypointData, edit = false) {
     console.log(waypointData)
-    const form = this.createWaypointForm(waypointData, edit)
-    document.getElementById('waypoint-form').innerHTML = form
 
-    if (!edit) {
-      document
-        .getElementById('create-marker-btn')
-        .addEventListener('click', () => this.updateWaypoint(waypointData.id))
-    } else {
-      document
-        .getElementById('edit-marker-btn')
-        .addEventListener('click', () => updateWaypointApi(waypointData.id))
+    // document.getElementById('waypoint-form').innerHTML = form
 
-      document
-        .getElementById('waypoint-image')
-        .addEventListener('change', (e) => {
-          addImages(waypointData.id, e)
-        })
-    }
+    // if (!edit) {
+    //   document.getElementById('create-marker-btn').addEventListener('click', () => this.updateWaypoint(waypointData.id))
+    // } else {
+    //   document.getElementById('edit-marker-btn').addEventListener('click', () => updateWaypointApi(waypointData.id))
+
+    //   document.getElementById('waypoint-image').addEventListener('change', (e) => {
+    //     addImages(waypointData.id, e)
+    //   })
+    // }
   }
 
   addWayPointClick(e) {
@@ -86,17 +75,11 @@ class MapAdmin extends Map {
       return toastr.error('You have endpoint in your tour!')
     }
 
-    if (
-      this.toolSelector.currentTool === 'start' &&
-      this.waypoints.some((w) => w.type === 'start')
-    ) {
+    if (this.toolSelector.currentTool === 'start' && this.waypoints.some((w) => w.type === 'start')) {
       return toastr.error('Start point already exists!')
     }
 
-    if (
-      this.toolSelector.currentTool === 'end' &&
-      !this.waypoints.some((w) => w.type === 'start')
-    ) {
+    if (this.toolSelector.currentTool === 'end' && !this.waypoints.some((w) => w.type === 'start')) {
       return toastr.error('Start point must be added first!')
     }
 
@@ -104,13 +87,7 @@ class MapAdmin extends Map {
   }
 
   addWaypoint(waypoint, currentTool, edit = false) {
-    const marker = this.createMarker(
-      waypoint,
-      edit,
-      true,
-      false,
-      this.getIcon(currentTool)
-    )
+    const marker = this.createMarker(waypoint, edit, true, false, this.getIcon(currentTool))
     waypoint.marker = marker
 
     if (currentTool === 'marker') {
@@ -121,46 +98,7 @@ class MapAdmin extends Map {
 
     this.waypoints.push(waypoint)
     this.connectWaypointsWithLine(this.waypoints)
-  }
-
-  createWaypointForm(waypointData, edit = false) {
-    return `
-          <div>
-              <label for="waypoint-title">Title</label>
-              <div class="input-group mt-1">
-                  <input class="form-control w-100" type="text" id="waypoint-title" value="${
-                    waypointData.name
-                  }" />
-              </div>
-              <label for="waypoint-description">Description</label>
-              <div class="input-group mt-1">
-                  <textarea class="form-control w-100" id="waypoint-description">${
-                    waypointData.description
-                  }</textarea>
-              </div>
-              <label for="waypoint-image">Image</label>
-              ${
-                !edit
-                  ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />`
-                  : ''
-              }
-              ${
-                edit
-                  ? `<input class="form-control w-100" type="file" id="waypoint-image" multiple />`
-                  : ''
-              }
-              ${
-                !edit
-                  ? `<button id="create-marker-btn" type="button" class="btn btn-primary mt-2">Update</button>`
-                  : ''
-              }
-              ${
-                edit === true
-                  ? `<button id="edit-marker-btn" type="button" class="btn btn-primary mt-2">Update</button>`
-                  : ''
-              }
-          </div>
-      `
+    document.dispatchEvent(new CustomEvent('waypointAdded', { detail: { waypoint } }))
   }
 }
 
@@ -196,56 +134,3 @@ class ToolSelector {
 
 const toolSelector = new ToolSelector()
 export const adminMap = new MapAdmin(toolSelector)
-
-function updateWaypointApi(id) {
-  console.log(id, adminMap.waypoints)
-  adminMap.updateWaypoint(id, true)
-  const waypoint = adminMap.waypoints.find((waypoint) => waypoint.id == id)
-  if (!waypoint) return
-
-  const formData = new FormData()
-
-  formData.append('id', waypoint.id)
-  formData.append('lat', waypoint.lat)
-  formData.append('lng', waypoint.lng)
-  formData.append('name', waypoint.name)
-  formData.append('description', waypoint.description)
-  formData.append('isRoad', waypoint.isRoad)
-
-  console.log(waypoint)
-  fetch('/Waypoint/Edit', {
-    method: 'POST',
-    body: formData,
-  })
-    .then((res) => {
-      if (res.ok) {
-        toastr.success(`${waypoint.name} updated!`)
-      } else {
-        throw new Error('Something went wrong!')
-      }
-    })
-    .catch((err) => {
-      toastr.error(`${waypoint.name} not updated! ${err.message}`)
-    })
-}
-
-function addImages(id, event) {
-  const formData = new FormData()
-  console.log(event.target.files, id)
-  formData.append('id', id)
-  const imagesArray = Array.from(event.target.files)
-  imagesArray.forEach((file) => {
-    formData.append('images', file)
-  })
-
-  fetch('/Waypoint/AddImages', {
-    method: 'POST',
-    body: formData,
-  })
-    .then((res) => {
-      window.location.reload()
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-}

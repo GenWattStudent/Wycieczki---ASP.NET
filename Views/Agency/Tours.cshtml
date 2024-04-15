@@ -1,0 +1,33 @@
+@using Book.App.ViewModels
+@model AgencyTourListViewModel
+
+@{
+    ViewData["Title"] = "Agency Tours";
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h2>Tours</h2>
+</header>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    @await Component.InvokeAsync("AgencyNav", new { agencyId = Model.AgencyId })
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    <a asp-action="AddTour" asp-controller="Tour" asp-route-agencyId="@Model.AgencyId"
+        class="btn btn-primary mb-2">Create
+        Tour</a>
+    @if (Model.Tours.Any())
+    {
+        foreach (var tour in Model.Tours)
+        {
+            <div class="mt-3">
+                <partial name="_TourPartial" model="@tour" />
+            </div>
+        }
+    }
+    else
+    {
+        <h4>No tours found</h4>
+    }
+</div>

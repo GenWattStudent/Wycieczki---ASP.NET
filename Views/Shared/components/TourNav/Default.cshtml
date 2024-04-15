@@ -1,0 +1,56 @@
+@using Book.App.Helpers
+@using Book.App.ViewModels
+@model TourNavViewModel
+
+@if (Model.TourModel != null)
+{
+    var waypoint = Model.TourModel.Waypoints.FirstOrDefault();
+    var tourAction = Model.IsEdit ? "EditTour" : "Details";
+    var tourController = Model.IsEdit ? "Tour" : "Book";
+
+    var galleryAction = Model.IsEdit ? "Edit" : "Details";
+
+    var waypointAction = Model.IsEdit ? "Edit" : "MapView";
+
+    var mealAction = Model.IsEdit ? "Add" : "Details";
+
+    var waypointsAction = Model.IsEdit ? "EditWaypoints" : "WaypointsDetails";
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive(tourController, tourAction)" asp-controller="@tourController"
+                asp-action="@tourAction" asp-route-id="@Model.TourModel.Id">Tour</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Gallery", galleryAction)" asp-controller="Gallery"
+                asp-action="@galleryAction" asp-route-id="@Model.TourModel.Id">Gallery</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Waypoint", waypointAction)" asp-controller="Waypoint"
+                asp-action="@waypointAction" asp-route-id="@Model.TourModel.Id">Map</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @Html.IsActive("Meal", mealAction) @Html.IsActive("Meal", "Edit")" asp-controller="Meal"
+                asp-action="@mealAction" asp-route-tourId="@Model.TourModel.Id">Meal</a>
+        </li>
+
+        @if (waypoint != null)
+        {
+            <li class="nav-item">
+                <a class="nav-link @Html.IsActive("Waypoint", waypointsAction)" asp-controller="Waypoint"
+                    asp-action="@waypointsAction" asp-route-tourId="@Model.TourModel.Id"
+                    asp-route-waypointId="@waypoint.Id">Waypoints</a>
+            </li>
+        }
+        else
+        {
+            <li data-toggle="tooltip" data-placement="top" title="No waypoints added on map" class="nav-item">
+                <a class="nav-link disabled">Waypoints</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Couldn't load tour!</p>
+}

@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js'
 import EarthPlanet from './EarthPlanet.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { latLongToVector3 } from './helpers.js'
@@ -28,7 +28,6 @@ export default class EarthScene {
 
     this.earth = new EarthPlanet(this.scene, this.camera, true, assets)
     this.scene.add(this.directionalLight)
-
     window.addEventListener('resize', this.resize.bind(this))
   }
 
@@ -81,7 +80,7 @@ export default class EarthScene {
     if (!this.width) {
       width = window.innerWidth
     }
-    console.log('height', height, width)
+
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)

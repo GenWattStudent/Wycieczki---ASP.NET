@@ -1,0 +1,17 @@
+@using Book.App.ViewModels
+@model VideoViewModel
+
+@if (Model.Path != null)
+{
+    <div>
+        @if (Model.IsEdit)
+        {
+            <a asp-action="DeleteVideo" asp-controller="Agency" asp-route-agencyId="@Model.Id" class="btn btn-danger mb-2">
+                <ion-icon name="trash"></ion-icon></a>
+        }
+        <video class="rounded w-100" controls autoplay>
+            <source src="@Model.Path" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+}

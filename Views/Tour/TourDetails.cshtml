@@ -8,7 +8,7 @@
 @{
     var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
     var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-    var sliderData = new ImageSliderModel
+    var sliderData = new ImageSliderViewModel
             {
                 Images = Model.Images,
                 SliderId = Model.Id,
@@ -143,6 +143,9 @@
             const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
             const bounds = L.latLngBounds(latLngs);
             userMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
+        } else {
+            const userMap = new UserMap([]);
+            userMap.map.setView([ 51.9194, 19.1451 ], 6);
         }
     </script>
 }

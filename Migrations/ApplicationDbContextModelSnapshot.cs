@@ -41,7 +41,7 @@ namespace Book.App.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Zip")
@@ -51,9 +51,51 @@ namespace Book.App.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("Book.App.Models.CommentModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TourId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TravelAgencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.HasIndex("TravelAgencyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Book.App.Models.ContactModel", b =>
@@ -71,13 +113,7 @@ namespace Book.App.Migrations
                     b.Property<int>("Phone")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Contacts");
                 });
@@ -97,6 +133,9 @@ namespace Book.App.Migrations
                     b.Property<int?>("TourModelId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TravelAgencyModelId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("WaypointModelId")
                         .HasColumnType("int");
 
@@ -104,9 +143,54 @@ namespace Book.App.Migrations
 
                     b.HasIndex("TourModelId");
 
+                    b.HasIndex("TravelAgencyModelId");
+
                     b.HasIndex("WaypointModelId");
 
                     b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("Book.App.Models.MealModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MealType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MealTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TourId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.ToTable("Meals");
                 });
 
             modelBuilder.Entity("Book.App.Models.PreferencesModel", b =>
@@ -153,6 +237,9 @@ namespace Book.App.Migrations
                     b.Property<int>("TourId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TravelAgencyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -163,9 +250,27 @@ namespace Book.App.Migrations
 
                     b.HasIndex("TourId");
 
+                    b.HasIndex("TravelAgencyId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Reservations");
+                });
+
+            modelBuilder.Entity("Book.App.Models.RoleModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Book.App.Models.TourModel", b =>
@@ -184,6 +289,9 @@ namespace Book.App.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
                     b.Property<int>("MaxUsers")
                         .HasColumnType("int");
 
@@ -198,9 +306,55 @@ namespace Book.App.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("TravelAgencyId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("TravelAgencyId");
+
                     b.ToTable("Tours");
+                });
+
+            modelBuilder.Entity("Book.App.Models.TravelAgencyModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LogoPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VideoPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId")
+                        .IsUnique();
+
+                    b.ToTable("TravelAgencies");
                 });
 
             modelBuilder.Entity("Book.App.Models.UserModel", b =>
@@ -211,6 +365,9 @@ namespace Book.App.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("ContactId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
 
@@ -218,7 +375,7 @@ namespace Book.App.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Role")
+                    b.Property<int?>("TravelAgencyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
@@ -227,6 +384,12 @@ namespace Book.App.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ContactId")
+                        .IsUnique()
+                        .HasFilter("[ContactId] IS NOT NULL");
+
+                    b.HasIndex("TravelAgencyId");
 
                     b.ToTable("Users");
                 });
@@ -240,7 +403,6 @@ namespace Book.App.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsRoad")
@@ -269,6 +431,21 @@ namespace Book.App.Migrations
                     b.ToTable("Waypoints");
                 });
 
+            modelBuilder.Entity("RoleModelUserModel", b =>
+                {
+                    b.Property<int>("RolesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RoleModelUserModel");
+                });
+
             modelBuilder.Entity("TourModelUserModel", b =>
                 {
                     b.Property<int>("ToursId")
@@ -288,20 +465,30 @@ namespace Book.App.Migrations
                 {
                     b.HasOne("Book.App.Models.UserModel", "User")
                         .WithOne("Address")
-                        .HasForeignKey("Book.App.Models.AddressModel", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Book.App.Models.AddressModel", "UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Book.App.Models.ContactModel", b =>
+            modelBuilder.Entity("Book.App.Models.CommentModel", b =>
                 {
+                    b.HasOne("Book.App.Models.TourModel", "Tour")
+                        .WithMany("Comments")
+                        .HasForeignKey("TourId");
+
+                    b.HasOne("Book.App.Models.TravelAgencyModel", "TravelAgency")
+                        .WithMany("Comments")
+                        .HasForeignKey("TravelAgencyId");
+
                     b.HasOne("Book.App.Models.UserModel", "User")
-                        .WithOne("Contact")
-                        .HasForeignKey("Book.App.Models.ContactModel", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Tour");
+
+                    b.Navigation("TravelAgency");
 
                     b.Navigation("User");
                 });
@@ -312,9 +499,24 @@ namespace Book.App.Migrations
                         .WithMany("Images")
                         .HasForeignKey("TourModelId");
 
+                    b.HasOne("Book.App.Models.TravelAgencyModel", null)
+                        .WithMany("Images")
+                        .HasForeignKey("TravelAgencyModelId");
+
                     b.HasOne("Book.App.Models.WaypointModel", null)
                         .WithMany("Images")
                         .HasForeignKey("WaypointModelId");
+                });
+
+            modelBuilder.Entity("Book.App.Models.MealModel", b =>
+                {
+                    b.HasOne("Book.App.Models.TourModel", "Tour")
+                        .WithMany("Meals")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
                 });
 
             modelBuilder.Entity("Book.App.Models.PreferencesModel", b =>
@@ -336,6 +538,12 @@ namespace Book.App.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Book.App.Models.TravelAgencyModel", "TravelAgency")
+                        .WithMany("Reservations")
+                        .HasForeignKey("TravelAgencyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Book.App.Models.UserModel", "User")
                         .WithMany("Reservations")
                         .HasForeignKey("UserId")
@@ -344,7 +552,46 @@ namespace Book.App.Migrations
 
                     b.Navigation("Tour");
 
+                    b.Navigation("TravelAgency");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Book.App.Models.TourModel", b =>
+                {
+                    b.HasOne("Book.App.Models.TravelAgencyModel", "TravelAgency")
+                        .WithMany("Tours")
+                        .HasForeignKey("TravelAgencyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("TravelAgency");
+                });
+
+            modelBuilder.Entity("Book.App.Models.TravelAgencyModel", b =>
+                {
+                    b.HasOne("Book.App.Models.AddressModel", "Address")
+                        .WithOne("TravelAgency")
+                        .HasForeignKey("Book.App.Models.TravelAgencyModel", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("Book.App.Models.UserModel", b =>
+                {
+                    b.HasOne("Book.App.Models.ContactModel", "Contact")
+                        .WithOne("User")
+                        .HasForeignKey("Book.App.Models.UserModel", "ContactId");
+
+                    b.HasOne("Book.App.Models.TravelAgencyModel", "TravelAgency")
+                        .WithMany("Users")
+                        .HasForeignKey("TravelAgencyId");
+
+                    b.Navigation("Contact");
+
+                    b.Navigation("TravelAgency");
                 });
 
             modelBuilder.Entity("Book.App.Models.WaypointModel", b =>
@@ -356,6 +603,21 @@ namespace Book.App.Migrations
                         .IsRequired();
 
                     b.Navigation("Tour");
+                });
+
+            modelBuilder.Entity("RoleModelUserModel", b =>
+                {
+                    b.HasOne("Book.App.Models.RoleModel", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Book.App.Models.UserModel", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TourModelUserModel", b =>
@@ -373,20 +635,46 @@ namespace Book.App.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Book.App.Models.AddressModel", b =>
+                {
+                    b.Navigation("TravelAgency");
+                });
+
+            modelBuilder.Entity("Book.App.Models.ContactModel", b =>
+                {
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Book.App.Models.TourModel", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Images");
+
+                    b.Navigation("Meals");
 
                     b.Navigation("Reservations");
 
                     b.Navigation("Waypoints");
                 });
 
+            modelBuilder.Entity("Book.App.Models.TravelAgencyModel", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Images");
+
+                    b.Navigation("Reservations");
+
+                    b.Navigation("Tours");
+
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("Book.App.Models.UserModel", b =>
                 {
-                    b.Navigation("Address");
-
-                    b.Navigation("Contact");
+                    b.Navigation("Address")
+                        .IsRequired();
 
                     b.Navigation("Preferences")
                         .IsRequired();

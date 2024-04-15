@@ -2,20 +2,31 @@ using System.Security.Claims;
 using Book.App.Models;
 using Book.App.Services;
 using Book.App.ViewModels;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 public class UserController : Controller
 {
-    private readonly ILogger<UserController> _logger;
-    private readonly UserService _userService;
-    private readonly TokenService _tokenService;
+    private readonly IUserService _userService;
+    private readonly ITokenService _tokenService;
+    private readonly IValidator<RegisterViewModel> _registerValidator;
+    private readonly IValidator<EditUserViewModel> _editUserValidator;
+    private readonly IValidator<LoginViewModel> _loginValidator;
 
-    public UserController(ILogger<UserController> logger, UserService userService, TokenService tokenService)
+    public UserController(
+        IUserService userService,
+        ITokenService tokenService,
+        IValidator<RegisterViewModel> registerValidator,
+        IValidator<EditUserViewModel> editUserValidator,
+        IValidator<LoginViewModel> loginViewModel)
     {
-        _logger = logger;
         _userService = userService;
         _tokenService = tokenService;
+        _registerValidator = registerValidator;
+        _editUserValidator = editUserValidator;
+        _loginValidator = loginViewModel;
     }
 
     public IActionResult Register()
@@ -29,48 +40,52 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register(RegisterModel registerModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel registerModel)
     {
         try
         {
-            if (ModelState.IsValid)
+            var validationResult = await _registerValidator.ValidateAsync(registerModel);
+
+            if (!validationResult.IsValid)
             {
-                var userExists = await _userService.GetByUsername(registerModel.Username);
-
-                if (userExists != null)
-                {
-                    ModelState.AddModelError("Username", "Username already exists");
-                    return View(registerModel);
-                }
-
-                await _userService.Register(registerModel);
-
-                return RedirectToAction("Login");
+                validationResult.AddToModelState(ModelState, null);
+                return View(registerModel);
             }
 
-            return View(registerModel);
+            await _userService.Register(registerModel);
+            return RedirectToAction("Login");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error registering user");
+            TempData["ErrorMessage"] = "Error registering user";
             return View(registerModel);
         }
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(LoginModel loginModel)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login(LoginViewModel loginModel)
     {
         try
         {
-            var user = await _userService.Login(loginModel);
+            var validationResult = await _loginValidator.ValidateAsync(loginModel);
 
-            if (user == null)
+            if (!validationResult.IsValid)
             {
-                ModelState.AddModelError("Username", "Invalid username or password");
+                validationResult.AddToModelState(ModelState, null);
                 return View(loginModel);
             }
 
-            var token = _tokenService.GenerateToken(user.Username, user.Role, user.Id, user.ImagePath, user.Contact?.Email);
+            var user = await _userService.GetByUsername(loginModel.Username);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Error logging in";
+                return View(loginModel);
+            }
+
+            var token = _tokenService.Generate(user.Username, user.Roles, user.Id, user.ImagePath, user.Contact.Email);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {
@@ -83,7 +98,7 @@ public class UserController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error logging in user");
+            TempData["ErrorMessage"] = "Error logging in";
             return View(loginModel);
         }
     }
@@ -95,6 +110,7 @@ public class UserController : Controller
         return RedirectToAction("Login");
     }
 
+    [Authorize]
     async public Task<IActionResult> UserInfo()
     {
         var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
@@ -109,26 +125,35 @@ public class UserController : Controller
         return View(userViewModel);
     }
 
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    [HttpPost]
     public async Task<IActionResult> EditUserInfo(UserViewModel userInfo)
     {
-        Console.WriteLine("EditUserInfo " + userInfo.RegisterModel.Image);
         try
         {
             var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
+            var validationResult = await _editUserValidator.ValidateAsync(userInfo.EditUserViewModel);
 
             if (user == null)
             {
                 return RedirectToAction("Logout");
             }
 
-            await _userService.EditUserInfo(userInfo.RegisterModel, user);
+            if (!validationResult.IsValid)
+            {
+                validationResult.AddToModelState(ModelState, null);
+                return View("UserInfo", new UserViewModel(user));
+            }
+
+            await _userService.EditUserInfo(userInfo.EditUserViewModel, user);
 
             return RedirectToAction("UserInfo");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error editing user info");
-            return BadRequest();
+            TempData["ErrorMessage"] = "Error editing user info";
+            return RedirectToAction("UserInfo");
         }
     }
 
@@ -143,7 +168,7 @@ public class UserController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting user");
+            TempData["ErrorMessage"] = "Error deleting user";
             return BadRequest();
         }
     }
@@ -166,7 +191,7 @@ public class UserController : Controller
             {
                 Username = username,
                 Password = password,
-                Role = Role.Admin
+                Roles = new List<RoleModel> { new RoleModel { Role = Role.Admin } }
             };
 
             await _userService.RegisterAdmin(user);
@@ -175,11 +200,12 @@ public class UserController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating admin");
+            TempData["ErrorMessage"] = "Error creating admin";
             return BadRequest();
         }
     }
 
+    [Authorize]
     public async Task<IActionResult> DeleteImage()
     {
         await _userService.DeleteImage(User.FindFirst(ClaimTypes.Name)?.Value);

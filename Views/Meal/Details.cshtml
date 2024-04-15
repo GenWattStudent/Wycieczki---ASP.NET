@@ -1,0 +1,53 @@
+@using Book.App.ViewModels
+@model MealViewModel
+
+@{
+    ViewData["Title"] = "Meal";
+}
+
+
+@if (Model.TourModel != null)
+{
+    var timelineViewModel = new TimelineViewModel
+                {
+                    Meals = Model.TourModel.Meals,
+                    TourId = Model.TourModel.Id
+                };
+
+    <header class="glassmorphism p-3 rounded">
+        <h2>Meal - <strong class="text-primary">@Model.TourModel.Name</strong></h2>
+        <small>Something good for you belly</small>
+    </header>
+
+    <div class="glassmorphism p-3 rounded">
+        @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id })
+    </div>
+
+    <section id="add-timeline">
+        <partial name="_MealTimeline" model="@timelineViewModel" />
+    </section>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Oh snap!</strong> Tour Not found.
+    </div>
+
+}
+
+@section Scripts {
+    @if (Model.TourModel != null)
+    {
+        <script>
+            $(document).ready(() => {
+                const mealsModel = @Html.Raw(Json.Serialize(Model.TourModel.Meals));
+                const timeline = new Timeline(mealsModel, "#add-timeline");
+                timeline.init();
+
+                setInterval(() => {
+                    timeline.update();
+                }, 1000);
+            })
+        </script>
+    }
+}

@@ -1,55 +1,43 @@
-@using Book.App.Models
-@model TourModel
+@using Book.App.ViewModels
+@model CreateTourViewModel
 
 @{
     ViewData["Title"] = "Add Tour";
+    Model.AddTourViewModel.TravelAgencyId = Model.AgencyModel.Id;
+    var formTourViewModel = new FormTourViewModel
+            {
+                TourModel = Model.TourModel,
+                AddTourViewModel = Model.AddTourViewModel
+            };
 }
 
-<header class="glassmorphism p-3 rounded">
-    <h2>Add Tour</h2>
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.AgencyModel.Id"
+    class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+    title="Go back to @Model.AgencyModel.Name agency">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+    Back
+</a>
+
+<header class="glassmorphism p-3 rounded d-flex align-items-center gap-2">
+    <h2>
+        Add Tour
+    </h2>
 </header>
 
-<div class="">
+<div>
     @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         <div class="glassmorphism p-3 mt-3 rounded">
-            <partial name="_TourFormPartial" model="Model" />
-            <div id="preview" class="d-flex mt-2"></div>
+            <partial name="_TourFormPartial" model="@formTourViewModel" />
         </div>
 
-        @Html.Hidden("images", "", new { id = "images" })
-
-        <div class="glassmorphism p-3 mt-3 rounded">
-            <strong class="d-block">Click on the waypoint to update it.</strong>
-
-            <div id="waypoint-form" class="mt-2"></div>
-        </div>
-
-        <div class="glassmorphism p-3 mt-3 rounded">
-            <div class="position-relative">
-                <partial name="_MapTools" />
-                <div id="map" class="rounded mt-2"></div>
-            </div>
-
-            <div class="d-flex flex-column">
-                <input class="btn btn-primary mt-3" type="submit" value="Submit">
-            </div>
-        </div>
+        <input class="btn btn-primary mt-3" type="submit" value="Submit">
     }
 </div>
 
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
-    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
-
     <script src="~/js/dateGreaterThan.js"></script>
-    <script src="~/js/imagePreview.js"></script>
-    <script src="~/js/adminMap.js" type="module"></script>
-    <script src="~/js/addTour.js" type="module"></script>
+    <script src="~/js/resize-textarea.js"></script>
 }

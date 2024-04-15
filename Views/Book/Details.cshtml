@@ -3,14 +3,19 @@
 
 @{
     ViewBag.Title = $"Tour - {Model.TourModel.Name}";
-    var sliderData = new ImageSliderModel
+    var sliderData = new ImageSliderViewModel
             {
                 Images = Model.TourModel.Images,
                 SliderId = Model.TourModel.Id,
             };
 }
 
-<section class="card glassmorphism">
+
+<div class="glassmorphism p-3 rounded">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id })
+</div>
+
+<section class="card glassmorphism mt-3">
     <div class="card-header">
 
         @if (sliderData.Images.Count > 0)
@@ -27,7 +32,7 @@
     </div>
 
     <div class="card-body">
-        <div class="">
+        <div>
             <p class="card-text">@Model.TourModel.Description</p>
 
             <partial name="_TourDetailsPartial" model="@Model.TourModel" />
@@ -76,94 +81,19 @@
     </div>
 </div>
 
-<div id="map" class="glassmorphism mt-3 p-3"></div>
-
-<div class="glassmorphism mt-3 p-3" style="display: none;" id="earth"></div>
-
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/d3-geo@3/+esm"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
-    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
-
-    <script src="~/js/userMap.js" type="module"></script>
-    @{
-        var tourLat = Model.NextWaypointData != null ? Model.NextWaypointData.TourLat : 0;
-        var tourLon = Model.NextWaypointData != null ? Model.NextWaypointData.TourLon : 0;
-    }
     <script type="module">
-        import { UserMap } from '/js/userMap.js';
-        import { TourData } from '/js/tourData.js';
         import { Waypoint } from '/js/Waypoint.js';
-        import { Map } from '/js/map.js';
-        import { setupGlob, EarthOptions } from '/js/three/setupGlob.js';
+        import { updateTourData } from '/js/tour/updateTourData.js';
 
         $(document).ready(function () {
             const model = @Html.Raw(Json.Serialize(Model.TourModel));
-            const tourLat = @tourLat;
-            const tourLon = @tourLon;
             let isTourEnded = new Date(model.endDate) < new Date();
             let isTourStarted = new Date(model.startDate) < new Date();
-            let earthScene
-
-            function reloadWhenTourStarts() {
-                if (!isTourStarted && new Date(model.startDate) < new Date()) {
-                    location.reload();
-                }
-            }
-
-            function tourEnded() {
-                if (isTourEnded || new Date(model.endDate) < new Date()) {
-                    $('#TourEnded').modal("show");
-                }
-            }
-
-            function updateTourData(userMap) {
-                reloadWhenTourStarts()
-                tourEnded()
-
-                const tourData = new TourData(model.waypoints.$values, model.startDate, model.endDate);
-                const completed = tourData.calculatePercentComplete();
-                const data = tourData.calculateDistanceToNextWaypoint(completed);
-
-                $('#passed').text(`Passed ${tourData.calculatePassedDistance(completed).toFixed(3)} km`);
-                $('#completed').text(`${(completed * 100).toFixed(1)}% completed`);
-                $('#distanceToNextWaypoint').html(`${data.distance.toFixed(3)} km to <strong class="text-primary">${data.nextWaypoint.name}</strong>`);
-
-                userMap.updateTourIndicator(data.tourLat, data.tourLon);
-                if (earthScene) {
-                    earthScene.updateTourLatLong(data.tourLat, data.tourLon, data.nextWaypoint)
-                }
-            }
-
-            function glob(waypoints) {
-                const distance = @Model.Distance;
-
-                if (distance > 70) {
-                    $('#earth').css('display', 'block');
-                    const paddingX = +$('#earth').css('padding-left').replace('px', '');
-                    console.log(paddingX)
-                    const earthOptions = new EarthOptions(window.innerWidth - $('#earth').offset().left * 2 - (paddingX * 2), $('#map').height(), 7);
-                    const earth = setupGlob(waypoints, earthOptions).then(earth => {
-                        earthScene = earth;
-                        window.addEventListener('resize', () => {
-                            const paddingX = +$('#earth').css('padding-left').replace('px', '');
-                            earth.setWidth(window.innerWidth - $('#earth').offset().left * 2 - (paddingX * 2))
-                        });
-                    });
-                }
-            }
 
             if (model.waypoints.$values.length > 0) {
-                const userMap = new UserMap(model.waypoints.$values, tourLat, tourLon);
-                if (!isTourEnded) setInterval(() => updateTourData(userMap), 1000);
+                if (!isTourEnded) setInterval(() => updateTourData(null, null, model.waypoints.$values, model.startDate, model.endDate, isTourStarted, isTourEnded), 1000);
                 else tourEnded();
-                console.log(userMap.waypoints)
-                const latLngs = model.waypoints.$values.map(w => L.latLng(w.latitude, w.longitude));
-                const bounds = L.latLngBounds(latLngs);
-                userMap.map.fitBounds(bounds, { padding: [ 50, 50 ] });
-                glob(userMap.waypoints)
             }
         });
     </script>

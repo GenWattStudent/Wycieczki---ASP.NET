@@ -1,0 +1,60 @@
+@using Book.App.ViewModels
+@using Book.App.Helpers
+@model TravelAgencyViewModel
+
+@{
+    var isAgencyAdmin = Html.HasRole("AgencyAdmin");
+    var videoViewModel = new VideoViewModel
+            {
+                IsEdit = isAgencyAdmin,
+                Path = Model.TravelAgency.VideoPath,
+                Id = Model.TravelAgency.Id
+            };
+    var logoViewModel = new VideoViewModel
+            {
+                IsEdit = isAgencyAdmin,
+                Path = Model.TravelAgency.LogoPath,
+                Id = Model.TravelAgency.Id
+            };
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h2>Welcome to <strong class="text-primary">@Model.TravelAgency.Name</strong>
+        <partial name="_AgencyStatus" model="@Model.TravelAgency" />
+    </h2>
+</header>
+
+@if (!Model.TravelAgency.IsAccepted && string.IsNullOrEmpty(Model.TravelAgency.Reason))
+{
+    <div class="glassmorphism p-3 mt-3 rounded">
+        <h4>Agency not accepted yet!</h4>
+    </div>
+}
+else
+{
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @await Component.InvokeAsync("AgencyNav", new { agencyId = Model.TravelAgency.Id })
+    </div>
+
+    @if (Model.TravelAgency.VideoPath != null)
+    {
+        <div class="glassmorphism p-3 mt-3 rounded">
+            <partial name="_VideoPartial" model="@videoViewModel" />
+        </div>
+    }
+
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @if (Model.TravelAgency.LogoPath != null)
+        {
+            <partial name="_LogoPartial" model="@logoViewModel" />
+        }
+        @using (Html.BeginForm("Update", "Agency", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <partial name="_AgencyForm" model="@Model" />
+            <button type="submit" class="btn btn-primary">Update</button>
+        }
+
+        <a asp-action="Delete" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
+            class="btn btn-danger mt-2">Delete Agency</a>
+    </div>
+}

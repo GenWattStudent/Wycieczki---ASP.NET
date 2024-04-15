@@ -1,85 +1,55 @@
-@model TourModel
+@using Book.App.ViewModels
+@model FormTourViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
+@if (Model.TourModel != null)
+{
+    <a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TourModel.TravelAgency.Id"
+        class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+        title="Go back to @Model.TourModel.TravelAgency.Name agency">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Back
+    </a>
 
-<header class="glassmorphism p-3 rounded">
-    <h2>Edit - <span class="text-primary">@Model.Name</span></h2>
-</header>
+    <header class="glassmorphism p-3 rounded">
+        <h2>Edit - <span class="text-primary">@Model.TourModel.Name</span></h2>
+    </header>
 
-<div>
-    @using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        <div class="glassmorphism p-3 rounded mt-3">
-            <partial name="_TourFormPartial" model="Model" />
-        </div>
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id, isEdit = true })
+    </div>
 
-        <div class="glassmorphism p-3 rounded mt-3">
-            <h2>Gallery</h2>
-            <div id="preview" class="d-flex">
-                <partial name="_ImagesPartial" model="Model" />
+    <div>
+        @using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="glassmorphism p-3 rounded mt-3">
+                <partial name="_TourFormPartial" model="@Model" />
+
+                <div class="form-check form-switch ml-4 mt-2 align-items-center d-flex">
+                    @Html.CheckBoxFor(m => m.AddTourViewModel.IsVisible, new
+                        {
+                            @class = "form-check-input",
+                            type = "checkbox",
+                        })
+                    <label class="form-check-label d-flex aling-items-center" for="isVisible">Is visible
+                        <ion-icon class="bg-primary text-light p-1 rounded ml-2" data-toggle="tooltip"
+                            title="@(!Model.AddTourViewModel.IsVisible ? "This trip won't be visible for users" : "This trip is visible for users")"
+                            name="help-outline"></ion-icon>
+                    </label>
+                </div>
+
             </div>
-        </div>
 
-        @Html.Hidden("Id", Model.Id, new { id = "Id" })
-        <div class="glassmorphism p-3 rounded mt-3">
-            <strong class="mt-2 d-block">Click on the map to add waypoints</strong>
-
-            <div id="waypoint-form" class="mt-2"></div>
-        </div>
-
-        <div class="glassmorphism p-3 rounded mt-3">
-            <partial name="_MapTools" />
-
-            <div id="map" class="mt-2"></div>
-        </div>
-
-        <div class="d-flex flex-column">
             <input class="btn btn-primary mt-3" type="submit" value="Submit">
-        </div>
-    }
-</div>
+        }
+    </div>
+}
 
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.js"></script>
-    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
-
+    <script src="~/js/resize-textarea.js"></script>
     <script src="~/js/dateGreaterThan.js"></script>
-    <script src="~/js/imagePreview.js"></script>
-    <script src="~/js/adminMap.js" type="module"></script>
-    <script src="~/js/editTour.js" type="module"></script>
-
-    <script type="module">
-        import { Waypoint } from '/js/waypoint.js';
-        import { adminMap } from '/js/adminMap.js';
-
-        function getTypeFromEnum(type) {
-            switch (type) {
-                case 0:
-                    return 'start'
-                case 1:
-                    return 'marker'
-                case 2:
-                    return 'end'
-                case 4:
-                    return 'indicator'
-                default:
-                    return 'road'
-            }
-        }
-        const model = @Html.Raw(Json.Serialize(Model));
-
-        model.waypoints.$values.forEach(waypoint => {
-            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
-            console.log(waypointObj);
-            adminMap.addWaypoint(waypointObj, waypointObj.type, true);
-        });
-    </script>
 }

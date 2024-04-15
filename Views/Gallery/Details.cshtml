@@ -1,0 +1,33 @@
+@using Book.App.Models
+@using Book.App.ViewModels
+@model TourModel
+
+@{
+    ViewData["Title"] = $"{Model.Name} - Gallery";
+    var galleyViewModel = new GalleryViewModel
+            {
+                TourId = Model.Id,
+                Images = Model.Images
+            };
+}
+
+<header class="glassmorphism p-3 rounded">
+    <h2>
+        Gallery - <strong class="text-primary">@Model.Name</strong>
+    </h2>
+    <small>Good for eyes!</small>
+</header>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id })
+</div>
+
+<div class="d-flex flex-wrap gap-3 glassmorphism p-3 mt-3">
+    <partial name="_Gallery" model="@galleyViewModel" />
+</div>
+
+<partial name="_PreviewModal" />
+
+@section Scripts {
+    <script src="~/js/gallery/gallery.js"></script>
+}

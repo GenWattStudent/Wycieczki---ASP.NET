@@ -10,7 +10,7 @@ public class NextWaypointData
     public WaypointModel NextWaypoint;
 }
 
-public class GeoService
+public class GeoService : IGeoService
 {
     public float CalculateDistance(List<WaypointModel> waypoints)
     {
@@ -36,8 +36,10 @@ public class GeoService
             Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
             Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
             Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
         var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
         var d = R * c; // Distance in km
+
         return (float)d;
     }
 

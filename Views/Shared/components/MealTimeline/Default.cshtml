@@ -1,0 +1,20 @@
+@using Book.App.ViewModels
+@model TimelineViewModel
+
+<div id="side-timeline" class="mt-3 glassmorphism rounded p-2"
+    style="max-height: 300px; overflow-y: auto; overlow-x: hidden">
+    <partial name="_MealTimeline" model="@Model" />
+</div>
+
+
+<script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mealsModel = @Html.Raw(Json.Serialize(Model.Meals));
+        const timeline = new Timeline(mealsModel, "#side-timeline");
+        timeline.init();
+
+        setInterval(() => {
+            timeline.update();
+        }, 1000);
+    })
+</script>

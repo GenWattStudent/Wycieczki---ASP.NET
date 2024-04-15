@@ -1,90 +1,57 @@
 using System.Linq.Expressions;
-using Book.App.Filters;
+using AutoMapper;
 using Book.App.Models;
-using Book.App.Repositories;
+using Book.App.Repositories.UnitOfWork;
 using Book.App.Specifications;
-using Microsoft.EntityFrameworkCore;
+using Book.App.ViewModels;
 
 namespace Book.App.Services;
 
-public class TourService
+public class TourService : ITourService
 {
-    private readonly ITourRepository _tourRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ApplicationDbContext _dbContext;
-    private readonly FileService _fileService;
+    private readonly IFileService _fileService;
+    private readonly IMapper _mapper;
 
-    private readonly string _tourFolder = "Tours";
-    private readonly string _waypointFolder = "waypoints";
-
-    public TourService(ITourRepository tourRepository, FileService fileService, ApplicationDbContext dbContext)
+    public TourService(IUnitOfWork unitOfWork, IFileService fileService, ApplicationDbContext dbContext, IMapper mapper)
     {
-        _tourRepository = tourRepository;
+        _unitOfWork = unitOfWork;
         _fileService = fileService;
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
-    public async Task<List<TourModel>> GetTours(FilterModel filterModel)
+    public async Task<List<TourModel>> GetVisible(FilterModel filterModel)
+    {
+        List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now, t => t.IsVisible };
+        var tours = await _unitOfWork.tourRepository.GetBySpec(new TourFilterSpecification(filterModel, criterias));
+        return tours;
+    }
+
+    public async Task<List<TourModel>> Get(FilterModel filterModel)
     {
         List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now };
-        var tours = await _tourRepository.GetBySpec(new TourFilterSpecification(filterModel, criterias));
+        var tours = await _unitOfWork.tourRepository.GetBySpec(new TourFilterSpecification(filterModel, criterias));
         return tours;
     }
 
     public async Task<List<TourModel>> GetActiveTours()
     {
-        return await _tourRepository.GetBySpec(new ActiveToursSpecification());
+        return await _unitOfWork.tourRepository.GetBySpec(new ActiveToursSpecification());
     }
 
-    public async Task SaveTourImages(List<IFormFile> images, TourModel tour)
+    public async Task<TourModel> Add(TourModel tour)
     {
-        var imageUrls = await SaveImages(images, _tourFolder);
+        _unitOfWork.tourRepository.Add(tour);
+        await _unitOfWork.SaveAsync();
 
-        foreach (var imageUrl in imageUrls)
-        {
-            if (!tour.Images.Any(i => i.ImageUrl == imageUrl))
-            {
-                tour.Images.Add(new ImageModel
-                {
-                    ImageUrl = imageUrl
-                });
-            }
-        }
+        return tour;
     }
 
-    public async Task AddTour(TourModel tour, AddTourModel addTourModel)
+    public async Task<TourModel?> GetById(int id)
     {
-        foreach (var waypoint in addTourModel.Waypoints)
-        {
-            List<string> waypointImageUrls = new();
-
-            if (waypoint.Images != null)
-            {
-                waypointImageUrls = await SaveImages(waypoint.Images, _waypointFolder);
-            }
-
-            tour.Waypoints.Add(new WaypointModel(waypoint));
-
-            foreach (var imageUrl in waypointImageUrls)
-            {
-                tour.Waypoints.Last().Images.Add(new ImageModel
-                {
-                    ImageUrl = imageUrl
-                });
-            }
-        }
-
-        if (addTourModel.Images != null && addTourModel.Images.Count > 0)
-        {
-            await SaveTourImages(addTourModel.Images, tour);
-        }
-
-        _tourRepository.Add(tour);
-        await _tourRepository.SaveAsync();
-    }
-
-    public async Task<TourModel?> GetTour(int id)
-    {
-        return await _tourRepository.GetSingleBySpec(new TourSpecification(id));
+        return await _unitOfWork.tourRepository.GetSingleBySpec(new TourSpecification(id));
     }
 
     public async Task<List<string>> SaveImages(List<IFormFile> images, string folder)
@@ -99,92 +66,47 @@ public class TourService
 
         return imageUrls;
     }
-    public async Task EditTour(TourModel tour, EditTourModel editTourModel)
+    public async Task Edit(AddTourViewModel addTourModel)
     {
-        using (var transaction = _dbContext.Database.BeginTransaction())
+        var dbTour = await GetById(addTourModel.Id);
+
+        if (dbTour != null)
         {
-            try
-            {
-                var dbTour = await GetTour(tour.Id);
-
-                if (dbTour != null)
-                {
-                    Console.WriteLine("EditTour: " + tour.Description);
-                    dbTour.EditTour(tour);
-                    Console.WriteLine("EditTour2 " + dbTour.Description);
-                    // Add new waypoints
-                    foreach (var waypoint in editTourModel.Waypoints.Where(wm => wm.Id == 0))
-                    {
-                        List<string> imageUrlsToAdd = new();
-
-                        if (waypoint.Images != null)
-                        {
-                            imageUrlsToAdd = await SaveImages(waypoint.Images, _waypointFolder);
-                        }
-
-                        var imagesToAdd = new List<ImageModel>();
-
-                        foreach (var imageUrl in imageUrlsToAdd)
-                        {
-                            imagesToAdd.Add(new ImageModel
-                            {
-                                ImageUrl = imageUrl
-                            });
-                        }
-
-                        var newWaypoint = new WaypointModel(waypoint);
-                        newWaypoint.Images = imagesToAdd;
-                        dbTour.Waypoints.Add(newWaypoint);
-                    }
-
-                    if (editTourModel.Images != null && editTourModel.Images.Count > 0)
-                    {
-                        await SaveTourImages(editTourModel.Images, dbTour);
-                    }
-
-                    await _tourRepository.SaveAsync();
-
-                    transaction.Commit();
-                }
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("EditTour: Error");
-                transaction.Rollback();
-            }
+            _mapper.Map(addTourModel, dbTour);
+            await _unitOfWork.SaveAsync();
         }
     }
 
-    public async Task DeleteTour(int id)
+    public async Task Delete(int id)
     {
         using (var transaction = _dbContext.Database.BeginTransaction())
         {
             try
             {
-                var tour = await GetTour(id);
+                var tour = await GetById(id);
 
                 if (tour != null)
                 {
                     foreach (var image in tour.Images)
                     {
-                        await _fileService.DeleteFile(image.ImageUrl);
+                        _fileService.DeleteFile(image.ImageUrl);
                     }
 
                     // remove images from db
-                    _dbContext.Images.RemoveRange(tour.Images);
+                    _unitOfWork.imageRepository.RemoveRange(tour.Images);
 
-                    await _tourRepository.SaveAsync();
-                    await _tourRepository.Remove(tour.Id);
+                    await _unitOfWork.SaveAsync();
+                    await _unitOfWork.tourRepository.Remove(tour.Id);
                     // Delete all waypoints images
                     foreach (var waypoint in tour.Waypoints)
                     {
                         foreach (var image in waypoint.Images)
                         {
-                            await _fileService.DeleteFile(image.ImageUrl);
+                            _fileService.DeleteFile(image.ImageUrl);
                         }
                     }
 
-                    await _tourRepository.SaveAsync();
+                    await _unitOfWork.SaveAsync();
                 }
 
                 transaction.Commit();
@@ -194,5 +116,10 @@ public class TourService
                 transaction.Rollback();
             }
         }
+    }
+
+    public async Task<List<TourModel>> GetByAgencyIdAsync(int id)
+    {
+        return await _unitOfWork.tourRepository.GetBySpec(new TourByAgencyIdSpecification(id));
     }
 }

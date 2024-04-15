@@ -6,9 +6,9 @@ namespace Book.App.Controllers;
 public class WeatherController : Controller
 {
     private readonly ILogger<WeatherController> _logger;
-    private readonly WeatherService _weatherService;
+    private readonly IWeatherService _weatherService;
 
-    public WeatherController(ILogger<WeatherController> logger, WeatherService weatherService)
+    public WeatherController(ILogger<WeatherController> logger, IWeatherService weatherService)
     {
         _logger = logger;
         _weatherService = weatherService;
@@ -16,7 +16,20 @@ public class WeatherController : Controller
 
     public async Task<IActionResult> Index(int lat, int lon)
     {
-        var weather = await _weatherService.GetWeather(lat, lon);
+        var weather = await _weatherService.Get(lat, lon);
         return View(weather);
+    }
+
+    public async Task<IActionResult> GetOneDayWeather(int lat, int lon)
+    {
+        var weather = await _weatherService.Get(lat, lon);
+
+        if (weather == null)
+        {
+            TempData["Error"] = "Weather data not found";
+            return NotFound();
+        }
+
+        return Json(weather.Days[0]);
     }
 }

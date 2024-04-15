@@ -1,0 +1,17 @@
+@using Book.App.ViewModels
+@using Book.App.Helpers
+@model AgencyNavViewModel
+
+@if (Model.TravelAgency != null)
+{
+    <div class="nav nav-tabs">
+        <a class="nav-link @Html.IsActive("Agency", "Details")" asp-action="Details" asp-controller="Agency"
+            asp-route-agencyId="@Model.TravelAgency.Id">Agency Details</a>
+
+        <a class="nav-link @Html.IsActive("AgencyFiles", "AddGallery")" asp-action="AddGallery" asp-controller="AgencyFiles"
+            asp-route-agencyId="@Model.TravelAgency.Id">Gallery</a>
+
+        <a class="nav-link @Html.IsActive("Agency", "Tours")" asp-action="Tours" asp-controller="Agency"
+            asp-route-agencyId="@Model.TravelAgency.Id">Tours</a>
+    </div>
+}

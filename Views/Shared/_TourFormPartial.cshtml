@@ -1,47 +1,52 @@
 @using Book.App.Helpers
-@model TourModel
+@using Book.App.ViewModels
+@model FormTourViewModel
+
+@Html.AntiForgeryToken()
+@Html.HiddenFor(model => model.AddTourViewModel.Id)
+@Html.HiddenFor(model => model.AddTourViewModel.TravelAgencyId)
+
+<div>
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.TravelAgencyId, "", new { @class = "field-validation-error text-danger" })
+</div>
 
 <label for="name">Name</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
-    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "field-validation-error text-danger" })
+    @Html.TextBoxFor(model => model.AddTourViewModel.Name, new { @class = "form-control w-100", placeholder = "Type tour name...",  })
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.Name, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="description">Description</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextAreaFor(model => model.Description, new { @class = "form-control w-100", placeholder = "Type tour description...", style = "resize: vertical;" })
-    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "field-validation-error text-danger" })
+    @Html.TextAreaFor(model => model.AddTourViewModel.Description, new { @class = "form-control w-100", placeholder = "Type tour description...", style = "resize: vertical;" })
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.Description, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="price">Price</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1", step = "0.01" })
-    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "field-validation-error text-danger" })
+    @Html.TextBoxFor(model => model.AddTourViewModel.Price, new { @class = "form-control w-100", placeholder = "Tour price", type = "number", min = "1", step = "0.01" })
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.Price, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="maxUsers">Max People</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
-    @Html.ValidationMessageFor(model => model.MaxUsers, "", new { @class = "field-validation-error text-danger" })
+    @Html.TextBoxFor(model => model.AddTourViewModel.MaxUsers, new { @class = "form-control w-100", placeholder = "Max people", type = "number", min = "1" })
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.MaxUsers, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="startDate">Start Date</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.StartDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
-    @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "field-validation-error text-danger" })
+    @Html.TextBoxFor(model => model.AddTourViewModel.StartDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.StartDate, "", new { @class = "field-validation-error text-danger" })
 </div>
 
 <label for="endDate">End Date</label>
 <div class="input-group mt-1 d-flex flex-column">
-    @Html.TextBoxFor(model => model.EndDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
-    @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "field-validation-error text-danger" })
+    @Html.TextBoxFor(model => model.AddTourViewModel.EndDate, @"{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control w-100", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm") })
+    @Html.ValidationMessageFor(model => model.AddTourViewModel.EndDate, "", new { @class = "field-validation-error text-danger" })
 </div>
 
-<label for="image">Image</label>
+@* <label for="image">Image</label>
 <div class="input-group mt-1">
     <input class="form-control" type="file" multiple="false" onchange="ImgPre(this)" accept="image/*">
-</div>
-
-@section Scripts {
-    <script src="~/js/resize-textarea.js"></script>
-}
+</div> *@

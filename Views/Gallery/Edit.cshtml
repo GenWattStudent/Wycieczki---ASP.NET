@@ -1,0 +1,47 @@
+@using Book.App.ViewModels
+@model TourModel
+
+@{
+    ViewData["Title"] = "Gallery - Edit";
+    var galleyViewModel = new GalleryViewModel
+            {
+                TourId = Model.Id,
+                Images = Model.Images
+            };
+}
+
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
+    class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+    title="Go back to @Model.TravelAgency.Name agency">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+    Back
+</a>
+
+<header class="glassmorphism p-3 rounded">
+    <h1>Gallery</h1>
+    <small>Choose your best pictures!</small>
+</header>
+
+<div class="glassmorphism p-3 mt-3 rounded">
+    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id, isEdit = true })
+</div>
+
+<div class="glassmorphism p-3 rounded mt-3">
+    <form id="addImageForm" asp-controller="Gallery" asp-action="Add" asp-route-id="@Model.Id" method="post"
+        enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <input type="file" class="form-control" id="files" name="files" multiple accept="image/*">
+        </div>
+    </form>
+
+    <div class="d-flex flex-wrap gap-3">
+        <partial name="_Gallery" model="@galleyViewModel" />
+    </div>
+</div>
+
+<partial name="_PreviewModal" />
+
+@section Scripts {
+    <script src="~/js/gallery/gallery.js"></script>
+}
