@@ -74,14 +74,14 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const model = @Json.Serialize(Model);
 
-            document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
-                document.getElementById(`deleteForm-${model.id}`).submit();
-            });
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const model = @Json.Serialize(Model);
+
+        document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
+            console.log('delete');
+            document.getElementById(`deleteForm-${model.id}`).submit();
         });
-    </script>
-}
+    });
+</script>
