@@ -25,9 +25,11 @@ public class TravelAgencyValidator : AbstractValidator<CreateAgencyViewModel>
             .NotEmpty()
             .WithMessage("Name is required")
             .Length(minNameLength, maxNameLength)
-            .WithMessage($"Name must be between {minNameLength} and {maxNameLength} characters")
-            .MustAsync(IsUniqueName)
-            .WithMessage("Agency with this name already exists"); ;
+            .WithMessage($"Name must be between {minNameLength} and {maxNameLength} characters");
+
+        RuleFor(x => x.Name)
+            .MustAsync((x, model, token) => IsUniqueName(x.Name, x.Id, token))
+            .WithMessage("Name is already taken");
 
         RuleFor(x => x.Description)
             .NotEmpty()
@@ -38,19 +40,25 @@ public class TravelAgencyValidator : AbstractValidator<CreateAgencyViewModel>
         RuleFor(x => x.Address).SetValidator(new AddressValidator());
 
         RuleFor(x => x.Id)
-            .MustAsync((x, token) => x == 0 ? IsUserHasAgency(_currentUserId, token) : Task.FromResult(true))
+            .MustAsync((x, token) => IsUserHasAgency(_currentUserId, x, token))
             .WithMessage("User already has an agency");
     }
 
-    private async Task<bool> IsUniqueName(string name, CancellationToken token)
+    private async Task<bool> IsUniqueName(string name, int id, CancellationToken token)
     {
         var agency = await _unitOfWork.agencyRepository.GetByName(name);
-        return agency == null;
+        return agency == null || agency.Id == id;
     }
 
-    private async Task<bool> IsUserHasAgency(int userId, CancellationToken token)
+    private async Task<bool> IsUserHasAgency(int userId, int id, CancellationToken token)
     {
+        if (id != 0)
+        {
+            return true;
+        }
+
         var user = await _unitOfWork.userRepository.GetById(userId);
+        // Console.WriteLine(user?.TravelAgencyId);
         return user?.TravelAgencyId == null;
     }
 

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using AutoMapper;
 using Book.App.Models;
 using Book.App.Repositories.UnitOfWork;
 using Book.App.Specifications;
@@ -11,12 +12,14 @@ public class TourService : ITourService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ApplicationDbContext _dbContext;
     private readonly IFileService _fileService;
+    private readonly IMapper _mapper;
 
-    public TourService(IUnitOfWork unitOfWork, IFileService fileService, ApplicationDbContext dbContext)
+    public TourService(IUnitOfWork unitOfWork, IFileService fileService, ApplicationDbContext dbContext, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _fileService = fileService;
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     public async Task<List<TourModel>> GetVisible(FilterModel filterModel)
@@ -63,21 +66,14 @@ public class TourService : ITourService
 
         return imageUrls;
     }
-    public async Task Edit(TourModel tour, EditTourViewModel editTourModel)
+    public async Task Edit(AddTourViewModel addTourModel)
     {
-        try
-        {
-            var dbTour = await GetById(tour.Id);
+        var dbTour = await GetById(addTourModel.Id);
 
-            if (dbTour != null)
-            {
-                dbTour.EditTour(tour);
-                await _unitOfWork.SaveAsync();
-            }
-        }
-        catch (Exception)
+        if (dbTour != null)
         {
-            Console.WriteLine("EditTour: Error");
+            _mapper.Map(addTourModel, dbTour);
+            await _unitOfWork.SaveAsync();
         }
     }
 

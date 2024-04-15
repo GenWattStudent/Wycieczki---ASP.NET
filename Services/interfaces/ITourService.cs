@@ -10,7 +10,7 @@ public interface ITourService
     Task<TourModel> Add(TourModel tour);
     Task<TourModel?> GetById(int id);
     Task<List<string>> SaveImages(List<IFormFile> images, string folder);
-    Task Edit(TourModel tour, EditTourViewModel editTourModel);
+    Task Edit(AddTourViewModel editTourModel);
     Task Delete(int id);
     Task<List<TourModel>> GetVisible(FilterModel filterModel);
     Task<List<TourModel>> GetByAgencyIdAsync(int id);

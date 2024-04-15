@@ -1,47 +1,51 @@
-@model TourModel
+@using Book.App.ViewModels
+@model FormTourViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
+@if (Model.TourModel != null)
+{
+    <a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TourModel.TravelAgency.Id"
+        class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+        title="Go back to @Model.TourModel.TravelAgency.Name agency">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Back
+    </a>
 
-<header class="glassmorphism p-3 rounded">
-    <h2>Edit - <span class="text-primary">@Model.Name</span></h2>
-</header>
+    <header class="glassmorphism p-3 rounded">
+        <h2>Edit - <span class="text-primary">@Model.TourModel.Name</span></h2>
+    </header>
 
-<div class="glassmorphism p-3 mt-3 rounded">
-    @await Component.InvokeAsync("TourNav", new { tourId = Model.Id, isEdit = true })
-</div>
+    <div class="glassmorphism p-3 mt-3 rounded">
+        @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id, isEdit = true })
+    </div>
 
-<div>
-    @using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        <div class="glassmorphism p-3 rounded mt-3">
-            <partial name="_TourFormPartial" model="Model" />
+    <div>
+        @using (Html.BeginForm("EditTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="glassmorphism p-3 rounded mt-3">
+                <partial name="_TourFormPartial" model="@Model" />
 
-            <div class="form-check form-switch ml-4 mt-2 align-items-center d-flex">
-                @Html.CheckBoxFor(m => m.IsVisible, new
-                    {
-                        @class = "form-check-input",
-                        type = "checkbox",
-                        name = "isVisible",
-                        id = "isVisible"
-                    })
-                <label class="form-check-label d-flex aling-items-center" for="isVisible">Is visible
-                    <ion-icon class="bg-primary text-light p-1 rounded ml-2" data-toggle="tooltip"
-                        title="@(!Model.IsVisible ? "This trip won't be visible for users" : "This trip is visible for users")"
-                        name="help-outline"></ion-icon>
-                </label>
+                <div class="form-check form-switch ml-4 mt-2 align-items-center d-flex">
+                    @Html.CheckBoxFor(m => m.AddTourViewModel.IsVisible, new
+                        {
+                            @class = "form-check-input",
+                            type = "checkbox",
+                        })
+                    <label class="form-check-label d-flex aling-items-center" for="isVisible">Is visible
+                        <ion-icon class="bg-primary text-light p-1 rounded ml-2" data-toggle="tooltip"
+                            title="@(!Model.AddTourViewModel.IsVisible ? "This trip won't be visible for users" : "This trip is visible for users")"
+                            name="help-outline"></ion-icon>
+                    </label>
+                </div>
+
             </div>
 
-        </div>
-
-        @Html.Hidden("Id", Model.Id, new { id = "Id" })
-
-        <div class="d-flex flex-column">
             <input class="btn btn-primary mt-3" type="submit" value="Submit">
-        </div>
-    }
-</div>
+        }
+    </div>
+}
 
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

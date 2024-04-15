@@ -4,6 +4,13 @@
     ViewData["Title"] = "Draw your tour";
 }
 
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TravelAgency.Id"
+    class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+    title="Go back to @Model.TravelAgency.Name agency">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+    Back
+</a>
+
 <header class="glassmorphism rounded p-3">
     <h1>Draw a tour</h1>
     <small>Create a new tour by adding waypoints to the map</small>
@@ -15,7 +22,9 @@
 
 <div class="glassmorphism p-3 rounded mt-3">
     <partial name="_MapTools" />
-
+    <div id="map-info" class="mt-2">
+        <strong id="distance">Distance: 0 km</strong>
+    </div>
     <div id="map" class="mt-2"></div>
 </div>
 
@@ -58,6 +67,7 @@
     <script type="module" defer>
         import { Waypoint } from '/js/waypoint.js';
         import { adminMap } from '/js/adminMap.js';
+        import { TourData } from '/js/tourData.js';
 
         function getTypeFromEnum(type) {
             switch (type) {
@@ -76,7 +86,6 @@
         const model = @Html.Raw(Json.Serialize(Model));
 
         model.waypoints.$values.forEach(waypoint => {
-            console.log(waypoint);
             const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
             adminMap.addWaypoint(waypointObj, waypointObj.type, true);
 
@@ -89,6 +98,13 @@
             }
         });
 
+        function updateMapInfo() {
+            const tourData = new TourData(adminMap.waypoints.map(w => ({ latitude: w.lat, longitude: w.lng })));
+            $('#map-info #distance').text(`Distance: ${tourData.calculateTotalDistance().toFixed(3)} km`);
+        }
+
+        updateMapInfo()
+
         function createInput(name, value, id, index) {
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -98,7 +114,7 @@
             return input;
         }
         let waypointIndex = model.waypoints.$values.length;
-        console.log(waypointIndex);
+
         document.addEventListener('waypointAdded', function (e) {
             const waypoint = e.detail.waypoint;
 
@@ -112,6 +128,8 @@
             $('#waypointsForm').append(inputLng);
             $('#waypointsForm').append(inputType);
             waypointIndex++;
+
+            updateMapInfo()
         });
 
         document.addEventListener('waypointRemoved', function (e) {
@@ -122,13 +140,16 @@
             document.getElementById(`waypointLng${id}`).remove();
             document.getElementById(`waypointType${id}`).remove();
             waypointIndex--;
+
+            updateMapInfo()
         });
 
         document.addEventListener('waypointMoved', function (e) {
             const waypoint = e.detail.waypoint;
-            console.log(waypoint);
+
             document.getElementById(`waypointLat${waypoint.id}`).value = waypoint.lat;
             document.getElementById(`waypointLng${waypoint.id}`).value = waypoint.lng;
+            updateMapInfo()
         })
     </script>
 }

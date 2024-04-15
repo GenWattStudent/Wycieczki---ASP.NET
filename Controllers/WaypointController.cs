@@ -21,7 +21,7 @@ public class WaypointController : Controller
         _reservationService = reservationService;
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     public async Task<IActionResult> EditWaypoints(int tourId, int waypointId)
     {
         var tour = await _tourService.GetById(tourId);
@@ -36,12 +36,13 @@ public class WaypointController : Controller
         {
             TourId = tourId,
             Waypoints = tour.Waypoints,
-            CurrentWaypoint = tour.Waypoints.FirstOrDefault(w => w.Id == waypointId)
+            CurrentWaypoint = tour.Waypoints.FirstOrDefault(w => w.Id == waypointId),
+            TourModel = tour
         };
         return View(editWaypointsViewModel);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgencyAdmin")]
     public async Task<IActionResult> Delete(int id)
     {
         var waypoint = await _waypointService.Get(id);
@@ -56,7 +57,7 @@ public class WaypointController : Controller
         return RedirectToAction("Edit", new { id = waypoint.TourId });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin,Admin")]
     [HttpPost]
     public async Task<IActionResult> Edit(WaypointModel waypoint)
     {
@@ -71,7 +72,7 @@ public class WaypointController : Controller
         return RedirectToAction("EditWaypoints", new { tourId = waypointDb.TourId, waypointId = waypointDb.Id });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     [HttpPost]
     public async Task<IActionResult> AddImages(List<IFormFile> images, int id)
     {
@@ -89,7 +90,7 @@ public class WaypointController : Controller
         return RedirectToAction("EditTour", "Tour", new { id = waypoint.TourId });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgencyAdmin")]
     public async Task<IActionResult> Edit(int id)
     {
         var tour = await _tourService.GetById(id);
@@ -121,7 +122,7 @@ public class WaypointController : Controller
         return View(waypointViewModel);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     [ValidateAntiForgeryToken]
     [HttpPost]
     public async Task<IActionResult> Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId)

@@ -4,6 +4,9 @@ using Book.App.Models;
 using Book.App.ViewModels;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace Book.App.Controllers;
 
@@ -11,10 +14,16 @@ namespace Book.App.Controllers;
 public class TourController : Controller
 {
     private readonly ITourService _tourService;
+    private readonly IAgencyService _agencyService;
+    private readonly IMapper _mapper;
+    private readonly IValidator<AddTourViewModel> _addTourValidator;
 
-    public TourController(ITourService tourService)
+    public TourController(ITourService tourService, IAgencyService agencyService, IMapper mapper, IValidator<AddTourViewModel> addTourValidator)
     {
         _tourService = tourService;
+        _agencyService = agencyService;
+        _mapper = mapper;
+        _addTourValidator = addTourValidator;
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -25,44 +34,52 @@ public class TourController : Controller
         return View(tours);
     }
 
-    [Authorize(Roles = "Admin")]
-    public IActionResult AddTour()
+    [Authorize(Roles = "AgencyAdmin")]
+    public async Task<IActionResult> AddTour(int agencyId)
     {
-        return View();
+        var agency = await _agencyService.GetByIdAsync(agencyId);
+        return View(new CreateTourViewModel { AgencyModel = agency });
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddTour(AddTourViewModel addTourModel)
+    public async Task<IActionResult> AddTour(AddTourViewModel addTourViewModel)
     {
-        if (!ModelState.IsValid)
+        var validationResult = await _addTourValidator.ValidateAsync(addTourViewModel);
+        Console.WriteLine(addTourViewModel.TravelAgencyId);
+
+        if (!validationResult.IsValid)
         {
-            var errorMessage = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-            return Json(new { error = errorMessage });
+            validationResult.AddToModelState(ModelState, null);
+            return View(addTourViewModel);
         }
 
-        var tour = new TourModel(addTourModel);
+        var tour = _mapper.Map<TourModel>(addTourViewModel);
         await _tourService.Add(tour);
 
         return RedirectToAction("EditTour", new { id = tour.Id });
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgencyAdmin")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditTour(EditTourViewModel editTourModel)
+    public async Task<IActionResult> EditTour(FormTourViewModel formTourViewModel)
     {
-        var tour = new TourModel(editTourModel);
-
-        if (!ModelState.IsValid)
+        var addTourViewModel = formTourViewModel.AddTourViewModel;
+        Console.WriteLine(formTourViewModel.AddTourViewModel.Id.ToString() + formTourViewModel.AddTourViewModel.Name);
+        var validationResult = await _addTourValidator.ValidateAsync(addTourViewModel);
+        Console.WriteLine(addTourViewModel.Name + " " + addTourViewModel.Description + " " + addTourViewModel.Price + " " + addTourViewModel.StartDate + " " + addTourViewModel.EndDate + " " + addTourViewModel.TravelAgencyId + " ");
+        if (!validationResult.IsValid)
         {
-            return View(tour);
+            validationResult.AddToModelState(ModelState, null);
+            Console.WriteLine(await _tourService.GetById(addTourViewModel.Id));
+            return View(new FormTourViewModel { TourModel = await _tourService.GetById(addTourViewModel.Id), AddTourViewModel = addTourViewModel });
         }
 
-        await _tourService.Edit(tour, editTourModel);
+        await _tourService.Edit(addTourViewModel);
 
-        return RedirectToAction("EditTour", new { id = tour.Id });
+        return RedirectToAction("EditTour", new { id = addTourViewModel.Id });
     }
 
     public async Task<IActionResult> TourDetails(int id)
@@ -75,7 +92,7 @@ public class TourController : Controller
         return View(tour);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgencyAdmin")]
     public async Task<IActionResult> DeleteTour(int id)
     {
         var tour = await _tourService.GetById(id);
@@ -88,7 +105,7 @@ public class TourController : Controller
         return Redirect("/Tour/Tours");
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin,Admin")]
     public async Task<IActionResult> EditTour(int id)
     {
         var tour = await _tourService.GetById(id);
@@ -97,7 +114,7 @@ public class TourController : Controller
         {
             return RedirectToAction("AddTour");
         }
-        return View(tour);
+        return View(new FormTourViewModel { TourModel = tour, AddTourViewModel = _mapper.Map<AddTourViewModel>(tour) });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -112,7 +129,7 @@ public class TourController : Controller
         return Json(new { key = mapTilerKey });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgecyAdmin")]
     public async Task<IActionResult> Active()
     {
         var tours = await _tourService.GetActiveTours();

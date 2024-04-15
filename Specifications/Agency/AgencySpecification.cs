@@ -9,6 +9,7 @@ public class AgencySpecification : BaseSpecification<TravelAgencyModel>
         AddInclude(x => x.Address);
         AddInclude(x => x.Users);
         AddInclude(x => x.Images);
+        AddInclude(x => x.Tours);
     }
 
     public void SetNotAccepted()

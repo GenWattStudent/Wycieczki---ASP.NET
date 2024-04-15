@@ -21,7 +21,9 @@
     {
         foreach (var tour in Model.Tours)
         {
-            <partial name="_TourPartial" model="@tour" />
+            <div class="mt-3">
+                <partial name="_TourPartial" model="@tour" />
+            </div>
         }
     }
     else

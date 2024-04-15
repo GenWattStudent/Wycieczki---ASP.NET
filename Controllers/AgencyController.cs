@@ -3,7 +3,6 @@ using AutoMapper;
 using Book.App.Services;
 using Book.App.ViewModels;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +39,10 @@ public class AgencyController : Controller
 
         if (!result.IsValid)
         {
-            result.AddToModelState(ModelState, null);
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError($"CreateAgencyViewModel.{error.PropertyName}", error.ErrorMessage);
+            }
             return View(createAgencyViewModel);
         }
 
@@ -128,7 +130,10 @@ public class AgencyController : Controller
 
             if (!result.IsValid)
             {
-                result.AddToModelState(ModelState, null);
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError($"CreateAgencyViewModel.{error.PropertyName}", error.ErrorMessage);
+                }
                 return View("Details", new TravelAgencyViewModel() { TravelAgency = await _agencyService.GetByIdAsync(createAgencyViewModel.Id), CreateAgencyViewModel = createAgencyViewModel });
             }
             await _agencyService.UpdateAsync(createAgencyViewModel);

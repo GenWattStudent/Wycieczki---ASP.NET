@@ -44,6 +44,7 @@ public class TourFilterSpecification : BaseSpecification<TourModel>
         Includes.Add(t => t.Images);
         Includes.Add(t => t.Reservations);
         IncludeStrings.Add("Reservations.User");
+        IncludeStrings.Add("TravelAgency.Users");
 
         // ordering by date or price
         switch (filterModel.OrderBy)

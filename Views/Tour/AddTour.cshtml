@@ -1,20 +1,34 @@
-@using Book.App.Models
-@model TourModel
+@using Book.App.ViewModels
+@model CreateTourViewModel
 
 @{
     ViewData["Title"] = "Add Tour";
+    Model.AddTourViewModel.TravelAgencyId = Model.AgencyModel.Id;
+    var formTourViewModel = new FormTourViewModel
+            {
+                TourModel = Model.TourModel,
+                AddTourViewModel = Model.AddTourViewModel
+            };
 }
 
-<header class="glassmorphism p-3 rounded">
-    <h2>Add Tour</h2>
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.AgencyModel.Id"
+    class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+    title="Go back to @Model.AgencyModel.Name agency">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+    Back
+</a>
+
+<header class="glassmorphism p-3 rounded d-flex align-items-center gap-2">
+    <h2>
+        Add Tour
+    </h2>
 </header>
 
 <div>
     @using (Html.BeginForm("AddTour", "Tour", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         <div class="glassmorphism p-3 mt-3 rounded">
-            <partial name="_TourFormPartial" model="Model" />
-            <div id="preview" class="d-flex mt-2"></div>
+            <partial name="_TourFormPartial" model="@formTourViewModel" />
         </div>
 
         <input class="btn btn-primary mt-3" type="submit" value="Submit">

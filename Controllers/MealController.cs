@@ -18,7 +18,7 @@ public class MealController : Controller
         _tourService = tourService;
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     public async Task<IActionResult> Add(int tourId)
     {
         var tour = await _tourService.GetById(tourId);
@@ -31,13 +31,13 @@ public class MealController : Controller
         return View(mealViewModel);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(MealModel mealModel)
     {
         var tour = await _tourService.GetById(mealModel.TourId);
-        Console.WriteLine($"Adding meal {mealModel.TourId} {mealModel.Id}");
+
         if (tour == null)
         {
             ViewData["Error"] = "Tour not found";
@@ -49,7 +49,7 @@ public class MealController : Controller
         return RedirectToAction("Add", new { tourId = mealModel.TourId });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgecyAdmin")]
     public async Task<IActionResult> Edit(int tourIdd, int mealId)
     {
         var tour = await _tourService.GetById(tourIdd);
@@ -82,7 +82,7 @@ public class MealController : Controller
         return View(mealViewModel);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgecyAdmin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(MealModel model)
@@ -110,7 +110,7 @@ public class MealController : Controller
         return RedirectToAction("Add", new { tourId = model.TourId });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgecyAdmin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)

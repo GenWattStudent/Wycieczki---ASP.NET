@@ -206,6 +206,12 @@ body * {
   box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.35);
 }
 
+.glassmorphism-2 {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.35);
+}
+
 .glass-2 {
   background-color: rgb(0 123 255 / 30%) !important;
   box-shadow: 0 0px 12px 0 rgb(0 123 255 / 25%) !important;

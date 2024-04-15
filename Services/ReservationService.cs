@@ -75,7 +75,8 @@ public class ReservationService : IReservationService
         var reservation = new ReservationModel
         {
             User = user,
-            Tour = tour
+            Tour = tour,
+            TravelAgency = tour.TravelAgency
         };
 
         user.Reservations.Add(reservation);

@@ -21,6 +21,8 @@ class MappingProfile : Profile
         CreateMap<RegisterViewModel, UserModel>();
         CreateMap<EditUserViewModel, UserModel>();
         CreateMap<EditAgencyViewModel, TravelAgencyModel>();
+        CreateMap<AddTourViewModel, TourModel>();
+        CreateMap<TourModel, AddTourViewModel>();
     }
 }
 
@@ -56,7 +58,7 @@ public static class Helpers
 
     public static void AddMyServices(this IServiceCollection services)
     {
-        const int MAX_BODY_SIZE = 104857600 / 2; // 50MB
+        const int MAX_BODY_SIZE = 104857600; // 100MB
         // Repositories
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IReservationRepository, ReservationRepository>();
@@ -85,6 +87,7 @@ public static class Helpers
         services.AddTransient<IValidator<ContactModel>, ContactValidator>();
         services.AddTransient<IValidator<EditUserViewModel>, EditUserViewModelValidator>();
         services.AddTransient<IValidator<LoginViewModel>, LoginViewModelValidator>();
+        services.AddTransient<IValidator<AddTourViewModel>, AddTourViewModelValidator>();
 
         services.AddHttpContextAccessor();
 

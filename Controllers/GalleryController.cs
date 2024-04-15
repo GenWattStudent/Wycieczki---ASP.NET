@@ -15,7 +15,7 @@ public class GalleryController : Controller
         _imageService = imageService;
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgencyAdmin")]
     // GET: Gallery{tourId}
     public async Task<IActionResult> Edit(int id)
     {
@@ -23,7 +23,7 @@ public class GalleryController : Controller
         return View(tour);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     // POST: Gallery{tourId}
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -42,7 +42,7 @@ public class GalleryController : Controller
         return View(tour);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AgencyAdmin")]
     // POST: Gallery{waypointId}
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -52,7 +52,7 @@ public class GalleryController : Controller
         return RedirectToAction("EditWaypoints", "Waypoint", new { tourId, waypointId = id });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AgencyAdmin")]
     // POST: Gallery/Delete{imageId}
     public async Task<IActionResult> Delete(int id, int tourId)
     {

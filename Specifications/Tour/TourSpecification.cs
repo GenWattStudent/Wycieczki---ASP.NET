@@ -11,6 +11,8 @@ public class TourSpecification : BaseSpecification<TourModel>
         Includes.Add(t => t.Waypoints);
         Includes.Add(t => t.Users);
         Includes.Add(t => t.Meals);
+        Includes.Add(t => t.TravelAgency);
+        IncludeStrings.Add("TravelAgency.Users");
         IncludeStrings.Add("Reservations.User");
         IncludeStrings.Add("Waypoints.Images");
         ApplyCriteria(t => t.Id == id);

@@ -10,6 +10,13 @@
             };
 }
 
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TourModel.TravelAgency.Id"
+    class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
+    title="Go back to @Model.TourModel.TravelAgency.Name agency">
+    <ion-icon name="arrow-back-outline"></ion-icon>
+    Back
+</a>
+
 <header class="glassmorphism p-3 rounded">
     <h1>
         You are editing
