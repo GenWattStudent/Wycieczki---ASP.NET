@@ -15,12 +15,13 @@
                 <ion-icon name="create-outline"></ion-icon>
             </button>
         </a>
-        @using (Html.BeginForm("DeleteTour", "Tour", new { id = Model.Id }, FormMethod.Post, true, new
+        @using (Html.BeginForm("DeleteTour", "Tour", new { id = Model.Id, agencyId = Model.TravelAgencyId },
+       FormMethod.Post, true, new
+       {
+           id = $"deleteForm-{Model.Id}",
+       }))
         {
-            id = $"deleteForm-{Model.Id}",
-        }))
-        {
-            <button type="button" data-toggle="modal" data-target="#deleteConfirmModal-@Model.Id" class="btn p-0">
+            <button type="button" data-delete-tour data-id="#deleteConfirmModal-@Model.Id" class="btn p-0">
                 <div data-toggle="tooltip" data-placement="top" title="Delete @Model.Name tour">
                     <ion-icon name="trash-outline"></ion-icon>
                 </div>

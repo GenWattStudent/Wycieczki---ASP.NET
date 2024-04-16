@@ -28,6 +28,7 @@
                 This trip is already full!
             </p>
         }
+
         @if (userId != null && Model.Reservations.Any(r => r.User.Id == int.Parse(userId)))
         {
             <p class="text-success d-flex align-items-center">
@@ -79,9 +80,26 @@
     document.addEventListener('DOMContentLoaded', function () {
         const model = @Json.Serialize(Model);
 
-        document.getElementById(`confirmDelete-${model.id}`).addEventListener('click', function () {
-            console.log('delete');
-            document.getElementById(`deleteForm-${model.id}`).submit();
+        document.querySelector(`#confirmDelete-${model.id}`).addEventListener('click', function () {
+            document.querySelector(`#deleteForm-${model.id}`).submit();
         });
+
+        // move modal on the top of body when button clicked
+        document.querySelectorAll('[data-delete-tour]').forEach(function (element) {
+            element.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                document.body.appendChild(document.querySelector(id));
+                // show modal
+                $(id).modal('show');
+            });
+        });
+
+        // hide modal when closed with jquery
+    @* $('.modal').on('hide.bs.modal', function () {
+            console.log('hide');
+            // remove appended modal from body
+            this.parentNode.removeChild(this);
+            }); *@
+
     });
 </script>

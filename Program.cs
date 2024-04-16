@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
+using Book.App.Filters.Exception;
 using Book.App.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
@@ -26,6 +27,9 @@ var tokenValidationParameters = new TokenValidationParameters
 };
 
 // Add services to the container.
+
+// Add the missing using directive
+
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;

@@ -1,63 +1,67 @@
 @using Book.App.ViewModels
 @model TravelAgencyViewModel
 
-<h3>General information</h3>
+@if (Model.CreateAgencyViewModel != null)
+{
 
-@Html.AntiForgeryToken()
-@* <span asp-validation-summary="ModelOnly" class="text-danger"></span> *@
+    <h3>General information</h3>
 
-@Html.HiddenFor(m => m.CreateAgencyViewModel.Id)
-@Html.ValidationMessageFor(m => m.CreateAgencyViewModel.Id, "", new { @class = "text-danger" })
-<span asp-validation-for="@Model.CreateAgencyViewModel.Id" class="text-danger"></span>
+    @Html.AntiForgeryToken()
+    @* <span asp-validation-summary="ModelOnly" class="text-danger"></span> *@
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.Name"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.Name" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.Name" class="text-danger"></span>
-</div>
+    @Html.HiddenFor(m => m.CreateAgencyViewModel.Id)
+    @Html.ValidationMessageFor(m => m.CreateAgencyViewModel.Id, "", new { @class = "text-danger" })
+    <span asp-validation-for="@Model.CreateAgencyViewModel.Id" class="text-danger"></span>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.Description"></label>
-    <textarea asp-for="@Model.CreateAgencyViewModel.Description" class="form-control"></textarea>
-    <span asp-validation-for="@Model.CreateAgencyViewModel.Description" class="text-danger"></span>
-</div>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.Name"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.Name" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.Name" class="text-danger"></span>
+    </div>
 
-<h3>Address</h3>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.Description"></label>
+        <textarea asp-for="@Model.CreateAgencyViewModel.Description" class="form-control"></textarea>
+        <span asp-validation-for="@Model.CreateAgencyViewModel.Description" class="text-danger"></span>
+    </div>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.Address.Street"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.Address.Street" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.Address.Street" class="text-danger"></span>
-</div>
+    <h3>Address</h3>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.Address.City"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.Address.City" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.Address.City" class="text-danger"></span>
-</div>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.Address.Street"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.Address.Street" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.Address.Street" class="text-danger"></span>
+    </div>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.Address.Country"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.Address.Country" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.Address.Country" class="text-danger"></span>
-</div>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.Address.City"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.Address.City" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.Address.City" class="text-danger"></span>
+    </div>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.Address.Zip"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.Address.Zip" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.Address.Zip" class="text-danger"></span>
-</div>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.Address.Country"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.Address.Country" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.Address.Country" class="text-danger"></span>
+    </div>
 
-<h3>Files</h3>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.Address.Zip"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.Address.Zip" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.Address.Zip" class="text-danger"></span>
+    </div>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.LogoFile"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.LogoFile" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.LogoFile" class="text-danger"></span>
-</div>
+    <h3>Files</h3>
 
-<div class="form-group">
-    <label asp-for="@Model.CreateAgencyViewModel.VideoFile"></label>
-    <input asp-for="@Model.CreateAgencyViewModel.VideoFile" class="form-control" />
-    <span asp-validation-for="@Model.CreateAgencyViewModel.VideoFile" class="text-danger"></span>
-</div>
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.LogoFile"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.LogoFile" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.LogoFile" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.CreateAgencyViewModel.VideoFile"></label>
+        <input asp-for="@Model.CreateAgencyViewModel.VideoFile" class="form-control" />
+        <span asp-validation-for="@Model.CreateAgencyViewModel.VideoFile" class="text-danger"></span>
+    </div>
+}

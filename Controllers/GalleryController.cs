@@ -1,9 +1,11 @@
+using Book.App.Filters.Exception;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Book.App.Controllers;
 
+[ServiceFilter(typeof(NotInAgencyExceptionFilter))]
 public class GalleryController : Controller
 {
     private readonly ITourService _tourService;

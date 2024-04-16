@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Book.App.Filters.Exception;
 using Book.App.Models;
 using Book.App.Repositories;
 using Book.App.Repositories.UnitOfWork;
@@ -7,6 +8,7 @@ using Book.App.Services;
 using Book.App.Validators;
 using Book.App.ViewModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
@@ -55,6 +57,18 @@ public static class Helpers
         var roles = htmlHelper.ViewContext.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value.Split(",");
         return roles != null && roles.Contains(role);
     }
+    // get user id
+    public static int GetCurrentUserId(this IHtmlHelper htmlHelper)
+    {
+        var userIdString = htmlHelper.ViewContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return userIdString != null ? int.Parse(userIdString) : 0;
+    }
+
+    public static int GetCurrentUserId(this ControllerBase controllerBase)
+    {
+        var userIdString = controllerBase.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return userIdString != null ? int.Parse(userIdString) : 0;
+    }
 
     public static void AddMyServices(this IServiceCollection services)
     {
@@ -88,6 +102,9 @@ public static class Helpers
         services.AddTransient<IValidator<EditUserViewModel>, EditUserViewModelValidator>();
         services.AddTransient<IValidator<LoginViewModel>, LoginViewModelValidator>();
         services.AddTransient<IValidator<AddTourViewModel>, AddTourViewModelValidator>();
+
+        // Exceptions
+        services.AddTransient<NotInAgencyExceptionFilter>();
 
         services.AddHttpContextAccessor();
 

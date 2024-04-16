@@ -1,10 +1,12 @@
 using System.Security.Claims;
+using Book.App.Filters.Exception;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Book.App.Controllers;
 
+[ServiceFilter(typeof(NotInAgencyExceptionFilter))]
 public class AgencyFilesController : Controller
 {
     private readonly IAgencyService _agencyService;

@@ -13,8 +13,6 @@ $(document).ready(function () {
   }
 
   function success(position) {
-    if (window.innerWidth < 980) return
-
     const latitude = position.coords.latitude
     const longitude = position.coords.longitude
 

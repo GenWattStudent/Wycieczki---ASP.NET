@@ -12,6 +12,8 @@ public class TourByAgencyIdSpecification : BaseSpecification<TourModel>
         Includes.Add(t => t.Users);
         Includes.Add(t => t.TravelAgency);
 
+        IncludeStrings.Add("Reservations.User");
+
         ApplyCriteria(t => t.TravelAgencyId == agencyId);
     }
 }

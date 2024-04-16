@@ -182,10 +182,6 @@ body * {
   backdrop-filter: blur(16px);
 }
 
-.carousel {
-  /* background-color: #a5a5a555; */
-}
-
 .weather-card {
   background: linear-gradient(90deg, rgb(190, 191, 168) 0%, rgb(199, 208, 221) 39%, rgb(152, 166, 180) 100%);
   background-size: 170% 150%;
@@ -193,11 +189,27 @@ body * {
 }
 
 .background {
-  /* background-image: url(/images/bg.jpg); */
+  background-image: url(/images/bg.jpg);
   background-position: center;
   background-attachment: fixed;
-  /* animation: gradient 25s infinite; */
+  animation: gradient 25s infinite;
   background-repeat: no-repeat;
+}
+
+#sidebar.small {
+  width: 100vw;
+  height: 100vh;
+  background-color: #e6e6e67c;
+  transition: left 0.5s;
+  padding: 1rem;
+  max-width: 100% !important;
+}
+
+#sidebar.small .overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #525252;
 }
 
 .glassmorphism {

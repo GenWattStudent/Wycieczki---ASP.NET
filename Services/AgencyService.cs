@@ -118,9 +118,6 @@ public class AgencyService : IAgencyService
         var agencySpecification = new AgencySpecification();
         agencySpecification.ById(id);
         var agency = await _unitOfWork.agencyRepository.GetSingleBySpec(agencySpecification);
-
-        if (agency == null) throw new Exception("Agency not found");
-
         return agency;
     }
 
@@ -171,6 +168,12 @@ public class AgencyService : IAgencyService
     }
 
     private bool IsAgencyAdmin(UserModel? user) => user != null && user.TravelAgency != null && user.Roles.Any(r => r.Role == Role.AgencyAdmin);
+    public async Task<bool> IsUserInAgencyAsync(int userId, int agencyId)
+    {
+        var agency = await GetByIdAsync(agencyId);
+        if (agency == null) return false;
+        return agency.Users.Any(u => u.Id == userId);
+    }
 
     public async Task PromoteAsync(int userId, int currentUserId, Role agencyRole)
     {

@@ -44,9 +44,9 @@
         </nav>
     </header>
 
-
     <div class="d-flex gap-3 p-3" style="overflow-y: auto;overflow-x: hidden;" id="main">
-        <div class="d-none d-lg-block w-100 position-sticky" style="left: 0rem; top: 0rem; max-width: 300px;">
+        <div id="sidebar" class="d-block w-100" style="left: 0rem; top: 0rem; max-width: 350px;">
+            <div class="overlay"></div>
             <div id="clock" class="glassmorphism p-3 rounded d-flex align-items-center gap-2 text-primary">
                 <ion-icon id="time-icon"></ion-icon>
                 <span id="time"></span>
@@ -54,11 +54,11 @@
             </div>
 
             @await Component.InvokeAsync("MealTimeline")
-            <div class="glassmorphism p-3 rounded mt-3 d-none">
+            <div class="glassmorphism p-3 rounded mt-3">
                 <partial name="_CurrentUserWeather" />
             </div>
-
         </div>
+
         <div class="container-lg">
             <main role=" main" class="pb-3">
                 @RenderBody()
@@ -110,6 +110,103 @@
             const mainHeight = window.innerHeight - footer.height() - main.offset().top;
 
             main.css("height", mainHeight);
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            let start = null;
+            const threshold = 100; // Set your threshold here
+
+            function handleSidebar(distance) {
+                if (distance > threshold) {
+                    $('#sidebar').css('left', '50%');
+                } else if (distance < -threshold) {
+                    $('#sidebar').css('left', '-100%');
+                }
+            }
+
+            function addListners() {
+                // Listen for the touchstart event
+                $(window).on('touchstart', function (event) {
+                    start = event.originalEvent.touches[ 0 ].clientX;
+                });
+
+                // Listen for the touchmove event
+                $(window).on('touchmove', function (event) {
+                    const end = event.originalEvent.changedTouches[ 0 ].clientX;
+                    const distance = end - start;
+                    handleSidebar(distance);
+                });
+
+                // Listen for the touchend event
+                $(window).on('touchend', function (event) {
+                    start = null;
+                });
+
+                $(window).on('touchcancel', function (event) {
+                    start = null;
+                });
+
+                $(window).on('touchleave', function (event) {
+                    start = null;
+                });
+                // Listen for the mousedown event
+                $(window).on('mousedown', function (event) {
+                    start = event.clientX;
+                });
+
+                // Listen for the mousemove event
+                $(window).on('mousemove', function (event) {
+                    if (start == null) return;
+                    const distance = event.clientX - start;
+                    handleSidebar(distance);
+                });
+
+                // Listen for the mouseup event
+                $(window).on('mouseup', function (event) {
+                    start = null;
+                });
+
+                // Listen for the mouseleave event
+                $(window).on('mouseleave', function (event) {
+                    start = null;
+                });
+            }
+
+            function removeListners() {
+                $(window).off('touchstart');
+                $(window).off('touchmove');
+                $(window).off('touchend');
+                $(window).off('touchcancel');
+                $(window).off('touchleave');
+                $(window).off('mousedown');
+                $(window).off('mousemove');
+                $(window).off('mouseup');
+                $(window).off('mouseleave');
+            }
+            // Change position to fixed for small screens
+            function checkWidth() {
+                if ($(window).width() <= 768) {
+                    console.log("small screen");
+                    $('#sidebar').css('position', 'fixed');
+                    $('#sidebar').css('z-index', '100');
+                    $('#sidebar').css('left', '-100%');
+                    $('#sidebar').css('transform', 'translateX(-50%)');
+                    $('#sidebar').addClass('small');
+                    addListners()
+                } else {
+                    console.log("big screen");
+                    $('#sidebar').css('position', 'sticky');
+                    $('#sidebar').css('z-index', '0');
+                    $('#sidebar').css('left', '0');
+                    $('#sidebar').css('transform', 'translateX(0)');
+                    $('#sidebar').removeClass('small');
+                    removeListners()
+                }
+            }
+
+            checkWidth();
+            $(window).resize(checkWidth);
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

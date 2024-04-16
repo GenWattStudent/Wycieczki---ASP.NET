@@ -7,10 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Book.App.Helpers;
+using Book.App.Filters.Exception;
 
 namespace Book.App.Controllers;
 
 [Authorize]
+[ServiceFilter(typeof(NotInAgencyExceptionFilter))]
 public class TourController : Controller
 {
     private readonly ITourService _tourService;
@@ -47,7 +50,6 @@ public class TourController : Controller
     public async Task<IActionResult> AddTour(AddTourViewModel addTourViewModel)
     {
         var validationResult = await _addTourValidator.ValidateAsync(addTourViewModel);
-        Console.WriteLine(addTourViewModel.TravelAgencyId);
 
         if (!validationResult.IsValid)
         {
@@ -66,14 +68,13 @@ public class TourController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditTour(FormTourViewModel formTourViewModel)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), formTourViewModel.AddTourViewModel.TravelAgencyId)) return NotFound();
         var addTourViewModel = formTourViewModel.AddTourViewModel;
-        Console.WriteLine(formTourViewModel.AddTourViewModel.Id.ToString() + formTourViewModel.AddTourViewModel.Name);
         var validationResult = await _addTourValidator.ValidateAsync(addTourViewModel);
-        Console.WriteLine(addTourViewModel.Name + " " + addTourViewModel.Description + " " + addTourViewModel.Price + " " + addTourViewModel.StartDate + " " + addTourViewModel.EndDate + " " + addTourViewModel.TravelAgencyId + " ");
+
         if (!validationResult.IsValid)
         {
             validationResult.AddToModelState(ModelState, null);
-            Console.WriteLine(await _tourService.GetById(addTourViewModel.Id));
             return View(new FormTourViewModel { TourModel = await _tourService.GetById(addTourViewModel.Id), AddTourViewModel = addTourViewModel });
         }
 
@@ -93,8 +94,9 @@ public class TourController : Controller
     }
 
     [Authorize(Roles = "Admin,AgencyAdmin")]
-    public async Task<IActionResult> DeleteTour(int id)
+    public async Task<IActionResult> DeleteTour(int id, int agencyId)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         var tour = await _tourService.GetById(id);
         if (tour == null)
         {
@@ -114,7 +116,7 @@ public class TourController : Controller
         {
             return RedirectToAction("AddTour");
         }
-        return View(new FormTourViewModel { TourModel = tour, AddTourViewModel = _mapper.Map<AddTourViewModel>(tour) });
+        return View(new FormTourViewModel { TourModel = tour, AddTourViewModel = _mapper.Map<AddTourViewModel>(tour), AgencyId = tour.TravelAgencyId });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

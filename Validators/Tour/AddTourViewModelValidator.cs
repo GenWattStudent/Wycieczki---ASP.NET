@@ -53,9 +53,9 @@ public class AddTourViewModelValidator : AbstractValidator<AddTourViewModel>
             .GreaterThan(x => x.StartDate)
             .WithMessage("End date must be greater than start date");
 
-        RuleFor(x => x.TravelAgencyId)
-            .MustAsync((x, token) => x != 0 ? IsUserInThisAgency(currentUserId, x, token) : Task.FromResult(true))
-            .WithMessage("You are not in this agency");
+        // RuleFor(x => x.TravelAgencyId)
+        //     .MustAsync((x, token) => x != 0 ? IsUserInThisAgency(currentUserId, x, token) : Task.FromResult(true))
+        //     .WithMessage("You are not in this agency");
 
         RuleFor(x => x.MaxUsers)
             .NotEmpty()

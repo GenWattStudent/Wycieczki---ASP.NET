@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Book.App.Filters.Exception;
 using Book.App.Services;
 using Book.App.ViewModels;
 using FluentValidation;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Book.App.Controllers;
-
+[ServiceFilter(typeof(NotInAgencyExceptionFilter))]
 public class AgencyController : Controller
 {
     private readonly IValidator<CreateAgencyViewModel> _validator;

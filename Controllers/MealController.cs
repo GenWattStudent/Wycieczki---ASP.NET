@@ -1,3 +1,4 @@
+using Book.App.Filters.Exception;
 using Book.App.Models;
 using Book.App.Services;
 using Book.App.ViewModels;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Book.App.Controllers;
 
+[ServiceFilter(typeof(NotInAgencyExceptionFilter))]
 public class MealController : Controller
 {
     private readonly ITourService _tourService;

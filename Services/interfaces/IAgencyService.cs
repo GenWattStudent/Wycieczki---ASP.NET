@@ -20,6 +20,7 @@ public interface IAgencyService
     Task PromoteAsync(int userId, int currentUserId, Role role);
 
     Task<bool> HasUserAgencyAsync(int userId);
+    Task<bool> IsUserInAgencyAsync(int userId, int agencyId);
 
     Task DeleteLogoAsync(int id);
     Task DeleteVideoAsync(int id);
