@@ -28,11 +28,11 @@
 
 <body class="background">
     <header id="nav">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm glass-2 border-bottom box-shadow mb-3 d-block">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm glass-2 border-bottom box-shadow mb-1 d-block">
             <div class="container-fluid">
-                <a class="navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
+                <a class=" navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
                     asp-action="Index">
-                    <img class="rounded me-2" style="width: 50px;height:50px;" src="~/images/th.jpeg" alt="logo" />
+                    <img class="rounded me-2" style="width: 50px;height:50px;" src="~/images/booklogo.png" alt="logo" />
                     Bookmania
                 </a>
 
@@ -44,8 +44,8 @@
         </nav>
     </header>
 
-    <div class="d-flex gap-3 p-3" style="overflow-y: auto;overflow-x: hidden;" id="main">
-        <div id="sidebar" class="d-block w-100" style="left: 0rem; top: 0rem; max-width: 350px;">
+    <div class="d-flex gap-3 p-3" style="overflow: hidden;" id="main">
+        <div id="sidebar" class="d-block w-100" style="left: 0rem; top: 0rem; max-width: 350px;overflow-y: auto;">
             <div class="overlay"></div>
             <div id="clock" class="glassmorphism p-3 rounded d-flex align-items-center gap-2 text-primary">
                 <ion-icon id="time-icon"></ion-icon>
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <div class="container-lg">
+        <div class="container-lg" style="overflow-y: auto;">
             <main role=" main" class="pb-3">
                 @RenderBody()
             </main>
@@ -114,8 +114,48 @@
     </script>
     <script>
         $(document).ready(function () {
+            let isAutomaticScrolling = true;
             let start = null;
             const threshold = 100; // Set your threshold here
+
+            $('#sidebar').on('mouseenter', function () {
+                isAutomaticScrolling = false;
+            });
+
+            $('#sidebar').on('mouseleave', function () {
+                isAutomaticScrolling = true;
+            });
+
+            $("#sidebar").on('touchstart', function () {
+                isAutomaticScrolling = false;
+            });
+
+            $('#sidebar').on('touchend touchcancel', function () {
+                if ($(event.target).closest('#sidebar').length === 0) {
+                    isAutomaticScrolling = true;
+                }
+            });
+
+            function clamp(value, min, max) {
+                return Math.min(Math.max(value, min), max);
+            }
+
+            function handleSidebarAutomaticScrolling() {
+                if (isAutomaticScrolling) {
+                    const sideBarScrollTop = $('#sidebar').scrollTop();
+                    const sideBarVisibleHeight = $('#sidebar').height();
+                    const newScrollTop = Math.round(clamp(sideBarScrollTop + sideBarVisibleHeight, 0, $('#sidebar')[ 0 ].scrollHeight));
+
+                    if (newScrollTop >= $('#sidebar')[ 0 ].scrollHeight) {
+                        $('#sidebar').animate({ scrollTop: 0 }, 1000);
+                        return
+                    }
+
+                    $('#sidebar').animate({ scrollTop: newScrollTop }, 1000);
+                }
+            }
+
+            setInterval(handleSidebarAutomaticScrolling, 5000);
 
             function handleSidebar(distance) {
                 if (distance > threshold) {
@@ -187,7 +227,6 @@
             // Change position to fixed for small screens
             function checkWidth() {
                 if ($(window).width() <= 768) {
-                    console.log("small screen");
                     $('#sidebar').css('position', 'fixed');
                     $('#sidebar').css('z-index', '100');
                     $('#sidebar').css('left', '-100%');
@@ -195,7 +234,6 @@
                     $('#sidebar').addClass('small');
                     addListners()
                 } else {
-                    console.log("big screen");
                     $('#sidebar').css('position', 'sticky');
                     $('#sidebar').css('z-index', '0');
                     $('#sidebar').css('left', '0');

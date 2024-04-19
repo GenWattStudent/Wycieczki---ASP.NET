@@ -6,87 +6,95 @@
     Layout = "~/Views/Shared/_UserAuthLayout.cshtml";
 }
 
-<div style="margin-top: 5.5rem;" class="p-3 rounded glassmorphism">
+<div style="margin-top: 5.5rem;" class="p-3 rounded glassmorphism ">
     <header class="container d-flex align-items-center gap-2 justify-content-md-center">
-        <img style="min-width: 50px; min-height: 50px; max-width: 150px; max-height: 150px;" src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
+        <img style="min-width: 50px; min-height: 50px; max-width: 150px; max-height: 150px;" src="~/images/booklogo.png" alt="BookmaniaLogo">
         <h1 class="text-center">Register To <strong class="text-primary">Bookmania</strong></h1>
     </header>
+    <div class="devider-x"></div>
+    <div class="d-flex justify-conten-between gap-3">
+        @using (Html.BeginForm("Register", "User", FormMethod.Post, new { enctype = "multipart/form-data", @class = "auth-form py-3" }))
+        {        
+            <h5 class="mt-2">Account</h5>
+
+            <label for="Username">Username</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
+                @Html.ValidationMessageFor(model => model.Username, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="Password">Password</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.PasswordFor(model => model.Password, new { @class = "form-control w-100", placeholder = "Your password...", })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="ConfirmPassword">Confirm Password</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control w-100", placeholder = "Confirm your password...", })
+                @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <h5 class="mt-2">Contact</h5>
+
+            <label for="Email">Email</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Contact.Email, new { @class = "form-control w-100", placeholder = "Your email...", })
+                @Html.ValidationMessageFor(model => model.Contact.Email, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="PhoneNumber">Phone Number</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Contact.Phone, new { @class = "form-control w-100", placeholder = "Your phone number...", })
+                @Html.ValidationMessageFor(model => model.Contact.Phone, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <h5 class="mt-2">Address</h5>
+
+            <label for="Address">Street</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Address.Street, new { @class = "form-control w-100", placeholder = "Your street...", })
+                @Html.ValidationMessageFor(model => model.Address.Street, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="City">City</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Address.City, new { @class = "form-control w-100", placeholder = "Your city...", })
+                @Html.ValidationMessageFor(model => model.Address.City, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="State">Country</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Address.Country, new { @class = "form-control w-100", placeholder = "Your state...", })
+                @Html.ValidationMessageFor(model => model.Address.Country, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="ZipCode">Zip Code</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(model => model.Address.Zip, new { @class = "form-control w-100", placeholder = "Your zip code...", })
+                @Html.ValidationMessageFor(model => model.Address.Zip, "", new { @class = "field-validation-error text-danger" })
+            </div>
+
+            <label for="image">Avatar</label>
+            <div class="input-group mt-1">
+                <input class="form-control" type="file" name="image" onchange="ImgPre(this)" accept="image/*">
+            </div>
+
+            <div id="preview" class="d-flex mt-2"></div>
+
+            <a href="@Url.Action("Login", "User")" class="mt-2 d-block">Already have an account? Login</a>
+
+            <div class="input-group mt-3">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+        }
     
-    @using (Html.BeginForm("Register", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {        
-        <h5 class="mt-2">Account</h5>
+        <div class="devider-y d-none d-sm-block"></div>
 
-        <label for="Username">Username</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
-            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "field-validation-error text-danger" })
+        <div class="d-none d-sm-flex justify-content-center position-relative"
+            style="overflow-x:hidden; top: 0px; z-index: -1; width:50%;" id="earth">
         </div>
-
-        <label for="Password">Password</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.PasswordFor(model => model.Password, new { @class = "form-control w-100", placeholder = "Your password...", })
-            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="ConfirmPassword">Confirm Password</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control w-100", placeholder = "Confirm your password...", })
-            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <h5 class="mt-2">Contact</h5>
-
-        <label for="Email">Email</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Contact.Email, new { @class = "form-control w-100", placeholder = "Your email...", })
-            @Html.ValidationMessageFor(model => model.Contact.Email, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="PhoneNumber">Phone Number</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Contact.Phone, new { @class = "form-control w-100", placeholder = "Your phone number...", })
-            @Html.ValidationMessageFor(model => model.Contact.Phone, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <h5 class="mt-2">Address</h5>
-
-        <label for="Address">Street</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Address.Street, new { @class = "form-control w-100", placeholder = "Your street...", })
-            @Html.ValidationMessageFor(model => model.Address.Street, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="City">City</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Address.City, new { @class = "form-control w-100", placeholder = "Your city...", })
-            @Html.ValidationMessageFor(model => model.Address.City, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="State">Country</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Address.Country, new { @class = "form-control w-100", placeholder = "Your state...", })
-            @Html.ValidationMessageFor(model => model.Address.Country, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="ZipCode">Zip Code</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(model => model.Address.Zip, new { @class = "form-control w-100", placeholder = "Your zip code...", })
-            @Html.ValidationMessageFor(model => model.Address.Zip, "", new { @class = "field-validation-error text-danger" })
-        </div>
-
-        <label for="image">Avatar</label>
-        <div class="input-group mt-1">
-            <input class="form-control" type="file" name="image" onchange="ImgPre(this)" accept="image/*">
-        </div>
-
-        <div id="preview" class="d-flex mt-2"></div>
-
-        <a href="@Url.Action("Login", "User")" class="mt-2 d-block">Already have an account? Login</a>
-
-        <div class="input-group mt-3">
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-        </div>
-    }
+    </div>
 </div>
 
 @section Scripts

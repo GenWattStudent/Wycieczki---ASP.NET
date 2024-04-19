@@ -8,28 +8,37 @@
 
 <div style="margin-top: 5.5rem;" class="p-3 rounded glassmorphism">
     <header class="container d-flex align-items-center gap-2 justify-content-md-center">
-        <img style="min-width: 50px; min-height: 50px; max-width: 150px; max-height: 150px;"
-            src="~/images/booklogo.jpeg" alt="BookmaniaLogo">
+        <img style="min-width: 50px; min-height: 50px; max-width: 150px; max-height: 150px;" src="~/images/booklogo.png"
+            alt="BookmaniaLogo">
         <h1 class="text-center">Login To <strong class="text-primary">Bookmania</strong></h1>
     </header>
-    @using (Html.BeginForm("Login", "User", FormMethod.Post))
-    {
-        <label for="Username">Username</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.TextBoxFor(m => m.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
-            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
-        </div>
+    <div class="devider-x"></div>
+    <div class="d-flex justify-content-between gap-3">
+        @using (Html.BeginForm("Login", "User", FormMethod.Post, new { @class = "auth-form py-3" }))
+        {
+            <label for="Username">Username</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control w-100", placeholder = "Your username...", })
+                @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+            </div>
 
-        <label for="Password">Password</label>
-        <div class="input-group mt-1 d-flex flex-column">
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control w-100", placeholder = "Your password...", })
-            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
-        </div>
+            <label for="Password">Password</label>
+            <div class="input-group mt-1 d-flex flex-column">
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control w-100", placeholder = "Your password...", })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
 
-        <a href="@Url.Action("Register", "User")" class="mt-2 d-block">Don't have an account? Register here</a>
+            <a href="@Url.Action("Register", "User")" class="mt-2 d-block">Don't have an account? Register here</a>
 
-        <div class="input-group mt-3">
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <div class="input-group mt-3">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        }
+
+        <div class="devider-y d-none d-sm-block"></div>
+
+        <div class="d-none d-sm-flex justify-content-center position-relative"
+            style="overflow:hidden; top: 0px; z-index: -1; width:50%;" id="earth">
         </div>
-    }
+    </div>
 </div>

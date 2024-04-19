@@ -36,7 +36,7 @@ body * {
 }
 
 .devider-x {
-  border-bottom: 3px solid #525252;
+  border-bottom: 3px solid #e5e5e5;
 }
 
 .dash {
@@ -203,6 +203,17 @@ body * {
   transition: left 0.5s;
   padding: 1rem;
   max-width: 100% !important;
+}
+
+.auth-form {
+  width: 50%;
+  height: fit-content;
+}
+
+@media (max-width: 574px) {
+  .auth-form {
+    width: 100%;
+  }
 }
 
 #sidebar.small .overlay {
