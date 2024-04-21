@@ -10,7 +10,7 @@
 @if ((Html.HasRole("AgencyAdmin") && isUserBelongToAgency) || Html.HasRole("Admin"))
 {
     <div class="d-flex" style="height: fit-content;">
-        <a asp-action="EditTour" asp-controller="Tour" asp-route-id="@Model.Id">
+        <a asp-action="EditTour" asp-controller="Tour" asp-route-id="@Model.Id" asp-route-agencyId="@Model.TravelAgencyId">
             <button data-toggle="tooltip" data-placement="top" title="Edit @Model.Name tour" class="btn pt-0 pe-2">
                 <ion-icon name="create-outline"></ion-icon>
             </button>

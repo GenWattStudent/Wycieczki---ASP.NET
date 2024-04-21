@@ -85,7 +85,7 @@ public class UserController : Controller
                 return View(loginModel);
             }
 
-            var token = _tokenService.Generate(user.Username, user.Roles, user.Id, user.ImagePath, user.Contact.Email);
+            var token = _tokenService.Generate(user.Username, user.Roles, user.Id, user.Contact.Email, user.TravelAgencyId ?? 0);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {
@@ -115,10 +115,7 @@ public class UserController : Controller
     {
         var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
 
-        if (user == null)
-        {
-            return RedirectToAction("Logout");
-        }
+        if (user == null) return RedirectToAction("Logout");
 
         var userViewModel = new UserViewModel(user);
 
@@ -135,10 +132,7 @@ public class UserController : Controller
             var user = await _userService.GetByUsername(User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty);
             var validationResult = await _editUserValidator.ValidateAsync(userInfo.EditUserViewModel);
 
-            if (user == null)
-            {
-                return RedirectToAction("Logout");
-            }
+            if (user == null) return RedirectToAction("Logout");
 
             if (!validationResult.IsValid)
             {
@@ -182,10 +176,7 @@ public class UserController : Controller
         {
             var userExists = await _userService.GetByUsername(username);
 
-            if (userExists != null)
-            {
-                return BadRequest("Admin already exists");
-            }
+            if (userExists != null) return BadRequest("Admin already exists");
 
             var user = new UserModel
             {

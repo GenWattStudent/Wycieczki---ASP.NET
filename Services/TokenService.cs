@@ -15,7 +15,7 @@ public class TokenService : ITokenService
         _configuration = configuration;
     }
 
-    public string Generate(string username, List<RoleModel> roles, int id, string? imagePath, string? email)
+    public string Generate(string username, List<RoleModel> roles, int id, string? email, int agencyId)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")));
@@ -24,7 +24,7 @@ public class TokenService : ITokenService
         var claims = new List<Claim> {
             new Claim(ClaimTypes.Name, username),
             new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-            new Claim("ImagePath", imagePath ?? string.Empty),
+            new Claim("AgencyId", agencyId.ToString()),
             new Claim(ClaimTypes.Email, email ?? string.Empty)
         };
 

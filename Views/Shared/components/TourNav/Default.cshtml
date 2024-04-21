@@ -19,19 +19,23 @@
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a class="nav-link @Html.IsActive(tourController, tourAction)" asp-controller="@tourController"
-                asp-action="@tourAction" asp-route-id="@Model.TourModel.Id">Tour</a>
+                asp-action="@tourAction" asp-route-id="@Model.TourModel.Id"
+                asp-route-agencyId="@Model.TourModel.TravelAgencyId">Tour</a>
         </li>
         <li class="nav-item">
             <a class="nav-link @Html.IsActive("Gallery", galleryAction)" asp-controller="Gallery"
-                asp-action="@galleryAction" asp-route-id="@Model.TourModel.Id">Gallery</a>
+                asp-action="@galleryAction" asp-route-id="@Model.TourModel.Id"
+                asp-route-agencyId="@Model.TourModel.TravelAgencyId">Gallery</a>
         </li>
         <li class="nav-item">
             <a class="nav-link @Html.IsActive("Waypoint", waypointAction)" asp-controller="Waypoint"
-                asp-action="@waypointAction" asp-route-id="@Model.TourModel.Id">Map</a>
+                asp-action="@waypointAction" asp-route-agencyId="@Model.TourModel.TravelAgencyId"
+                asp-route-id="@Model.TourModel.Id">Map</a>
         </li>
         <li class="nav-item">
             <a class="nav-link @Html.IsActive("Meal", mealAction) @Html.IsActive("Meal", "Edit")" asp-controller="Meal"
-                asp-action="@mealAction" asp-route-tourId="@Model.TourModel.Id">Meal</a>
+                asp-action="@mealAction" asp-route-tourId="@Model.TourModel.Id"
+                asp-route-agencyId="@Model.TourModel.TravelAgencyId">Meal</a>
         </li>
 
         @if (waypoint != null)
@@ -39,7 +43,7 @@
             <li class="nav-item">
                 <a class="nav-link @Html.IsActive("Waypoint", waypointsAction)" asp-controller="Waypoint"
                     asp-action="@waypointsAction" asp-route-tourId="@Model.TourModel.Id"
-                    asp-route-waypointId="@waypoint.Id">Waypoints</a>
+                    asp-route-agencyId="@Model.TourModel.TravelAgencyId" asp-route-waypointId="@waypoint.Id">Waypoints</a>
             </li>
         }
         else

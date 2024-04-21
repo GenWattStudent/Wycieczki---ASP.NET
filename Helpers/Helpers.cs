@@ -73,6 +73,12 @@ public static class Helpers
         return userIdString != null ? int.Parse(userIdString) : 0;
     }
 
+    public static int GetUserAgencyId(this ControllerBase controllerBase)
+    {
+        var agencyIdString = controllerBase.User.FindFirst("AgencyId")?.Value;
+        return agencyIdString != null ? int.Parse(agencyIdString) : 0;
+    }
+
     public static void AddMyServices(this IServiceCollection services)
     {
         const int MAX_BODY_SIZE = 104857600; // 100MB

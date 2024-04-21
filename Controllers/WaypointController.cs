@@ -1,4 +1,5 @@
 using Book.App.Filters.Exception;
+using Book.App.Helpers;
 using Book.App.Models;
 using Book.App.Services;
 using Book.App.ViewModels;
@@ -14,13 +15,15 @@ public class WaypointController : Controller
     private readonly ITourService _tourService;
     private readonly IWeatherService _weatherService;
     private readonly IReservationService _reservationService;
+    private readonly IAgencyService _agencyService;
 
-    public WaypointController(IWaypointService waypointService, IWeatherService weatherService, ITourService tourService, IReservationService reservationService)
+    public WaypointController(IWaypointService waypointService, IWeatherService weatherService, ITourService tourService, IReservationService reservationService, IAgencyService agencyService)
     {
         _waypointService = waypointService;
         _weatherService = weatherService;
         _tourService = tourService;
         _reservationService = reservationService;
+        _agencyService = agencyService;
     }
 
     [Authorize(Roles = "AgencyAdmin")]
@@ -41,6 +44,7 @@ public class WaypointController : Controller
             CurrentWaypoint = tour.Waypoints.FirstOrDefault(w => w.Id == waypointId),
             TourModel = tour
         };
+
         return View(editWaypointsViewModel);
     }
 
@@ -93,8 +97,9 @@ public class WaypointController : Controller
     }
 
     [Authorize(Roles = "Admin,AgencyAdmin")]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int id, int agencyId)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         var tour = await _tourService.GetById(id);
         return View(tour);
     }

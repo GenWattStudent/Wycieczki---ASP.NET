@@ -6,7 +6,8 @@
     var galleyViewModel = new GalleryViewModel
             {
                 TourId = Model.Id,
-                Images = Model.Images
+                Images = Model.Images,
+                AgencyId = Model.TravelAgencyId ?? 0
             };
 }
 
@@ -27,8 +28,8 @@
 </div>
 
 <div class="glassmorphism p-3 rounded mt-3">
-    <form id="addImageForm" asp-controller="Gallery" asp-action="Add" asp-route-id="@Model.Id" method="post"
-        enctype="multipart/form-data">
+    <form id="addImageForm" asp-controller="Gallery" asp-action="Add" asp-route-id="@Model.Id"
+        asp-route-agencyId="@Model.TravelAgencyId" method="post" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <div class="form-group">
             <input type="file" class="form-control" id="files" name="files" multiple accept="image/*">

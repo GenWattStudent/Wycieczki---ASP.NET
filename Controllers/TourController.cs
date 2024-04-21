@@ -40,6 +40,7 @@ public class TourController : Controller
     [Authorize(Roles = "AgencyAdmin")]
     public async Task<IActionResult> AddTour(int agencyId)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         var agency = await _agencyService.GetByIdAsync(agencyId);
         return View(new CreateTourViewModel { AgencyModel = agency });
     }
@@ -68,7 +69,7 @@ public class TourController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditTour(FormTourViewModel formTourViewModel)
     {
-        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), formTourViewModel.AddTourViewModel.TravelAgencyId)) return NotFound();
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), formTourViewModel.AddTourViewModel.TravelAgencyId)) throw new NotInAgencyException();
         var addTourViewModel = formTourViewModel.AddTourViewModel;
         var validationResult = await _addTourValidator.ValidateAsync(addTourViewModel);
 
@@ -104,12 +105,13 @@ public class TourController : Controller
         }
 
         await _tourService.Delete(id);
-        return Redirect("/Tour/Tours");
+        return RedirectToAction("Tours", "Agency", new { agencyId });
     }
 
     [Authorize(Roles = "AgencyAdmin,Admin")]
-    public async Task<IActionResult> EditTour(int id)
+    public async Task<IActionResult> EditTour(int id, int agencyId)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         var tour = await _tourService.GetById(id);
 
         if (tour == null)
