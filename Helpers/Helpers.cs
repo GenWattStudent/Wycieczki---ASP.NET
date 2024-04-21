@@ -18,13 +18,11 @@ class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<CreateAgencyViewModel, TravelAgencyModel>();
-        CreateMap<TravelAgencyModel, CreateAgencyViewModel>();
+        CreateMap<CreateAgencyViewModel, TravelAgencyModel>().ReverseMap();
         CreateMap<RegisterViewModel, UserModel>();
         CreateMap<EditUserViewModel, UserModel>();
         CreateMap<EditAgencyViewModel, TravelAgencyModel>();
-        CreateMap<AddTourViewModel, TourModel>();
-        CreateMap<TourModel, AddTourViewModel>();
+        CreateMap<AddTourViewModel, TourModel>().ReverseMap();
     }
 }
 
@@ -55,6 +53,11 @@ public static class Helpers
     public static bool HasRole(this IHtmlHelper htmlHelper, string role)
     {
         var roles = htmlHelper.ViewContext.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value.Split(",");
+        Console.WriteLine(htmlHelper.ViewContext.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value);
+        foreach (var r in roles)
+        {
+            Console.WriteLine(r);
+        }
         return roles != null && roles.Contains(role);
     }
     // get user id
