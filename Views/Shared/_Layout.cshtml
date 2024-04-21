@@ -37,7 +37,7 @@
                 </a>
 
                 <div class="d-flex align-items-center">
-                    <partial name="_UserPartial" />
+                    @await Component.InvokeAsync("UserAvatar")
                 </div>
             </div>
             @await Component.InvokeAsync("Nav")

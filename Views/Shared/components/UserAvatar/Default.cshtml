@@ -1,15 +1,12 @@
 @using Book.App.Helpers;
-
-@{
-    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
-    var imagePath = User.FindFirst("ImagePath")?.Value;
-    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-}
+@using Book.App.ViewModels;
+@model NavViewModel
 
 <div class="d-none d-sm-block">
     <div class="d-flex gap-2">
-        <a asp-action="UserInfo" asp-controller="User" data-toggle="tooltip" data-placement="bottom" title="@userName">
-            <partial name="_UserImagePartial" model="imagePath" />
+        <a asp-action="UserInfo" asp-controller="User" data-toggle="tooltip" data-placement="bottom"
+            title="@Model.Username">
+            <partial name="_UserImagePartial" model="@Model.ImagePath" />
         </a>
         <span class="devider-y"></span>
         <a class="d-flex align-items-center" asp-action="Logout" asp-controller="User">
@@ -22,13 +19,13 @@
 <div class="dropdown d-block d-sm-none">
     <div class="p-0 pe-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup=" true"
         aria-expanded="false">
-        <partial name="_UserImagePartial" model="imagePath" />
+        <partial name="_UserImagePartial" model="@Model.ImagePath" />
     </div>
     <div class="dropdown-menu dropdown-menu-right glassmorphism" aria-labelledby="dropdownMenuLink">
-        @if (role == "Admin")
+        @if (Model.AgencyId != 0)
         {
             <a class="dropdown-item @Html.IsActive("Tour", "AddTour")" asp-area="" asp-controller="Tour"
-                asp-action="AddTour">
+                asp-action="AddTour" asp-route-agencyId="@Model.AgencyId">
                 Add Tour
             </a>
         }
@@ -43,8 +40,8 @@
         <div class="dropdown-divider"></div>
 
         <a class="dropdown-item @Html.IsActive("User", "UserInfo")" asp-action="UserInfo" asp-controller="User"
-            data-toggle="tooltip" data-placement="bottom" title="@userName">
-            <strong>@userName</strong>
+            data-toggle="tooltip" data-placement="bottom" title="@Model.Username">
+            <strong>@Model.Username</strong>
         </a>
         <a class="dropdown-item" asp-action="Logout" asp-controller="User">
             <strong class=" m-0">Logout</strong>
