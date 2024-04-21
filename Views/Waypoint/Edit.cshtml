@@ -29,7 +29,7 @@
 </div>
 
 <form id="waypointsForm" asp-controller="Waypoint" asp-action="Add" asp-route-tourId="@Model.Id" method="post"
-    enctype="multipart/form-data">
+    asp-route-agencyId="@Model.TravelAgencyId" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
     @{
         var index = 0;

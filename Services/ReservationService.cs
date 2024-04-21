@@ -120,7 +120,7 @@ public class ReservationService : IReservationService
         if (tour.StartDate <= DateTime.Now && tour.EndDate >= DateTime.Now)
         {
             bookViewModel.PercentOfTime = (DateTime.Now - tour.StartDate).TotalDays / (tour.EndDate - tour.StartDate).TotalDays;
-            var nextWaypointData = _geoService.CalculateDistanceToNextWaypoint(tour.Waypoints, bookViewModel.PercentOfTime);
+            var nextWaypointData = _geoService.CalculateDistanceToNextWaypoint(tour.Waypoints.Where(w => w.Type != WaypointType.Road).ToList(), bookViewModel.PercentOfTime);
             bookViewModel.NextWaypointData = nextWaypointData;
         }
         else if (tour.StartDate > DateTime.Now)

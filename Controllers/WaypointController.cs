@@ -65,7 +65,7 @@ public class WaypointController : Controller
 
     [Authorize(Roles = "AgencyAdmin,Admin")]
     [HttpPost]
-    public async Task<IActionResult> Edit(WaypointModel waypoint)
+    public async Task<IActionResult> Edit(WaypointModel waypoint, int agencyId)
     {
         var waypointDb = await _waypointService.Edit(waypoint);
 
@@ -132,10 +132,10 @@ public class WaypointController : Controller
     [Authorize(Roles = "AgencyAdmin")]
     [ValidateAntiForgeryToken]
     [HttpPost]
-    public async Task<IActionResult> Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId)
+    public async Task<IActionResult> Add(List<AddTourWaypointsViewModel> addTourWaypointsModel, int tourId, int agencyId)
     {
         await _waypointService.Add(addTourWaypointsModel, tourId);
-        return RedirectToAction("Edit", new { id = tourId });
+        return RedirectToAction("Edit", new { id = tourId, agencyId });
     }
 
     [Authorize]

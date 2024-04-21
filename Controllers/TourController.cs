@@ -116,7 +116,7 @@ public class TourController : Controller
 
         if (tour == null)
         {
-            return RedirectToAction("AddTour");
+            return RedirectToAction("AddTour", new { agencyId });
         }
         return View(new FormTourViewModel { TourModel = tour, AddTourViewModel = _mapper.Map<AddTourViewModel>(tour), AgencyId = tour.TravelAgencyId });
     }

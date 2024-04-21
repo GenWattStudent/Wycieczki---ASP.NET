@@ -31,19 +31,27 @@ class BreakInfo {
       left: leftOffset,
     })
 
-    this.setText(this.getTimeRemaining(this.date))
+    this.setText(this.date - new Date())
   }
 
   getTimeRemaining(date) {
-    const totalSeconds = Math.max(Math.floor(date / 1000), 0)
-    const days = Math.floor(totalSeconds / (24 * 60 * 60))
-    const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60))
-    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60)
-    const seconds = totalSeconds % 60
+    const days = Math.floor(date / (1000 * 60 * 60 * 24))
+    const hours =
+      Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) >= 10
+        ? Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        : `0${Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))}`
 
-    return `${days}d ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds
-      .toString()
-      .padStart(2, '0')}s`
+    const minutes =
+      Math.floor((date % (1000 * 60 * 60)) / (1000 * 60)) >= 10
+        ? Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
+        : `0${Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))}`
+
+    const seconds =
+      Math.floor((date % (1000 * 60)) / 1000) >= 10
+        ? Math.floor((date % (1000 * 60)) / 1000)
+        : `0${Math.floor((date % (1000 * 60)) / 1000)}`
+    console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`)
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`
   }
 }
 

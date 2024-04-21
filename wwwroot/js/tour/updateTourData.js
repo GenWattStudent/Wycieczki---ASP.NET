@@ -15,8 +15,12 @@ function tourEnded(endDate, isTourEnded) {
 export function updateTourData(userMap, earthScene, waypoints, startDate, endDate, isTourStarted, isTourEnded) {
   reloadWhenTourStarts(startDate, isTourStarted)
   tourEnded(endDate, isTourEnded)
-  console.log('updateTourData')
-  const tourData = new TourData(waypoints, startDate, endDate)
+
+  const tourData = new TourData(
+    waypoints.filter((w) => w.type !== 3),
+    startDate,
+    endDate
+  )
   const completed = tourData.calculatePercentComplete()
   const data = tourData.calculateDistanceToNextWaypoint(completed)
 
