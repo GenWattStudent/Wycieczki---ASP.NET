@@ -52,18 +52,19 @@ public class GalleryController : Controller
     // POST: Gallery{waypointId}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddImageToWaypoint(List<IFormFile> files, int id, int tourId)
+    public async Task<IActionResult> AddImageToWaypoint(List<IFormFile> files, int id, int tourId, int agencyId)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         await _imageService.AddImagesToWaypoint(files, id);
-        return RedirectToAction("EditWaypoints", "Waypoint", new { tourId, waypointId = id });
+        return RedirectToAction("EditWaypoints", "Waypoint", new { tourId, waypointId = id, agencyId });
     }
 
     [Authorize(Roles = "Admin,AgencyAdmin")]
     // POST: Gallery/Delete{imageId}
-    public async Task<IActionResult> Delete(int id, int tourId, int agencyId)
+    public async Task<IActionResult> Delete(int id, int tourId, int agencyId, string redirect)
     {
         if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         await _imageService.Delete(id);
-        return RedirectToAction("Edit", new { id = tourId, agencyId });
+        return RedirectToAction(redirect ?? "Edit", new { id = tourId, agencyId });
     }
 }

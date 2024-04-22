@@ -6,13 +6,20 @@
     var galleryViewModel = new GalleryViewModel
             {
                 TourId = Model.TourId,
-                Images = Model.CurrentWaypoint != null ? Model.CurrentWaypoint.Images : new()
+                Images = Model.CurrentWaypoint != null ? Model.CurrentWaypoint.Images : new(),
+                AgencyId = Model.TourModel?.TravelAgency.Id ?? 0,
+                Redirect = Url.Action("EditWaypoints", "Waypoint", new
+                {
+                    tourId = Model.TourId,
+                    waypointId = Model.CurrentWaypoint?.Id,
+                    agencyId = Model.TourModel?.TravelAgency.Id
+                })
             };
 }
 
-<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TourModel.TravelAgency.Id"
+<a asp-action="Tours" asp-controller="Agency" asp-route-agencyId="@Model.TourModel?.TravelAgency.Id"
     class="text-primary mb-3 d-flex align-items-center gap-1 glassmorphism p-3 rounded" data-toggle="tooltip"
-    title="Go back to @Model.TourModel.TravelAgency.Name agency">
+    title="Go back to @Model.TourModel?.TravelAgency.Name agency">
     <ion-icon name="arrow-back-outline"></ion-icon>
     Back
 </a>
@@ -36,7 +43,11 @@
 </div>
 
 <div class="glassmorphism p-3 rounded mt-3">
-    <partial name="_WaypointForm" model="Model.CurrentWaypoint" />
+    @using (Html.BeginForm("EditWaypoints", "Waypoint", FormMethod.Post))
+    {
+        @Html.Hidden("agencyId", Model.TourModel?.TravelAgency.Id)
+        <partial name="_WaypointForm" model="Model.CurrentWaypoint" />
+    }
 </div>
 
 @if (Model.CurrentWaypoint != null)
@@ -45,9 +56,10 @@
         <h4>Waypoint Gallery</h4>
         <form id="addImageForm" asp-controller="Gallery" asp-action="AddImageToWaypoint"
             asp-route-id="@Model.CurrentWaypoint.Id" asp-route-tourId="@Model.TourId" method="post"
-            enctype="multipart/form-data">
+            asp-route-agencyId="@Model.TourModel?.TravelAgencyId" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <div class="form-group">
+                @Html.Hidden("agencyId", Model.TourModel?.TravelAgency.Id)
                 <input type="file" class="form-control" id="files" name="files" multiple accept="image/*">
             </div>
         </form>
@@ -61,7 +73,8 @@
 <partial name="_PreviewModal" />
 
 <a asp-action="Delete" asp-controller="Waypoint" asp-route-id="@Model.CurrentWaypoint?.Id"
-    asp-route-tourId="@Model.TourId" class="btn btn-danger mt-3">Delete Waypoint</a>
+    asp-route-tourId="@Model.TourId" asp-route-agencyId="@Model.TourModel?.TravelAgencyId"
+    class="btn btn-danger mt-3">Delete Waypoint</a>
 
 @section Scripts {
     <script defer src="~/js/gallery/gallery.js"></script>

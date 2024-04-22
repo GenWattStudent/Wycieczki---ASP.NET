@@ -65,3 +65,4 @@ App is responsive even for mobile.
 
 ### Check waypoints weather
 ![Register Image](./readme/weather.png)
+

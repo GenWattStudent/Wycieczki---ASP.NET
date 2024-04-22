@@ -88,7 +88,7 @@ export class Map {
           </a>
         </div>
   
-        <a href="/Waypoint/Delete/${waypointData.id}">
+        <a href="/Waypoint/Delete/${waypointData.id}?agencyId=${waypointData.agencyId}">
           <button type="button" class="btn btn-primary mt-2 w-100">Delete waypoint</button>
         </a>
       </div>`

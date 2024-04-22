@@ -84,9 +84,9 @@
             }
         }
         const model = @Html.Raw(Json.Serialize(Model));
-
+        console.log(model);
         model.waypoints.$values.forEach(waypoint => {
-            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad);
+            const waypointObj = new Waypoint(waypoint.latitude, waypoint.longitude, Number(waypoint.id), waypoint.name, waypoint.description, getTypeFromEnum(waypoint.type), waypoint.images.$values, true, waypoint.isRoad, model.travelAgencyId);
             adminMap.addWaypoint(waypointObj, waypointObj.type, true);
 
             if (model.waypoints.$values.length > 1) {

@@ -8,7 +8,8 @@ export class Waypoint {
     type = 'start',
     images = [],
     fromDb = false,
-    isRoad = false
+    isRoad = false,
+    agencyId = 0
   ) {
     this.id = id
     this.lat = lat
@@ -21,6 +22,7 @@ export class Waypoint {
     this.type = type
     this.isTourIndicator = false
     this.marker = null
+    this.agencyId = agencyId
   }
 
   getSubmitData() {
@@ -38,10 +40,7 @@ export class Waypoint {
   }
 
   createMarker(draggable = false) {
-    this.marker = L.marker(
-      { lat: this.lat, lng: this.lng },
-      { draggable }
-    ).addTo(mapAdmin.map)
+    this.marker = L.marker({ lat: this.lat, lng: this.lng }, { draggable }).addTo(mapAdmin.map)
   }
 
   update(title, description, images) {
@@ -59,8 +58,6 @@ export class Waypoint {
   }
 
   addRemoveListener(eventHandler) {
-    document
-      .getElementById(`remove-${this.id}`)
-      .addEventListener('click', eventHandler)
+    document.getElementById(`remove-${this.id}`).addEventListener('click', eventHandler)
   }
 }

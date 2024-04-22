@@ -111,6 +111,7 @@ public static class Helpers
         services.AddTransient<IValidator<EditUserViewModel>, EditUserViewModelValidator>();
         services.AddTransient<IValidator<LoginViewModel>, LoginViewModelValidator>();
         services.AddTransient<IValidator<AddTourViewModel>, AddTourViewModelValidator>();
+        services.AddTransient<IValidator<WaypointModel>, EditWaypointValidator>();
 
         // Exceptions
         services.AddTransient<NotInAgencyExceptionFilter>();
