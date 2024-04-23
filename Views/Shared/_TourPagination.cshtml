@@ -1,0 +1,24 @@
+@using Book.App.ViewModels
+@model TourListViewModel
+
+@{
+    var pageCount = Math.Ceiling((double)Model.TotalItems / Model.FilterModel.PageSize);
+}
+
+@if (pageCount > 1)
+{
+    <div class="glassmorphism p-3 rounded mb-3 d-flex gap-2">
+        @for (int i = 1; i <= pageCount; i++)
+        {
+            <a asp-action="Tours" asp-controller="Tour" asp-route-page="@i" asp-route-pageSize="@Model.FilterModel.PageSize"
+                asp-route-searchString="@Model.FilterModel.SearchString" asp-route-minPrice="@Model.FilterModel.MinPrice"
+                asp-route-maxPrice="@Model.FilterModel.MaxPrice" asp-route-startDate="@Model.FilterModel.StartDate"
+                asp-route-endDate="@Model.FilterModel.EndDate" asp-route-orderBy="@((int)Model.FilterModel.OrderBy)"
+                asp-route-orderDirection="@((int)Model.FilterModel.OrderDirection)"
+                class="glass-2 p-1 text-light text-center rounded @((Model.FilterModel.Page == i) ? "bg-primary" : "")"
+                style="width:2rem;height:2rem;">
+                @i
+            </a>
+        }
+    </div>
+}

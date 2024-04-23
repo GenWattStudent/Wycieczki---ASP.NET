@@ -122,4 +122,14 @@ public class TourService : ITourService
     {
         return await _unitOfWork.tourRepository.GetBySpec(new TourByAgencyIdSpecification(id));
     }
+
+    public int GetCount(FilterModel filterModel)
+    {
+        List<Expression<Func<TourModel, bool>>> criterias = new() { t => t.StartDate >= DateTime.Now, t => t.IsVisible };
+        var newFilterModel = new FilterModel(filterModel)
+        {
+            Page = 0
+        };
+        return _unitOfWork.tourRepository.Count(new TourFilterSpecification(newFilterModel, criterias));
+    }
 }

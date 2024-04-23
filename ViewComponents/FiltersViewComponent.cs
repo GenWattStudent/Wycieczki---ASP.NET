@@ -5,9 +5,8 @@ namespace Book.App.ViewComponents;
 
 public class FiltersViewComponent : ViewComponent
 {
-    public IViewComponentResult Invoke()
+    public IViewComponentResult Invoke(FilterModel filter)
     {
-        var model = new FilterModel();
-        return View(model);
+        return View(filter);
     }
 }

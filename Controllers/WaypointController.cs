@@ -112,8 +112,7 @@ public class WaypointController : Controller
         if (waypoint == null)
         {
             TempData["ErrorMessage"] = "Waypoint not found";
-            var referrer = Request.Headers["Referer"].ToString();
-            return Redirect(referrer);
+            return RedirectToAction("Tours", "Agency", new { agencyId });
         }
 
         await _waypointService.AddImages(images, waypoint);
@@ -143,13 +142,7 @@ public class WaypointController : Controller
         if (waypoint == null)
         {
             TempData["ErrorMessage"] = "Waypoint not found";
-
-            var referrer = Request.Headers["Referer"].ToString();
-            if (string.IsNullOrEmpty(referrer))
-            {
-                return RedirectToAction("Tours", "Tour");
-            }
-            return Redirect(referrer);
+            return RedirectToAction("Tours", "Tour");
         }
 
         var weather = await _weatherService.Get(waypoint.Latitude, waypoint.Longitude);

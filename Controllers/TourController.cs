@@ -29,12 +29,13 @@ public class TourController : Controller
         _addTourValidator = addTourValidator;
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [Authorize]
     public async Task<IActionResult> Tours(FilterModel filterModel)
     {
+        Console.WriteLine(filterModel.OrderBy);
         var tours = await _tourService.GetVisible(filterModel);
-        return View(tours);
+        var totalItems = _tourService.GetCount(filterModel);
+        return View(new TourListViewModel { Tours = tours, FilterModel = filterModel, TotalItems = totalItems });
     }
 
     [Authorize(Roles = "AgencyAdmin")]
@@ -50,6 +51,7 @@ public class TourController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddTour(AddTourViewModel addTourViewModel)
     {
+        if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), addTourViewModel.TravelAgencyId)) throw new NotInAgencyException();
         var validationResult = await _addTourValidator.ValidateAsync(addTourViewModel);
 
         if (!validationResult.IsValid)
@@ -61,7 +63,7 @@ public class TourController : Controller
         var tour = _mapper.Map<TourModel>(addTourViewModel);
         await _tourService.Add(tour);
 
-        return RedirectToAction("EditTour", new { id = tour.Id });
+        return RedirectToAction("EditTour", new { id = tour.Id, agencyId = tour.TravelAgencyId });
     }
 
     [HttpPost]
@@ -81,7 +83,7 @@ public class TourController : Controller
 
         await _tourService.Edit(addTourViewModel);
 
-        return RedirectToAction("EditTour", new { id = addTourViewModel.Id });
+        return RedirectToAction("EditTour", new { id = addTourViewModel.Id, agencyId = addTourViewModel.TravelAgencyId });
     }
 
     public async Task<IActionResult> TourDetails(int id)

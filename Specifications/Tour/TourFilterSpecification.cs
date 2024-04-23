@@ -41,6 +41,11 @@ public class TourFilterSpecification : BaseSpecification<TourModel>
             ApplyCriteria(tour => tour.Price <= filterModel.MaxPrice);
         }
 
+        if (filterModel.Page > 0 && filterModel.PageSize > 0)
+        {
+            ApplyPaging((filterModel.Page - 1) * filterModel.PageSize, filterModel.PageSize);
+        }
+
         Includes.Add(t => t.Images);
         Includes.Add(t => t.Reservations);
         IncludeStrings.Add("Reservations.User");
