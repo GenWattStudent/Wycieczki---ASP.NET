@@ -22,19 +22,20 @@ public class TourController : Controller
     private readonly IAgencyService _agencyService;
     private readonly IMapper _mapper;
     private readonly IValidator<AddTourViewModel> _addTourValidator;
+    private readonly IConfiguration _configuration;
 
-    public TourController(ITourService tourService, IAgencyService agencyService, IMapper mapper, IValidator<AddTourViewModel> addTourValidator)
+    public TourController(ITourService tourService, IAgencyService agencyService, IMapper mapper, IValidator<AddTourViewModel> addTourValidator, IConfiguration configuration)
     {
         _tourService = tourService;
         _agencyService = agencyService;
         _mapper = mapper;
         _addTourValidator = addTourValidator;
+        _configuration = configuration;
     }
 
     [Authorize]
     public async Task<IActionResult> Tours(FilterModel filterModel)
     {
-        Console.WriteLine(filterModel.OrderBy);
         var tours = await _tourService.GetVisible(filterModel);
         var totalItems = _tourService.GetCount(filterModel);
         return View(new TourListViewModel { Tours = tours, FilterModel = filterModel, TotalItems = totalItems });
@@ -133,7 +134,7 @@ public class TourController : Controller
 
     public IActionResult GetMapKey()
     {
-        var mapTilerKey = Environment.GetEnvironmentVariable("MAP_TILER_KEY");
+        var mapTilerKey = _configuration["MapTilerKey"];
         return Json(new { key = mapTilerKey });
     }
 

@@ -18,7 +18,7 @@ public class TokenService : ITokenService
     public string Generate(string username, List<RoleModel> roles, int id, string? email, int agencyId)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:JwtSecret"]));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim> {
@@ -37,7 +37,7 @@ public class TokenService : ITokenService
             _configuration["Jwt:Issuer"],
             _configuration["Jwt:Audience"],
             claims,
-            expires: DateTime.Now.AddMinutes(120),
+            expires: _configuration["Jwt:Expires"] == null ? DateTime.Now.AddMinutes(15) : DateTime.Now.AddMinutes(int.Parse(_configuration["Jwt:Expires"])),
             signingCredentials: credentials
         );
 
@@ -47,7 +47,7 @@ public class TokenService : ITokenService
     public ClaimsPrincipal GetPrincipal(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"));
+        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:JwtSecret"]);
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

@@ -6,19 +6,22 @@ namespace Book.App.Services;
 
 public class WeatherService : IWeatherService
 {
-    private static string key = Environment.GetEnvironmentVariable("OPEN_WEATHER_API_KEY");
+    private string _key = "";
     private string url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
     private HttpClient _client = new HttpClient();
     private readonly IDistributedCache _cache;
+    private readonly IConfiguration _configuration;
 
-    public WeatherService(IDistributedCache cache)
+    public WeatherService(IDistributedCache cache, IConfiguration configuration)
     {
         _cache = cache;
+        _configuration = configuration;
+        var key = _configuration["OpenWeatherApiKey"];
         if (key == null)
         {
             throw new Exception("Open Weather API Key not found");
         }
-
+        _key = key;
         _client.BaseAddress = new Uri(url);
     }
 
@@ -26,7 +29,7 @@ public class WeatherService : IWeatherService
     {
         if (string.IsNullOrEmpty(_cache.GetString($"{lat},{lon}")))
         {
-            var response = await _client.GetAsync($"{url}{lat},{lon}?key={key}&include=days&unitGroup=metric");
+            var response = await _client.GetAsync($"{url}{lat},{lon}?key={_key}&include=days&unitGroup=metric");
             var content = await response.Content.ReadAsStringAsync();
             var weatherData = JsonConvert.DeserializeObject<WeatherModel>(content);
             var cacheOptions = new DistributedCacheEntryOptions();

@@ -2,28 +2,36 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Azure.Identity;
 using Book.App.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-DotNetEnv.Env.Load();
-
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+if (builder.Environment.IsDevelopment())
+{
+    DotNetEnv.Env.Load();
+    builder.Configuration.AddEnvironmentVariables();
+}
+else if (builder.Environment.IsProduction())
+{
+    var keyVaultUrl = builder.Configuration["KeyVaultUrl"];
+    var azureCredentials = new DefaultAzureCredential();
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl!), azureCredentials);
+}
 
 var tokenValidationParameters = new TokenValidationParameters
 {
-    ValidateIssuer = false,
-    ValidateAudience = false,
+    ValidateIssuer = true,
+    ValidateAudience = true,
     ValidateLifetime = true,
     ValidateIssuerSigningKey = true,
     ValidIssuer = builder.Configuration["Jwt:Issuer"],
     ValidAudience = builder.Configuration["Jwt:Audience"],
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"))),
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:JwtSecret"] ?? throw new InvalidOperationException("JWT secret is not set."))),
     ClockSkew = TimeSpan.Zero,
 };
 
@@ -33,12 +41,13 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 });
 
 // Add database context
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString ?? throw new InvalidOperationException("Connection string is not set.")));
 builder.Services.AddMyServices();
 
 builder.Services.AddDistributedRedisCache(options =>
 {
-    options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString") ?? throw new InvalidOperationException("Redis connection string is not set.");
     options.InstanceName = "BookApp_";
 });
 // Setup authentication JWT
