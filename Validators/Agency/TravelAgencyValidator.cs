@@ -28,6 +28,8 @@ public class TravelAgencyValidator : AbstractValidator<CreateAgencyViewModel>
             .WithMessage($"Name must be between {minNameLength} and {maxNameLength} characters");
 
         RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Name is required")
             .MustAsync((x, model, token) => IsUniqueName(x.Name, x.Id, token))
             .WithMessage("Name is already taken");
 
@@ -46,6 +48,11 @@ public class TravelAgencyValidator : AbstractValidator<CreateAgencyViewModel>
 
     private async Task<bool> IsUniqueName(string name, int id, CancellationToken token)
     {
+        if (string.IsNullOrEmpty(name))
+        {
+            return false;
+        }
+
         var agency = await _unitOfWork.agencyRepository.GetByName(name);
         return agency == null || agency.Id == id;
     }
@@ -58,7 +65,8 @@ public class TravelAgencyValidator : AbstractValidator<CreateAgencyViewModel>
         }
 
         var user = await _unitOfWork.userRepository.GetById(userId);
-        // Console.WriteLine(user?.TravelAgencyId);
+        Console.WriteLine(user?.TravelAgencyId);
+
         return user?.TravelAgencyId == null;
     }
 

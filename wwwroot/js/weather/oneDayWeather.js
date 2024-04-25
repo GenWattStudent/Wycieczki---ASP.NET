@@ -33,7 +33,8 @@ $(document).ready(function () {
   }
 
   function error() {
-    toastr.error('Some services are not available without location permission.')
+    // toastr.error('Some services are not available without location permission.')
+    $('#weather-card').addClass('d-none')
   }
 
   navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true })

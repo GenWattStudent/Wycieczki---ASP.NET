@@ -21,6 +21,8 @@ App is responsive even for mobile.
 
 ## Overview
 
+Website hosted on azure: https://bookmaniaapp.azurewebsites.net
+
 ![Login Image](./readme/login.png)
 - You can create Admin going to /User/CreateAdmin username and password will be admin, 
 - You can create regular user in Register page

@@ -11,17 +11,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
-// if (builder.Environment.IsDevelopment())
-// {
-//     DotNetEnv.Env.Load();
-//     builder.Configuration.AddEnvironmentVariables();
-// }
-// else if (builder.Environment.IsProduction())
-// {
-var keyVaultUrl = builder.Configuration["KeyVaultUrl"];
-var azureCredentials = new DefaultAzureCredential();
-builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl!), azureCredentials);
-// }
+if (builder.Environment.IsDevelopment())
+{
+    DotNetEnv.Env.Load();
+    builder.Configuration.AddEnvironmentVariables();
+}
+else if (builder.Environment.IsProduction())
+{
+    var keyVaultUrl = builder.Configuration["KeyVaultUrl"];
+    var azureCredentials = new DefaultAzureCredential();
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl!), azureCredentials);
+}
 
 var tokenValidationParameters = new TokenValidationParameters
 {

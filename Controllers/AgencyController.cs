@@ -4,6 +4,7 @@ using Book.App.Filters.Exception;
 using Book.App.Services;
 using Book.App.ViewModels;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,16 +40,14 @@ public class AgencyController : Controller
     public async Task<IActionResult> Create(CreateAgencyViewModel createAgencyViewModel)
     {
         ValidationResult result = await _validator.ValidateAsync(createAgencyViewModel);
-
+        Console.WriteLine(createAgencyViewModel.Name + " asdasddasd");
         if (!result.IsValid)
         {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError($"CreateAgencyViewModel.{error.PropertyName}", error.ErrorMessage);
-            }
-            return View(createAgencyViewModel);
+            Console.WriteLine("Validation failed");
+            result.AddToModelState(ModelState, null);
+            return View("Create", createAgencyViewModel);
         }
-
+        Console.WriteLine("Validation passed");
         if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId))
         {
             try
