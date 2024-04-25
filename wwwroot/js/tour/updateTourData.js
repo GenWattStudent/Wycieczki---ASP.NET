@@ -16,6 +16,8 @@ export function updateTourData(userMap, earthScene, waypoints, startDate, endDat
   reloadWhenTourStarts(startDate, isTourStarted)
   tourEnded(endDate, isTourEnded)
 
+  if (!isTourStarted) return
+
   const tourData = new TourData(
     waypoints.filter((w) => w.type !== 3),
     startDate,
@@ -37,6 +39,5 @@ export function updateTourData(userMap, earthScene, waypoints, startDate, endDat
   $(`#waypoint-${data.nextWaypoint.id}`)?.addClass('text-primary')
 
   if (userMap) userMap.updateTourIndicator(data.tourLat, data.tourLon)
-  console.log('earthScene', earthScene)
   if (earthScene) earthScene.updateTourLatLong(data.tourLat, data.tourLon, data.nextWaypoint)
 }

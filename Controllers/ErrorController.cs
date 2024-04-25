@@ -29,6 +29,10 @@ namespace Book.App.Controllers
                     TempData["ErrorMessage"] = "Sorry, you don't have permission to access this resource";
                     return View("Forbidden");
 
+                case 429:
+                    TempData["ErrorMessage"] = "Sorry, you have exceeded the rate limit";
+                    return View("TooManyRequests");
+
                 default:
                     TempData["ErrorMessage"] = "Sorry, something went wrong";
                     return View("ServerError");

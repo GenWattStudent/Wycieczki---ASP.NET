@@ -11,7 +11,9 @@
     var galleyViewModel = new GalleryViewModel
                 {
                     TourId = Model.Id,
-                    Images = Model.Images
+                    Images = Model.Images,
+                    AgencyId = Model.Id,
+                    Redirect = Url.Action("AddGallery", "AgencyFiles", new { agencyId = Model.Id })
                 };
 
     <header class="glassmorphism p-3 rounded">

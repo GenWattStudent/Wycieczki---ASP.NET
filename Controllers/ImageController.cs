@@ -1,9 +1,11 @@
 using Book.App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
+[EnableRateLimiting("fixed")]
 public class ImageController : Controller
 {
     private readonly IImageService _imageService;

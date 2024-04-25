@@ -7,10 +7,12 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
 [ServiceFilter(typeof(NotInAgencyExceptionFilter))]
+[EnableRateLimiting("fixed")]
 public class WaypointController : Controller
 {
     private readonly IWaypointService _waypointService;

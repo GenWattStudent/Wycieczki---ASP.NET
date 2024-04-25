@@ -8,7 +8,7 @@
                 TourId = Model.Id,
                 Images = Model.Images,
                 AgencyId = Model.TravelAgencyId ?? 0,
-                Redirect = "Edit"
+                Redirect = Url.Action("Edit", "Gallery", new { id = Model.Id, agencyId = Model.TravelAgencyId })
             };
 }
 

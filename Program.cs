@@ -1,10 +1,11 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
-using Book.App.Filters.Exception;
+using System.Threading.RateLimiting;
 using Book.App.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,10 +26,6 @@ var tokenValidationParameters = new TokenValidationParameters
     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"))),
     ClockSkew = TimeSpan.Zero,
 };
-
-// Add services to the container.
-
-// Add the missing using directive
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 {
@@ -65,7 +62,16 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
+builder.Services.AddRateLimiter(_ =>
+{
+    _.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    _.AddPolicy("fixed", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+       partitionKey: httpContext.Connection.RemoteIpAddress.ToString(),
+       factory: partition => new FixedWindowRateLimiterOptions { PermitLimit = 25, Window = TimeSpan.FromSeconds(10) }));
+});
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -80,6 +86,7 @@ else
 }
 
 var supportedCultures = new[] { new CultureInfo("en-US") };
+
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en-US"),
@@ -90,6 +97,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 app.UseStatusCodePagesWithRedirects("/Error/{0}");
 
 app.UseHttpsRedirection();
+
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".glb"] = "model/gltf-binary";
 app.UseStaticFiles(new StaticFileOptions
@@ -100,7 +108,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAuthentication();
 app.UseRouting();
 app.UseAuthorization();
-
+app.UseRateLimiter();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

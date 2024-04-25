@@ -19,7 +19,7 @@
         <small>Something good for you belly</small>
     </header>
 
-    <div class="glassmorphism p-3 rounded">
+    <div class="glassmorphism p-3 rounded mt-3">
         @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id })
     </div>
 
@@ -32,7 +32,6 @@ else
     <div class="alert alert-danger" role="alert">
         <strong>Oh snap!</strong> Tour Not found.
     </div>
-
 }
 
 @section Scripts {

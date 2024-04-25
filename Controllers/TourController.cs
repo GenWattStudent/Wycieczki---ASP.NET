@@ -9,11 +9,13 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Book.App.Helpers;
 using Book.App.Filters.Exception;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
 [Authorize]
 [ServiceFilter(typeof(NotInAgencyExceptionFilter))]
+[EnableRateLimiting("fixed")]
 public class TourController : Controller
 {
     private readonly ITourService _tourService;

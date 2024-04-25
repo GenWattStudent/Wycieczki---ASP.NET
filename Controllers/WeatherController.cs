@@ -1,8 +1,10 @@
 using Book.App.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
+[EnableRateLimiting("fixed")]
 public class WeatherController : Controller
 {
     private readonly ILogger<WeatherController> _logger;

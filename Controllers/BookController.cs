@@ -3,10 +3,12 @@ using Book.App.Services;
 using Book.App.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
 [Authorize]
+[EnableRateLimiting("fixed")]
 public class BookController : Controller
 {
     private readonly IReservationService _bookService;

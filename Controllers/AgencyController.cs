@@ -7,9 +7,11 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 [ServiceFilter(typeof(NotInAgencyExceptionFilter))]
+[EnableRateLimiting("fixed")]
 public class AgencyController : Controller
 {
     private readonly IValidator<CreateAgencyViewModel> _validator;

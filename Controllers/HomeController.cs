@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Book.App.ViewModels;
 using Book.App.Services;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
 [Authorize]
+[EnableRateLimiting("fixed")]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

@@ -6,7 +6,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
+[EnableRateLimiting("fixed")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;

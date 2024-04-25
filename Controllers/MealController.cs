@@ -4,10 +4,12 @@ using Book.App.Services;
 using Book.App.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
 [ServiceFilter(typeof(NotInAgencyExceptionFilter))]
+[EnableRateLimiting("fixed")]
 public class MealController : Controller
 {
     private readonly ITourService _tourService;

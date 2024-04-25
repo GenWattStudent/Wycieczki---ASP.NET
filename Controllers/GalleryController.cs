@@ -3,10 +3,13 @@ using Book.App.Helpers;
 using Book.App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Book.App.Controllers;
 
 [ServiceFilter(typeof(NotInAgencyExceptionFilter))]
+[EnableRateLimiting("fixed")]
+
 public class GalleryController : Controller
 {
     private readonly ITourService _tourService;
@@ -65,6 +68,12 @@ public class GalleryController : Controller
     {
         if (!await _agencyService.IsUserInAgencyAsync(this.GetCurrentUserId(), agencyId)) throw new NotInAgencyException();
         await _imageService.Delete(id);
+
+        if (!string.IsNullOrEmpty(redirect))
+        {
+            return Redirect(redirect);
+        }
+
         return RedirectToAction(redirect ?? "Edit", new { id = tourId, agencyId });
     }
 }
