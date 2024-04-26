@@ -40,8 +40,9 @@
                 asp-action="Requests">
                 Agency Requests
             </a>
+            <div class="dropdown-divider" style="border-color: rgb(0, 101, 189);"></div>
         }
-        <div class="dropdown-divider" style="border-color: rgb(0, 101, 189);"></div>
+
         @if (Model.AgencyId != 0)
         {
             <a class="dropdown-item @Html.IsActive("Tour", "AddTour")" asp-area="" asp-controller="Tour"
@@ -53,9 +54,8 @@
                 asp-action="Details" asp-route-agencyId="@Model.AgencyId">
                 Agency
             </a>
+            <div class="dropdown-divider" style="border-color: rgb(0, 101, 189);"></div>
         }
-
-        <div class="dropdown-divider" style="border-color: rgb(0, 101, 189);"></div>
 
         <a class="dropdown-item @Html.IsActive("User", "UserInfo")" asp-action="UserInfo" asp-controller="User"
             data-toggle="tooltip" data-placement="bottom" title="@Model.Username">

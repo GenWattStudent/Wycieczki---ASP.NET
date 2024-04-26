@@ -29,10 +29,9 @@
                     </a>
                 </li>
 
-                <span class="devider-y"></span>
-
                 @if (Model.AgencyId != 0)
                 {
+                    <span class="devider-y"></span>
                     <li class="nav-item px-1">
                         <a class="nav-link text-light @Html.IsActive("Tour", "AddTour")" asp-area="" asp-controller="Tour"
                             asp-route-agencyId="@Model.AgencyId" asp-action="AddTour">
@@ -47,8 +46,9 @@
                             <span></span>
                         </a>
                     </li>
+                    <span class="devider-y"></span>
                 }
-                <span class="devider-y"></span>
+
 
                 @if (isAdmin)
                 {
