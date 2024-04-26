@@ -23,7 +23,7 @@
         @await Component.InvokeAsync("TourNav", new { tourId = Model.TourModel.Id })
     </div>
 
-    <section id="add-timeline">
+    <section id="add-timeline" class="glassmorphism p-3 rounded mt-3">
         <partial name="_MealTimeline" model="@timelineViewModel" />
     </section>
 }

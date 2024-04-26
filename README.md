@@ -6,7 +6,7 @@
 - Entity Framework
 - JQuery
 - Redis - cache weather data
-- Azure (SQL databse, Web app, key vault)
+- Azure (SQL databse, Web app, key vault, Redis for cache, CI with github actions)
 
 In bookmania you can create your account as Admin, or normal user. Users Can create agencies that Admin can accept or not. User that creates Agecy recives new role AgencyAdmin and can Edit agency info, add Tours etc. Users can also Filters see tours details and book tours. There is a simulation of tour so users can see progress of tour. Tours can have gallery, map (AgencyAdmin can draw route of the tour, add waypoionts and meals). You can also check weather in waypoint.
 App is responsive even for mobile.

@@ -9,10 +9,13 @@
     var tourController = Model.IsEdit ? "Tour" : "Book";
 
     var galleryAction = Model.IsEdit ? "Edit" : "Details";
+    var isGalleryDisabled = !Model.IsEdit && Model.TourModel.Images.Count == 0;
 
     var waypointAction = Model.IsEdit ? "Edit" : "MapView";
+    var isWaypointDisabled = !Model.IsEdit && Model.TourModel.Waypoints.Count == 0;
 
     var mealAction = Model.IsEdit ? "Add" : "Details";
+    var isMealDisabled = !Model.IsEdit && Model.TourModel.Meals.Count == 0;
 
     var waypointsAction = Model.IsEdit ? "EditWaypoints" : "WaypointsDetails";
 
@@ -23,18 +26,18 @@
                 asp-route-agencyId="@Model.TourModel.TravelAgencyId">Tour</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @Html.IsActive("Gallery", galleryAction)" asp-controller="Gallery"
-                asp-action="@galleryAction" asp-route-id="@Model.TourModel.Id"
+            <a class="nav-link @(isGalleryDisabled ? "disabled" : "") @Html.IsActive("Gallery", galleryAction)"
+                asp-controller="Gallery" asp-action="@galleryAction" asp-route-id="@Model.TourModel.Id"
                 asp-route-agencyId="@Model.TourModel.TravelAgencyId">Gallery</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @Html.IsActive("Waypoint", waypointAction)" asp-controller="Waypoint"
-                asp-action="@waypointAction" asp-route-agencyId="@Model.TourModel.TravelAgencyId"
-                asp-route-id="@Model.TourModel.Id">Map</a>
+            <a class="nav-link @(isWaypointDisabled ? "disabled" : "") @Html.IsActive("Waypoint", waypointAction)"
+                asp-controller="Waypoint" asp-action="@waypointAction" asp-route-agencyId="@Model.TourModel.TravelAgencyId"
+                asp-route-id="@Model.TourModel.Id" disabled>Map</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @Html.IsActive("Meal", mealAction) @Html.IsActive("Meal", "Edit")" asp-controller="Meal"
-                asp-action="@mealAction" asp-route-tourId="@Model.TourModel.Id"
+            <a class="nav-link @(isMealDisabled ? "disabled" : "") @Html.IsActive("Meal", mealAction) @Html.IsActive("Meal", "Edit")"
+                asp-controller="Meal" asp-action="@mealAction" asp-route-tourId="@Model.TourModel.Id"
                 asp-route-agencyId="@Model.TourModel.TravelAgencyId">Meal</a>
         </li>
 

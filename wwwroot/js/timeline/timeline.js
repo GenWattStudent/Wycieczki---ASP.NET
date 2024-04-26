@@ -111,8 +111,10 @@ class Timeline {
     if (this.breakInfo) this.breakInfo.setBreak()
   }
 
+  clamp = (num, min, max) => Math.min(Math.max(num, min), max)
+
   getDatePercent(start, end) {
-    const percent = (new Date() - start) / (end - start)
+    const percent = this.clamp((new Date() - start) / (end - start), -1, 1)
     return percent > 1 ? 1 : percent < 0 ? 1 + percent : percent
   }
 
@@ -163,7 +165,7 @@ class Timeline {
           const nextIndex = this.mealsModel.indexOf(nextMeal)
           const checkpointHeight = this.dots[nextIndex].offsetTop
           const percent = this.getDatePercent(new Date(nextMeal.start), new Date(nextMeal.end))
-          console.log($(`${this.parent} #timeline-progress`))
+
           return checkpointHeight * percent
         } else {
           console.log(this.timeLineProgress)

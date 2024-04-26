@@ -79,7 +79,22 @@
         crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            const footer = $("footer");
+            const main = $("#main");
 
+            function resizeMain() {
+                const footerPaddingY = parseInt(footer.css("padding-top")) + parseInt(footer.css("padding-bottom"));
+                const mainHeight = window.innerHeight - footer.height() - main.offset().top - footerPaddingY;
+                main.css("height", mainHeight);
+            }
+
+            resizeMain();
+
+            $(window).resize(resizeMain);
+        });
+    </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
@@ -104,22 +119,6 @@
         </script>
     }
 
-    <script>
-        $(document).ready(function () {
-            const footer = $("footer");
-            const main = $("#main");
-
-            function resizeMain() {
-                const footerPaddingY = parseInt(footer.css("padding-top")) + parseInt(footer.css("padding-bottom"));
-                const mainHeight = window.innerHeight - footer.height() - main.offset().top - footerPaddingY;
-                main.css("height", mainHeight);
-            }
-
-            resizeMain();
-
-            $(window).resize(resizeMain);
-        });
-    </script>
     <script>
         $(document).ready(function () {
             let isAutomaticScrolling = true;
@@ -183,7 +182,10 @@
                 $(window).on('touchmove', function (event) {
                     const end = event.originalEvent.changedTouches[ 0 ].clientX;
                     const distance = end - start;
-                    handleSidebar(distance);
+                    // if cursor is not hovering the #map element
+                    if ($(event.target).closest('#map').length === 0) {
+                        handleSidebar(distance);
+                    }
                 });
 
                 // Listen for the touchend event
@@ -207,7 +209,9 @@
                 $(window).on('mousemove', function (event) {
                     if (start == null) return;
                     const distance = event.clientX - start;
-                    handleSidebar(distance);
+                    if ($(event.target).closest('#map').length === 0) {
+                        handleSidebar(distance);
+                    }
                 });
 
                 // Listen for the mouseup event
