@@ -50,7 +50,7 @@ else
         }
         @using (Html.BeginForm("Update", "Agency", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
-            <partial name="_AgencyForm" model="@Model" />
+            <partial name="_AgencyForm" model="@Model.CreateAgencyViewModel" />
             <button type="submit" class="btn btn-primary">Update</button>
         }
 

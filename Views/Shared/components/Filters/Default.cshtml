@@ -1,100 +1,102 @@
 @using Book.App.Models
 @model FilterModel
 
-<a class="btn btn-primary mb-3" data-toggle="collapse" href="#Filters" role="button" aria-expanded="false"
-    aria-controls="collapseExample">
-    Filters
-</a>
+<div>
+    <a class="btn btn-primary mb-3" data-toggle="collapse" href="#Filters" role="button" aria-expanded="false"
+        aria-controls="collapseExample">
+        Filters
+    </a>
 
-<div class="collapse mb-3" id="Filters">
-    <div class="card card-body glassmorphism">
-        @using (Html.BeginForm("Tours", "Tour", FormMethod.Get))
-        {
-            <label for="searchString">Search Title</label>
-            <div class="input-group mt-1 d-flex flex-column">
-                @Html.TextBoxFor(model => model.SearchString, new
-                    {
-                        @class = "form-control w-100",
-                        placeholder = "Search title",
-                    })
-            </div>
+    <div class="collapse mb-3" id="Filters">
+        <div class="card card-body glassmorphism">
+            @using (Html.BeginForm("Tours", "Tour", FormMethod.Get))
+            {
+                <label for="searchString">Search Title</label>
+                <div class="input-group mt-1 d-flex flex-column">
+                    @Html.TextBoxFor(model => model.SearchString, new
+                        {
+                            @class = "form-control w-100",
+                            placeholder = "Search title",
+                        })
+                </div>
 
-            <div class="d-flex justify-content-between mt-1">
-                <div>
-                    <label for="minPrice">Min Price</label>
+                <div class="d-flex justify-content-between mt-1">
+                    <div>
+                        <label for="minPrice">Min Price</label>
 
-                    <div class="input-group mt-1 d-flex flex-column">
-                        @Html.TextBoxFor(model => model.MinPrice, new
-                            {
-                                @class = "form-control w-100",
-                                placeholder = "Min price",
-                            })
-                        @Html.ValidationMessageFor(model => model.MinPrice, "", new
-                            {
-                                @class = "field-validation-error text-danger"
-                            })
+                        <div class="input-group mt-1 d-flex flex-column">
+                            @Html.TextBoxFor(model => model.MinPrice, new
+                                {
+                                    @class = "form-control w-100",
+                                    placeholder = "Min price",
+                                })
+                            @Html.ValidationMessageFor(model => model.MinPrice, "", new
+                                {
+                                    @class = "field-validation-error text-danger"
+                                })
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="maxPrice">Max Price</label>
+                        <div class="input-group mt-1 d-flex flex-column">
+                            @Html.TextBoxFor(model => model.MaxPrice, new
+                                {
+                                    @class = "form-control w-100",
+                                    placeholder = "Max price",
+                                })
+                            @Html.ValidationMessageFor(model => model.MaxPrice, "", new
+                                {
+                                    @class = "field-validation-error text-danger"
+                                })
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label for="maxPrice">Max Price</label>
-                    <div class="input-group mt-1 d-flex flex-column">
-                        @Html.TextBoxFor(model => model.MaxPrice, new
-                            {
-                                @class = "form-control w-100",
-                                placeholder = "Max price",
-                            })
-                        @Html.ValidationMessageFor(model => model.MaxPrice, "", new
-                            {
-                                @class = "field-validation-error text-danger"
-                            })
-                    </div>
-                </div>
-            </div>
+                <div class="d-flex gap-4 mt-2">
+                    <div>
+                        <span class="mt-1 mb-1">Sort By</span>
+                        @(Model.OrderBy == OrderBy.Price)
+                        <div class="form-check">
 
-            <div class="d-flex gap-4 mt-2">
-                <div>
-                    <span class="mt-1 mb-1">Sort By</span>
-                    @(Model.OrderBy == OrderBy.Price)
-                    <div class="form-check">
-
-                        <input type="radio" name="OrderBy" value="date" id="date" class="form-check-input"
-                             @(Model.OrderBy == OrderBy.Date ? "checked=\"checked\"" : "") />
-                        <label class="form-check-label" for="date">Date</label>
+                            <input type="radio" name="OrderBy" value="date" id="date" class="form-check-input"
+                            @(Model.OrderBy == OrderBy.Date ? "checked=\"checked\"" : "") />
+                            <label class="form-check-label" for="date">Date</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="OrderBy" value="price" id="price" class="form-check-input"
+                            @(Model.OrderBy == OrderBy.Price ? "checked=\"checked\"" : "") />
+                            <label class="form-check-label" for="price">Price</label>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input type="radio" name="OrderBy" value="price" id="price" class="form-check-input"
-                             @(Model.OrderBy == OrderBy.Price ? "checked=\"checked\"" : "") />
-                        <label class="form-check-label" for="price">Price</label>
-                    </div>
-                </div>
 
-                <div>
-                    <span class="mt-1 mb-1">Sort Order</span>
-                    <div class="form-check">
-                        <input type="radio" name="OrderDirection" value="asc" id="asc" class="form-check-input"
+                    <div>
+                        <span class="mt-1 mb-1">Sort Order</span>
+                        <div class="form-check">
+                            <input type="radio" name="OrderDirection" value="asc" id="asc" class="form-check-input"
                             @(Model.OrderDirection == OrderDirection.Asc ? "checked=\"checked\"" : "") />
-                        <label class="form-check-label" for="asc">
-                            Asc
-                        </label>
-                    </div>
+                            <label class="form-check-label" for="asc">
+                                Asc
+                            </label>
+                        </div>
 
-                    <div class="form-check">
-                        <input type="radio" name="OrderDirection" value="desc" id="desc" class="form-check-input"
+                        <div class="form-check">
+                            <input type="radio" name="OrderDirection" value="desc" id="desc" class="form-check-input"
                             @(Model.OrderDirection == OrderDirection.Desc ? "checked=\"checked\"" : "") />
-                        <label class="form-check-label" for="desc">
-                            Desc
-                        </label>
+                            <label class="form-check-label" for="desc">
+                                Desc
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            @Html.HiddenFor(model => model.Page)
-            @Html.HiddenFor(model => model.PageSize)
+                @Html.HiddenFor(model => model.Page)
+                @Html.HiddenFor(model => model.PageSize)
 
-            <div class="mt-2">
-                <input type="submit" value="Filter" class="btn btn-primary" />
-            </div>
-        }
+                <div class="mt-2">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </div>
+            }
+        </div>
     </div>
 </div>

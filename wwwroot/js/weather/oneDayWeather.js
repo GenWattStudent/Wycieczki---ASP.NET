@@ -28,13 +28,14 @@ $(document).ready(function () {
       },
       error: function () {
         toastr.error('Weather data not fetched.')
+        $('#weather-box').addClass('d-none')
       },
     })
   }
 
   function error() {
     // toastr.error('Some services are not available without location permission.')
-    $('#weather-card').addClass('d-none')
+    $('#weather-box').addClass('d-none')
   }
 
   navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true })

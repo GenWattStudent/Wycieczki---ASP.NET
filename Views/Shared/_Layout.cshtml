@@ -28,9 +28,9 @@
 
 <body class="background">
     <header id="nav">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm glass-2 border-bottom box-shadow mb-1 d-block">
-            <div class="container-fluid">
-                <a class=" navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
+        <nav class="navbar-expand-sm navbar-toggleable-sm glass-2 border-bottom box-shadow d-block">
+            <div class="container-fluid d-flex justify-content-between px-2">
+                <a class="navbar-brand font-weight-bold text-light" asp-area="" asp-controller="Home"
                     asp-action="Index">
                     <img class="rounded me-2" style="width: 50px;height:50px;" src="~/images/booklogo.png" alt="logo" />
                     Bookmania
@@ -45,7 +45,8 @@
     </header>
 
     <div class="d-flex gap-3 p-3" style="overflow: hidden;" id="main">
-        <div id="sidebar" class="d-block w-100" style="left: 0rem; top: 0rem; max-width: 350px;overflow-y: auto;">
+        <div id="sidebar" class="d-block w-100 small"
+            style="position: fixed; z-index: 100; left: -100%; transform: translateX(-50%); max-width: 350px;overflow-y: auto;">
             <div class="overlay"></div>
             <div id="clock" class="glassmorphism p-3 rounded d-flex align-items-center gap-2 text-primary">
                 <ion-icon id="time-icon"></ion-icon>
@@ -54,7 +55,7 @@
             </div>
 
             @await Component.InvokeAsync("MealTimeline")
-            <div class="glassmorphism p-3 rounded mt-3">
+            <div id="weather-box" class="glassmorphism p-3 rounded mt-3">
                 <partial name="_CurrentUserWeather" />
             </div>
         </div>
@@ -66,8 +67,8 @@
         </div>
     </div>
 
-    <footer class="border-top footer glassmorphism">
-        <div class="container">
+    <footer class="border-top glassmorphism p-2">
+        <div class="contaner">
             &copy; @(DateTime.Now.Year) - Bookmania - All rights reserved
         </div>
     </footer>
@@ -107,9 +108,16 @@
         $(document).ready(function () {
             const footer = $("footer");
             const main = $("#main");
-            const mainHeight = window.innerHeight - footer.height() - main.offset().top;
 
-            main.css("height", mainHeight);
+            function resizeMain() {
+                const footerPaddingY = parseInt(footer.css("padding-top")) + parseInt(footer.css("padding-bottom"));
+                const mainHeight = window.innerHeight - footer.height() - main.offset().top - footerPaddingY;
+                main.css("height", mainHeight);
+            }
+
+            resizeMain();
+
+            $(window).resize(resizeMain);
         });
     </script>
     <script>

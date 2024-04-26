@@ -18,9 +18,13 @@
 </div>
 
 <div class="d-flex gap-3">
+
+    <span class="glassmorphism p-2 rounded d-block mb-3" style="width: fit-content; align-self: flex-start;">
+        Results:
+        <strong>@Model.TotalItems</strong>
+    </span>
+
     @await Component.InvokeAsync("Filters", new { filter = Model.FilterModel })
-    <span class="glassmorphism p-2 rounded d-block mb-3" style="width: fit-content;">Total tours:
-        @Model.TotalItems</span>
 </div>
 <partial name="_TourPagination" model="Model" />
 
